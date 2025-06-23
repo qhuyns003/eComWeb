@@ -25,11 +25,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    User customer;
-
-    @ManyToOne
-    @JoinColumn(name = "shop_id")
-    Shop shop;
+    User user;
 
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL)
