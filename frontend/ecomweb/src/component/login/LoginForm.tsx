@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { login } from '../../api/api';
+import { login, getMyInfo } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
+import { setUser } from '../../store/features/userSlice';
 
 interface LoginFormProps {
   onSubmit?: (username: string, password: string) => void;
@@ -11,16 +13,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (onSubmit) onSubmit(username, password);
-    setLoading(true);
+    setLoading(true); // việc re-render không làm ngắt hàm đang chạy, nên có thể re-render trong lúc chờ api
     try {
-      const res = await login(username, password);
-      const token = res.data.result.token;
+      const res = await login(username, password); // giao dien có thể rerender trong lúc chờ api
+      const token = res.data.result.token; 
       localStorage.setItem('token', token);
-      alert('Đăng nhập thành công!');
+    
+      // Lấy thông tin user và cập nhật Redux store
+      const userRes = await getMyInfo(token);
+  
+      dispatch(setUser(userRes.data.result));
+      
+      
       navigate('/');
     } catch (err: any) {
       alert(err?.response?.data?.message || 'Đăng nhập thất bại!');
@@ -60,7 +69,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
             <div className="text-right pt-1">
               <a className="text-[#cc3333] hover:underline text-sm font-medium transition" href="#">Quên mật khẩu?</a>
             </div>
-            <button type="submit" className="w-full bg-[#cc3333] py-3 rounded-full text-white font-semibold text-base shadow hover:bg-[#b82d2d] transition mb-2 disabled:opacity-60" disabled={loading}>
+            <button type="submit" className="w-full text-white bg-[#cc3333] hover:bg-[#b82d2d] focus:ring-4 focus:outline-none focus:ring-[#f05252] font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-60" disabled={loading}>
               {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
           </form>
@@ -79,8 +88,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
               Đăng nhập với Google
             </button>
           </div>
-          <p className="text-center mt-7 text-gray-500 text-sm">
-            Chưa có tài khoản? <a href="#" className="text-[#cc3333] font-semibold hover:underline transition">Đăng ký ngay</a>
+          <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+            Chưa có tài khoản? <a href="/register" className="font-medium text-[#cc3333] hover:underline">Đăng ký ngay</a>
           </p>
         </div>
       </div>

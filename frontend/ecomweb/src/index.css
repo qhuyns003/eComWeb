@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dropdown menu animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Custom scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Animation for fade-in */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Swiper custom styles for Product Detail */
+.nav-for-slider .swiper-slide {
+    height: auto;
+    width: auto;
+    cursor: pointer;
+}
+
+.swiper-wrapper {
+    height: auto;
+}
+
+.nav-for-slider .swiper-slide img {
+    border: 2px solid transparent;
+    border-radius: 10px;
+    height: 80px;
+    width: 80px;
+    object-fit: cover;
+}
+
+.nav-for-slider .swiper-slide-thumb-active img {
+    border-color: #cc3333;
+}

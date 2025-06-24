@@ -37,6 +37,9 @@ public class UserService {
     PasswordEncoder passwordEncoder;
 
     public UserResponse createUser(UserCreationRequest request) {
+        if(!request.getPassword().equals(request.getConfirmPassword())){
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 

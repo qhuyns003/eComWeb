@@ -24,9 +24,10 @@ public class User {
     String username;
 
     String password;
-    String firstName;
     LocalDate dob;
-    String lastName;
+    String fullName;
+    String email;
+    String phone;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     List<UserCoupon> UserCoupons;

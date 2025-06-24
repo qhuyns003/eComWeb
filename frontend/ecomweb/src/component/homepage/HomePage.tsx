@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
+import UserMenu from "./UserMenu";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../store/hooks";
+import { selectUser } from "../../store/features/userSlice";
 
 const services = [
   { icon: "💸", label: "Ưu đãi mỗi ngày" },
@@ -22,15 +25,15 @@ const categories = [
 
 const banners = [
   {
-    img: "https://images.unsplash.com/photo-1515168833906-d2a3b82b3029?auto=format&fit=crop&w=1200&q=80",
+    img: "/360_F_465465254_1pN9MGrA831idD6zIBL7q8rnZZpUCQTy.jpg",
     alt: "Banner 1"
   },
   {
-    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+    img: "/867pIkbEsTAIq.png!w700wp",
     alt: "Banner 2"
   },
   {
-    img: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1200&q=80",
+    img: "/grocery-sale-retail-or-e-commerce-banner-ad-design-template-67720435bb809be27f46dfb1dd44c6fa_screen.jpg",
     alt: "Banner 3"
   },
 ];
@@ -39,6 +42,7 @@ export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bannerIdx, setBannerIdx] = useState(0);
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
 
   // Auto slide
   useEffect(() => {
@@ -64,8 +68,24 @@ export default function HomePage() {
         </form>
 
         <div className="flex gap-3">
-          <button className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow">Đăng ký</button>
-          <button className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow" onClick={() => navigate("/login")}>Đăng nhập</button>
+          {user ? (
+            <UserMenu />
+          ) : (
+            <>
+              <button
+                className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow"
+                onClick={() => navigate('/register')}
+              >
+                Đăng ký
+              </button>
+              <button
+                className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow"
+                onClick={() => navigate('/login')}
+              >
+                Đăng nhập
+              </button>
+            </>
+          )}
         </div>
 
         <button
@@ -153,6 +173,7 @@ export default function HomePage() {
           {Array.from({ length: 8 }).map((_, idx) => (
             <ProductCard
               key={idx}
+              productId={idx + 1}
               image={`https://picsum.photos/seed/new${idx}/220/220`}
               alt={`Hàng mới ${idx + 1}`}
               name={`Sản phẩm mới ${idx + 1}`}
@@ -168,6 +189,7 @@ export default function HomePage() {
           {Array.from({ length: 8 }).map((_, idx) => (
             <ProductCard
               key={idx}
+              productId={idx + 9}
               image={`https://picsum.photos/seed/top${idx}/220/220`}
               alt={`Top bán chạy ${idx + 1}`}
               name={`Sản phẩm hot ${idx + 1}`}
