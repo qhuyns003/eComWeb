@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -16,7 +18,9 @@ public class ProductAttribute {
     String id;
 
     String name;
-    String value;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productAttribute", cascade = CascadeType.ALL)
+    List<DetailAttribute> detailAttributes;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

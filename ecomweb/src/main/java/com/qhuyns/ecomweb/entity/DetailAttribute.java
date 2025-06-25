@@ -10,15 +10,14 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductImage {
+public class DetailAttribute {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    String url;
-    Boolean isMain;
+    String name;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
-} 
+    @JoinColumn(name = "product_attribute_id")
+    ProductAttribute productAttribute;
+}
