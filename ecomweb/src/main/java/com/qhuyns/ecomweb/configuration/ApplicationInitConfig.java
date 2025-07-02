@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 @Configuration
@@ -52,7 +53,7 @@ public class ApplicationInitConfig {
                         .description("Admin role")
                         .build());
 
-                var roles = new HashSet<Role>();
+                var roles = new ArrayList<Role>();
                 roles.add(adminRole);
 
                 User user = User.builder()

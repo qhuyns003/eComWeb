@@ -3,6 +3,8 @@ package com.qhuyns.ecomweb.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,6 +20,9 @@ public class ActivityLog {
 
     String action;
     String target;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     LocalDateTime createdAt;
 
     @ManyToOne

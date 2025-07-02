@@ -22,8 +22,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     try {
       const res = await login(username, password); // giao dien có thể rerender trong lúc chờ api
       const token = res.data.result.token; 
+      const role = res.data.result.role;
       localStorage.setItem('token', token);
-    
+      localStorage.setItem('role', role);
       // Lấy thông tin user và cập nhật Redux store
       const userRes = await getMyInfo(token);
   

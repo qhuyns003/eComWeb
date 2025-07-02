@@ -4,6 +4,10 @@ import UserMenu from "./UserMenu";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
+import { getCategories, getTopSellingProducts, getNewestProducts } from "../../api/api";
+import Header from "../layout/Header";
+import Footer from "../layout/Footer";
+import CompanyMarquee from "./CompanyMarquee";
 
 const services = [
   { icon: "💸", label: "Ưu đãi mỗi ngày" },
@@ -12,16 +16,25 @@ const services = [
   { icon: "🎁", label: "Quà tặng hấp dẫn" },
 ];
 
-const categories = [
-  { name: "Thời Trang", icon: "👗" },
-  { name: "Điện Thoại", icon: "📱" },
-  { name: "Laptop", icon: "💻" },
-  { name: "Đồng Hồ", icon: "⌚" },
-  { name: "Giày Dép", icon: "👟" },
-  { name: "Gia Dụng", icon: "🍳" },
-  { name: "Thể Thao", icon: "🏀" },
-  { name: "Xe Máy", icon: "🛵" },
-];
+type Category = {
+  id: number;
+  name: string;
+};
+
+type ProductOverviewResponse = {
+  id: string;
+  name: string;
+  price: number;
+  images: Array<{
+    id: string;
+    url: string;
+    isMain: boolean;
+  }>;
+  rating: number;
+  numberOfOrder: string;
+};
+
+const MAX_VISIBLE = 8;
 
 const banners = [
   {
@@ -43,6 +56,10 @@ export default function HomePage() {
   const [bannerIdx, setBannerIdx] = useState(0);
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [topSellingProducts, setTopSellingProducts] = useState<ProductOverviewResponse[]>([]);
+  const [newestProducts, setNewestProducts] = useState<ProductOverviewResponse[]>([]);
 
   // Auto slide
   useEffect(() => {
@@ -52,80 +69,79 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, [bannerIdx]);
 
+  useEffect(() => {
+    getCategories()
+      .then((res) => setCategories(res.data.result))
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    getTopSellingProducts(8)
+      .then((res) => setTopSellingProducts(res.data.result))
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    getNewestProducts(8)
+      .then(res => setNewestProducts(res.data.result))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <>
-      <nav className="h-[70px] relative w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-30 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all">
-        <a href="#">
-          <img className="h-9" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/dummyLogo/dummyLogoWhite.svg" alt="dummyLogoWhite" />
-        </a>
-
-        <form className="flex items-center border pl-4 gap-2 bg-white border-gray-500/30 h-[46px] rounded-full overflow-hidden max-w-md w-full">
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="#6B7280">
-            <path d="M13 3C7.489 3 3 7.489 3 13s4.489 10 10 10a9.95 9.95 0 0 0 6.322-2.264l5.971 5.971a1 1 0 1 0 1.414-1.414l-5.97-5.97A9.95 9.95 0 0 0 23 13c0-5.511-4.489-10-10-10m0 2c4.43 0 8 3.57 8 8s-3.57 8-8 8-8-3.57-8-8 3.57-8 8-8"/>
-          </svg>
-          <input type="text" className="w-full h-full outline-none text-sm text-gray-500" placeholder="Tìm kiếm sản phẩm..." />
-          <button type="submit" className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white mr-[5px] hover:bg-[#b82d2d] transition">Search</button>
-        </form>
-
-        <div className="flex gap-3">
-          {user ? (
-            <UserMenu />
-          ) : (
-            <>
-              <button
-                className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow"
-                onClick={() => navigate('/register')}
-              >
-                Đăng ký
-              </button>
-              <button
-                className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow"
-                onClick={() => navigate('/login')}
-              >
-                Đăng nhập
-              </button>
-            </>
-          )}
-        </div>
-
-        <button
-          aria-label="menu-btn"
-          type="button"
-          className="menu-btn inline-block md:hidden active:scale-90 transition bg-[#cc3333] p-2 rounded"
-          onClick={() => setMobileOpen((v) => !v)}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="#fff">
-            <path d="M3 7a1 1 0 1 0 0 2h24a1 1 0 1 0 0-2zm0 7a1 1 0 1 0 0 2h24a1 1 0 1 0 0-2zm0 7a1 1 0 1 0 0 2h24a1 1 0 1 0 0-2z" />
-          </svg>
-        </button>
-
-        {mobileOpen && (
-          <div className="mobile-menu absolute top-[70px] left-0 w-full bg-gradient-to-r from-[#cc3333] to-pink-500 p-6 md:hidden animate-fade-in z-40">
-            <ul className="flex flex-col space-y-4 text-white text-lg">
-              <li><a href="#" className="text-sm">Home</a></li>
-              <li><a href="#" className="text-sm">Services</a></li>
-              <li><a href="#" className="text-sm">Portfolio</a></li>
-              <li><a href="#" className="text-sm">Pricing</a></li>
-            </ul>
-            <button type="button" className="bg-[#cc3333] text-white mt-6 inline md:hidden text-sm hover:bg-[#b82d2d] active:scale-95 transition-all w-40 h-11 rounded-full shadow">
-              Get started
-            </button>
-          </div>
-        )}
-      </nav>
+      <Header />
       {/* Category bar dưới header */}
-      <div className="w-full bg-white shadow-sm px-4 md:px-16 lg:px-24 xl:px-32 py-2 border-b border-gray-100">
+      <div className="w-full bg-white shadow-sm px-4 md:px-16 lg:px-24 xl:px-32 py-2 border-b border-gray-100 relative">
         <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 pb-1">
-          {categories.map((cat) => (
+          {(showAllCategories ? categories : categories.slice(0, MAX_VISIBLE)).map((cat) => (
             <button
-              key={cat.name}
+              key={cat.id}
               className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-gray-700 hover:bg-[#cc3333] hover:text-white transition whitespace-nowrap shadow-sm min-w-[110px] justify-center"
             >
-              <span className="text-lg">{cat.icon}</span>
+            
               <span className="text-sm font-medium">{cat.name}</span>
             </button>
           ))}
+          {categories.length > MAX_VISIBLE && !showAllCategories && (
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#cc3333] text-white font-semibold border-2 border-[#cc3333] shadow-lg min-w-[110px] justify-center hover:bg-[#b82d2d] transition"
+              onClick={() => setShowAllCategories(true)}
+            >
+              <span className="text-sm font-medium">Xem thêm</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
         </div>
+        {/* Dropdown toàn bộ category */}
+        {showAllCategories && (
+          <div className="absolute left-0 w-full bg-white shadow-lg rounded p-4 z-50 top-full mt-2 flex flex-wrap gap-2">
+            {/* Nút Đóng nổi bật */}
+            <button
+              className="absolute top-2 right-4 bg-[#cc3333] text-white rounded-full p-2 shadow-lg z-50 hover:bg-[#b82d2d] transition"
+              onClick={() => setShowAllCategories(false)}
+              aria-label="Đóng"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-gray-700 hover:bg-[#cc3333] hover:text-white transition whitespace-nowrap shadow-sm min-w-[110px] justify-center"
+              >
+               
+                <span className="text-sm font-medium">{cat.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {/* Banner carousel */}
       <div className="w-full flex justify-center bg-white py-6">
@@ -170,14 +186,15 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto py-8 px-4">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Hàng mới</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, idx) => (
+          {newestProducts.map(product => (
             <ProductCard
-              key={idx}
-              productId={idx + 1}
-              image={`https://picsum.photos/seed/new${idx}/220/220`}
-              alt={`Hàng mới ${idx + 1}`}
-              name={`Sản phẩm mới ${idx + 1}`}
-              price={`${(199000 + idx * 10000).toLocaleString()}₫`}
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={Number(product.price)}
+              images={product.images}
+              rating={Number(product.rating)}
+              numberOfOrder={Number(product.numberOfOrder)}
             />
           ))}
         </div>
@@ -186,52 +203,21 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto py-8 px-4">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Top bán chạy</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, idx) => (
+          {topSellingProducts.map((product) => (
             <ProductCard
-              key={idx}
-              productId={idx + 9}
-              image={`https://picsum.photos/seed/top${idx}/220/220`}
-              alt={`Top bán chạy ${idx + 1}`}
-              name={`Sản phẩm hot ${idx + 1}`}
-              price={`${(299000 + idx * 15000).toLocaleString()}₫`}
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={Number(product.price)}
+              images={product.images}
+              rating={Number(product.rating)}
+              numberOfOrder={Number(product.numberOfOrder)}
             />
           ))}
         </div>
       </section>
-      {/* Footer */}
-      <footer className="px-6 md:px-16 lg:px-24 xl:px-32 pt-8 w-full text-gray-100 bg-[#cc3333]">
-        <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-[#fff]/30 pb-6">
-          <div className="md:max-w-96">
-            <img className="h-9" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/dummyLogo/dummyLogoWhite.svg" alt="dummyLogoDark" />
-            <p className="mt-6 text-sm text-gray-100/90">
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-              when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-            </p>
-          </div>
-          <div className="flex-1 flex items-start md:justify-end gap-20">
-            <div>
-              <h2 className="font-semibold mb-5 text-white">Company</h2>
-              <ul className="text-sm space-y-2">
-                <li><a href="#" className="hover:text-pink-200 transition">Home</a></li>
-                <li><a href="#" className="hover:text-pink-200 transition">About us</a></li>
-                <li><a href="#" className="hover:text-pink-200 transition">Contact us</a></li>
-                <li><a href="#" className="hover:text-pink-200 transition">Privacy policy</a></li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="font-semibold mb-5 text-white">Get in touch</h2>
-              <div className="text-sm space-y-2">
-                <p>+1-212-456-7890</p>
-                <p>contact@example.com</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <p className="pt-4 text-center text-xs md:text-sm pb-5 text-gray-100/80">
-          Copyright 2024 © Company name. All Right Reserved.
-        </p>
-      </footer>
+      <CompanyMarquee />
+      <Footer />
     </>
   );
 } 

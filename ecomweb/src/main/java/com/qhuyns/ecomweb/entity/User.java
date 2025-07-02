@@ -35,13 +35,13 @@ public class User {
     List<Cart> carts;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     List<ShopReview> shopReviews;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    List<CustomerReview> customerReviews;
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+//    List<CustomerReview> customerReviews;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     List<Order> orders;
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     Shop shop;
 
     @ManyToMany
-    Set<Role> roles;
+    List<Role> roles;
 }

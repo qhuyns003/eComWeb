@@ -44,10 +44,10 @@ public class SecurityConfig {
                             return config;
                         })
                 )
-                .authorizeHttpRequests(request -> request
-
-                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
-                .permitAll()
+                .authorizeHttpRequests(request -> request // nếu không yêu cầu token mà vẫn nhét token vào sẽ bị unauthorize
+                        .requestMatchers(HttpMethod.GET, API_URL.URL_ANONYMOUS_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, API_URL.URL_ANONYMOUS_POST).permitAll()
+                        .requestMatchers(HttpMethod.PUT, API_URL.URL_ANONYMOUS_PUT).permitAll()
                 .anyRequest()
                 .authenticated());
 

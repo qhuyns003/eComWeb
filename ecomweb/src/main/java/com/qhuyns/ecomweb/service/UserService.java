@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        HashSet<Role> roles = new HashSet<>();
+        List<Role> roles = new ArrayList<>();
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
         user.setRoles(roles);
@@ -74,7 +75,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         var roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(new HashSet<>(roles));
+        user.setRoles(new ArrayList<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

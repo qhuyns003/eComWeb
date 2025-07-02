@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,6 +25,11 @@ public class OrderItem {
     Order order;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
+    @JoinColumn(name = "product_variant_id")
+    ProductVariant productVariant;
+
+
+    @OneToOne
+    @JoinColumn(name = "customer_review_id")
+    private CustomerReview customerReview;
 } 

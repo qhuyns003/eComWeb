@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,4 +22,7 @@ public class DetailAttribute {
     @ManyToOne
     @JoinColumn(name = "product_attribute_id")
     ProductAttribute productAttribute;
+
+    @ManyToMany(mappedBy = "detailAttributes")
+    List<ProductVariant> productVariants;
 }

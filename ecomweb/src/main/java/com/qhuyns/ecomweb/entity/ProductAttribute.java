@@ -19,10 +19,12 @@ public class ProductAttribute {
 
     String name;
 
+
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productAttribute", cascade = CascadeType.ALL)
     List<DetailAttribute> detailAttributes;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
+    @ManyToMany(mappedBy = "productAttributes")
+    List<Product> products;
+
 } 

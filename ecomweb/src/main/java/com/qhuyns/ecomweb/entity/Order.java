@@ -3,6 +3,8 @@ package com.qhuyns.ecomweb.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +23,9 @@ public class Order {
 
     String status;
     BigDecimal total;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     LocalDateTime createdAt;
 
     @ManyToOne
@@ -30,6 +35,8 @@ public class Order {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL)
     List<OrderItem> orderItems;
+    @Enumerated(EnumType.STRING)
     Shipment shipment;
+    @Enumerated(EnumType.STRING)
     Payment payment;
 } 

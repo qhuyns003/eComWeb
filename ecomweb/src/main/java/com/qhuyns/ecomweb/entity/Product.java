@@ -3,6 +3,8 @@ package com.qhuyns.ecomweb.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -22,8 +24,10 @@ public class Product {
     String name;
     String description;
     BigDecimal price;
-    int stock;
     String status;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     LocalDateTime createdAt;
 
     @ManyToOne
@@ -38,11 +42,14 @@ public class Product {
     List<ProductImage> images;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
-    List<ProductAttribute> attributes;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Cart> carts;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "product", cascade = CascadeType.ALL)
-    private List<CustomerReview> customerReviews;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "product", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems;
+    List<ProductVariant> productVariants;
+//    @OneToMany(fetch = FetchType.LAZY,mappedBy = "product", cascade = CascadeType.ALL)
+//    private List<Cart> carts;
+
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_attribute_id")
+    )
+    List<ProductAttribute> productAttributes;
 } 

@@ -54,10 +54,12 @@ export const logoutUser = createAsyncThunk(
         await logoutApi(token);
       }
       localStorage.removeItem('token');
+      localStorage.removeItem('role');
       return null;
     } catch (error: any) {
       // Bỏ qua lỗi khi logout, vẫn xóa token
       localStorage.removeItem('token');
+      localStorage.removeItem('role');
       return null;
     }
   }
