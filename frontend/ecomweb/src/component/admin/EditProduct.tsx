@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getProductDetailForEdit, getCategories, updateProduct } from '../../api/api';
+import { getProductDetailForEdit, getCategories, updateProduct, uploadProductImage, deleteProductImage } from '../../api/api';
 
 // Các interface mở rộng theo dữ liệu thực tế
 interface ProductImage {
@@ -23,6 +23,7 @@ interface ProductVariant {
   detailAttributes: DetailAttribute[];
   image?: ProductImage;
   enabled?: boolean;
+  status?: string; // '1': bán, '0': không bán
 }
 interface Category {
   id: string;
@@ -57,7 +58,12 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
     setLoading(true);
     getProductDetailForEdit(productId)
       .then(res => {
-        setProduct(res.data.result);
+        const prod = res.data.result;
+        prod.productVariants = prod.productVariants.map((v: any) => ({
+          ...v,
+          enabled: v.status === '1'
+        }));
+        setProduct(prod);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -95,9 +101,16 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
       images: [...product.images, { id: Date.now().toString(), url: '/vite.svg', isMain: false }]
     });
   };
-  const handleRemoveImage = (id: string) => {
+  const handleRemoveImage = async (id: string) => {
     if (!product) return;
-    setProduct({ ...product, images: product.images.filter(img => img.id !== id) });
+    const img = product.images.find(img => img.id === id);
+    if (!img) return;
+    try {
+      await deleteProductImage(img.url); // Gọi API xóa ảnh theo url
+      setProduct({ ...product, images: product.images.filter(img => img.id !== id) });
+    } catch (error) {
+      alert('Xóa ảnh thất bại!');
+    }
   };
   const handleSetMainImage = (id: string) => {
     if (!product) return;
@@ -108,77 +121,33 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
   };
 
   // Handler cho thuộc tính (attributes)
-  const handleAddAttribute = () => {
-    if (!product) return;
-    setProduct({
-      ...product,
-      productAttributes: [...product.productAttributes, { id: Date.now().toString(), name: '', detailAttributes: [] }]
-    });
-  };
-  const handleRemoveAttribute = (attrId: string) => {
-    if (!product) return;
-    setProduct({
-      ...product,
-      productAttributes: product.productAttributes.filter(attr => attr.id !== attrId)
-    });
-  };
-  const handleAttributeNameChange = (attrId: string, value: string) => {
-    if (!product) return;
-    setProduct({
-      ...product,
-      productAttributes: product.productAttributes.map(attr =>
-        attr.id === attrId ? { ...attr, name: value } : attr
-      )
-    });
-  };
+  const createTempId = () => `temp_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+  const handleAddAttribute = () => {};
+  const handleRemoveAttribute = () => {};
+  const handleAttributeNameChange = () => {};
   // Handler cho detailAttributes
-  const handleAddDetailAttribute = (attrId: string) => {
-    if (!product) return;
-    setProduct({
-      ...product,
-      productAttributes: product.productAttributes.map(attr =>
-        attr.id === attrId
-          ? { ...attr, detailAttributes: [...attr.detailAttributes, { id: Date.now().toString(), name: '' }] }
-          : attr
-      )
-    });
-  };
-  const handleRemoveDetailAttribute = (attrId: string, detailId: string) => {
-    if (!product) return;
-    setProduct({
-      ...product,
-      productAttributes: product.productAttributes.map(attr =>
-        attr.id === attrId
-          ? { ...attr, detailAttributes: attr.detailAttributes.filter(d => d.id !== detailId) }
-          : attr
-      )
-    });
-  };
-  const handleDetailAttributeNameChange = (attrId: string, detailId: string, value: string) => {
-    if (!product) return;
-    setProduct({
-      ...product,
-      productAttributes: product.productAttributes.map(attr =>
-        attr.id === attrId
-          ? {
-              ...attr,
-              detailAttributes: attr.detailAttributes.map(d =>
-                d.id === detailId ? { ...d, name: value } : d
-              )
-            }
-          : attr
-      )
-    });
-  };
+  const handleAddDetailAttribute = () => {};
+  const handleRemoveDetailAttribute = () => {};
+  const handleDetailAttributeNameChange = () => {};
 
   // Handler cho variants (chỉ demo chỉnh sửa giá, stock, bật/tắt)
   const handleVariantChange = (variantId: string, field: string, value: any) => {
     if (!product) return;
     setProduct({
       ...product,
-      productVariants: product.productVariants.map(variant =>
-        variant.id === variantId ? { ...variant, [field]: value } : variant
-      )
+      productVariants: product.productVariants.map(variant => {
+        if (variant.id === variantId) {
+          if (field === 'enabled') {
+            return {
+              ...variant,
+              enabled: value,
+              status: value ? '1' : '0'
+            };
+          }
+          return { ...variant, [field]: value };
+        }
+        return variant;
+      })
     });
   };
 
@@ -207,7 +176,7 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
       return old
         ? { ...old }
         : {
-            id: Date.now().toString() + idx,
+            id: createTempId(),
             price: product.price,
             stock: 0,
             detailAttributes: combo,
@@ -221,11 +190,40 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
     });
   };
 
+  const isRealId = (id: string) => {
+    if (!id) return false;
+    return id.length > 10 && !id.startsWith('temp_');
+  };
+
+  const buildProductToSend = (product: Product) => {
+    const newVariants = product.productVariants
+      .filter(variant => variant.enabled !== false)
+      .map(variant => ({
+        id: isRealId(variant.id) ? variant.id : undefined,
+        price: variant.price,
+        stock: variant.stock,
+        status: variant.status ?? (variant.enabled ? '1' : '0'),
+        detailAttributes: variant.detailAttributes.map(detail => ({
+          id: isRealId(detail.id) ? detail.id : undefined
+        }))
+      }));
+    return {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      category: product.category ? { id: product.category.id } : null,
+      images: product.images,
+      productVariants: newVariants
+    };
+  };
+
   const handleSave = async () => {
     if (!product) return;
     setIsSaving(true);
     try {
-      const response = await updateProduct(productId, product);
+      const productToSend = buildProductToSend(product);
+      const response = await updateProduct(productId, productToSend);
       if (response.status === 200) {
         alert('Cập nhật sản phẩm thành công!');
         onSaveSuccess();
@@ -241,12 +239,44 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
     }
   };
 
-  const handleChangeImage = (id: string, file: File) => {
+  const handleChangeImage = async (id: string, file: File) => {
     if (!product) return;
-    const url = URL.createObjectURL(file); // preview, thực tế nên upload lên server lấy url thực
+    try {
+      const res = await uploadProductImage(file);
+      const url = res.data.url || res.data.result || res.data;
+      setProduct({
+        ...product,
+        images: product.images.map(img => img.id === id ? { ...img, url } : img)
+      });
+    } catch (error) {
+      alert('Upload ảnh thất bại!');
+    }
+  };
+
+  const handleAddImages = async (files: FileList) => {
+    if (!product) return;
+    const fileArr = Array.from(files);
+    const uploadedImages: ProductImage[] = [];
+    for (const file of fileArr) {
+      try {
+        const res = await uploadProductImage(file);
+        const url = res.data.url || res.data.result || res.data;
+        uploadedImages.push({
+          id: Date.now().toString() + file.name,
+          url,
+          isMain: false,
+        });
+      } catch {
+        alert('Upload ảnh thất bại!');
+      }
+    }
+    const updatedImages = [...product.images, ...uploadedImages];
+    if (updatedImages.length > 0 && !updatedImages.some(img => img.isMain)) {
+      updatedImages[0].isMain = true;
+    }
     setProduct({
       ...product,
-      images: product.images.map(img => img.id === id ? { ...img, url } : img)
+      images: updatedImages,
     });
   };
 
@@ -255,7 +285,15 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
   }
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-lg shadow p-8 mt-8">
+    <div className="max-w-3xl mx-auto bg-white rounded-lg shadow p-8 mt-8 relative">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="absolute top-4 right-4 px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-1 z-10"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        Quay lại
+      </button>
       <h2 className="text-2xl font-bold mb-6 text-[#cc3333]">Chỉnh sửa sản phẩm</h2>
       {/* Thông tin cơ bản */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -310,24 +348,9 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
               style={{ display: 'none' }}
               id="add-new-image-input"
               onChange={e => {
-                if (e.target.files && e.target.files.length > 0 && product) {
-                  const files = Array.from(e.target.files);
-                  const newImages = files.map(file => ({
-                    id: Date.now().toString() + file.name,
-                    url: URL.createObjectURL(file),
-                    isMain: false,
-                  }));
-
-                  const updatedImages = [...product.images, ...newImages];
-                  if (updatedImages.length > 0 && !updatedImages.some(img => img.isMain)) {
-                    updatedImages[0].isMain = true;
-                  }
-                  
-                  setProduct({
-                    ...product,
-                    images: updatedImages,
-                  });
-                  e.target.value = ''; 
+                if (e.target.files && e.target.files.length > 0) {
+                  handleAddImages(e.target.files);
+                  e.target.value = '';
                 }
               }}
             />
@@ -339,24 +362,19 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold">Thuộc tính sản phẩm</h3>
-          <button type="button" onClick={handleAddAttribute} className="px-3 py-1 rounded bg-[#cc3333] text-white text-sm">+ Thêm thuộc tính</button>
         </div>
         <div className="space-y-4">
           {product.productAttributes.map(attr => (
-            <div key={attr.id} className="bg-gray-50 rounded p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <input type="text" value={attr.name} onChange={e => handleAttributeNameChange(attr.id, e.target.value)} className="border rounded px-2 py-1 w-40" placeholder="Tên thuộc tính" />
-                <button type="button" onClick={() => handleRemoveAttribute(attr.id)} className="text-red-500 text-xs">Xóa</button>
+            <div key={attr.id} className="bg-white border rounded-lg p-4 shadow-sm">
+              <div className="font-semibold text-[#cc3333] mb-2 text-base flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#cc3333]" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#cc3333" strokeWidth="2"/></svg>
+                {attr.name}
               </div>
-              <div className="flex flex-wrap gap-2">
+              <ul className="list-disc list-inside pl-4 text-gray-700">
                 {attr.detailAttributes.map(detail => (
-                  <div key={detail.id} className="flex items-center gap-1 bg-white border rounded px-2 py-1">
-                    <input type="text" value={detail.name} onChange={e => handleDetailAttributeNameChange(attr.id, detail.id, e.target.value)} className="w-20" placeholder="Giá trị" />
-                    <button type="button" onClick={() => handleRemoveDetailAttribute(attr.id, detail.id)} className="text-red-400 text-xs">✕</button>
-                  </div>
+                  <li key={detail.id} className="py-1">{detail.name}</li>
                 ))}
-                <button type="button" onClick={() => handleAddDetailAttribute(attr.id)} className="text-[#cc3333] text-xs px-2 py-1 border border-dashed rounded">+ Giá trị</button>
-              </div>
+              </ul>
             </div>
           ))}
         </div>
@@ -394,7 +412,7 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
                     <input type="number" value={variant.stock} min={0} onChange={e => handleVariantChange(variant.id, 'stock', Number(e.target.value))} className="w-16 border rounded px-2 py-1" />
                   </td>
                   <td className="py-2 px-3 text-center">
-                    <input type="checkbox" checked={variant.enabled !== false} onChange={e => handleVariantChange(variant.id, 'enabled', e.target.checked)} />
+                    <input type="checkbox" checked={variant.status === '1'} onChange={e => handleVariantChange(variant.id, 'enabled', e.target.checked)} />
                   </td>
                 </tr>
               ))}

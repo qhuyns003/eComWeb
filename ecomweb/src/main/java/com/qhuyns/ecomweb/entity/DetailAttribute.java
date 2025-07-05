@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -18,11 +20,12 @@ public class DetailAttribute {
     String id;
 
     String name;
+    String status;
 
     @ManyToOne
     @JoinColumn(name = "product_attribute_id")
     ProductAttribute productAttribute;
-
+    //set list quan he phia ben khong co mapped By moi luu duoc quan he
     @ManyToMany(mappedBy = "detailAttributes")
-    List<ProductVariant> productVariants;
+    List<ProductVariant> productVariants= new ArrayList<>();;
 }

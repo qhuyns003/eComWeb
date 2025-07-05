@@ -12,4 +12,5 @@ import lombok.experimental.FieldDefaults;
 public class DetailAttributeResponse {
     String id;
     String name;
+    String status;
 }

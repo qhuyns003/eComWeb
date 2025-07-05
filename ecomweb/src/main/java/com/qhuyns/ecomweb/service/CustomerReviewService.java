@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class CustomerReviewService {
             reviewProductResponse.setUser(userMapper.toUserResponse(cr.getOrderItem().getOrder().getUser()));
             reviewProductResponse.setProductVariant(productVariantMapper.toProductVariantResponse(cr.getOrderItem().getProductVariant()));
             reviewProductResponse.getProductVariant().setDetailAttributes(cr.getOrderItem().getProductVariant().getDetailAttributes().stream().map(
-                    da -> detailAttributeMapper.toDetailAttributeResponse(da)).toList());
+                    da -> detailAttributeMapper.toDetailAttributeResponse(da)).collect(Collectors.toList()));
             reviewProductResponses.add(reviewProductResponse);
         }
         return reviewProductResponses;

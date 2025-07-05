@@ -7,10 +7,12 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,7 +36,7 @@ public class Order {
 
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL)
-    List<OrderItem> orderItems;
+    List<OrderItem> orderItems= new ArrayList<>();;
     @Enumerated(EnumType.STRING)
     Shipment shipment;
     @Enumerated(EnumType.STRING)

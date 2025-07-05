@@ -20,5 +20,6 @@ import java.util.List;
 public class ProductAttributeResponse {
     String id;
     String name;
+    String status;
     List<DetailAttributeResponse> detailAttributes;
 }

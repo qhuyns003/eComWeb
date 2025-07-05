@@ -6,10 +6,12 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,7 +34,7 @@ public class Shop {
     @JoinColumn(name = "user_id")
     User user;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "shop", cascade = CascadeType.ALL)
-    private List<ShopReview> shopReviews;
+    private List<ShopReview> shopReviews= new ArrayList<>();;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "shop", cascade = CascadeType.ALL)
-    private List<Product> products;
+    private List<Product> products= new ArrayList<>();;
 } 

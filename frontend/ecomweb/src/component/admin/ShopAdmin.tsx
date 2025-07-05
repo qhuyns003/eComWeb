@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import HeaderAdmin from './HeaderAdmin';
 import ShopProducts from './ShopProducts';
 import EditProduct from './EditProduct';
+import AddProduct from './AddProduct';
 import { useAppSelector } from '../../store/hooks';
 import { selectUser } from '../../store/features/userSlice';
 
@@ -21,6 +22,7 @@ const ShopAdmin: React.FC = () => {
   const user = useAppSelector(selectUser);
   const userId: String = String(user?.id) || "";
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [showAddProduct, setShowAddProduct] = useState(false);
   const navigate = useNavigate();
 
   const menuItems: MenuItem[] = [
@@ -92,6 +94,19 @@ const ShopAdmin: React.FC = () => {
     setEditingProductId(null);
   };
 
+  const handleAddProduct = () => {
+    setShowAddProduct(true);
+  };
+
+  const handleCancelAdd = () => {
+    setShowAddProduct(false);
+  };
+
+  const handleSaveSuccess = () => {
+    setShowAddProduct(false);
+    setEditingProductId(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <HeaderAdmin />
@@ -139,14 +154,19 @@ const ShopAdmin: React.FC = () => {
         {/* Main Content */}
         <main className="flex-1 p-4">
           {selectedMenuId === 'products' ? (
-            editingProductId !== null ? (
+            showAddProduct ? (
+              <AddProduct
+                onSaveSuccess={handleSaveSuccess}
+                onCancel={handleCancelAdd}
+              />
+            ) : editingProductId !== null ? (
               <EditProduct
                 productId={editingProductId}
                 onSaveSuccess={handleCancelEdit}
                 onCancel={handleCancelEdit}
               />
             ) : (
-              userId != null && <ShopProducts userId={userId} onEdit={handleEditProduct} />
+              userId != null && <ShopProducts userId={userId} onEdit={handleEditProduct} onAdd={handleAddProduct} />
             )
           ) : (
             <div className="p-6 border-2 border-gray-200 border-dashed rounded-lg bg-white text-gray-400 text-xl text-center">

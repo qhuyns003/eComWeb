@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class ProductImageService {
 
     ProductImageRepository productImageRepository;
     ProductImageMapper productImageMapper;
-    public List<ProductImageResponse> getAllById(String productId) {
-        return productImageRepository.findById(productId).stream().map(img -> productImageMapper.toProductImageResponse(img)).toList();
+    public List<ProductImageResponse> getAllByProductId(String productId) {
+        return productImageRepository.findByProductId(productId).stream().map(img -> productImageMapper.toProductImageResponse(img)).collect(Collectors.toList());
     }
 }

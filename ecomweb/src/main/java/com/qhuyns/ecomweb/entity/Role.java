@@ -6,6 +6,8 @@ import jakarta.persistence.ManyToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -22,5 +24,5 @@ public class Role {
     String description;
 
     @ManyToMany
-    Set<Permission> permissions;
+    List<Permission> permissions= new ArrayList<>();;
 }

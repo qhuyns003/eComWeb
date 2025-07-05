@@ -17,7 +17,10 @@ public enum ErrorCode {
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     PASSWORD_NOT_MATCH(1009, "Your password is not match with repeat password", HttpStatus.BAD_REQUEST),
     PRODUCT_NOT_FOUND(1010, "Product not exists", HttpStatus.BAD_REQUEST),
-    CATEGORY_NOT_FOUND(1010, "Category not exists", HttpStatus.BAD_REQUEST)
+    CATEGORY_NOT_FOUND(1011, "Category not exists", HttpStatus.BAD_REQUEST),
+    CANT_NOT_UPLOAD(1012, "Can not upload image", HttpStatus.BAD_GATEWAY),
+    VARIANT_NOT_FOUND(1013, "Variant not found", HttpStatus.BAD_REQUEST),
+    DETAIL_ATTRIBUTE_NOT_EXISTS(1013, "Detail attribute is not exists", HttpStatus.BAD_GATEWAY)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

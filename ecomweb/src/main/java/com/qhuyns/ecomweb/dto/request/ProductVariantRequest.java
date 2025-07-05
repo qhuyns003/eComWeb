@@ -15,5 +15,6 @@ public class ProductVariantRequest {
     String id;
     Long price;
     Long stock;
+    String status;
     List<DetailAttributeRequest> detailAttributes;
 }

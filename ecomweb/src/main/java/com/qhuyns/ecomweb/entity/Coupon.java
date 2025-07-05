@@ -5,10 +5,12 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -24,5 +26,5 @@ public class Coupon {
     LocalDate startDate;
     LocalDate endDate;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "coupon", cascade = CascadeType.ALL)
-    private List<UserCoupon> userCoupons;
+    private List<UserCoupon> userCoupons= new ArrayList<>();;
 } 

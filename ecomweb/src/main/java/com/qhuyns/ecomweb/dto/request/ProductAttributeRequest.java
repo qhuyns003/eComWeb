@@ -15,5 +15,6 @@ import java.util.List;
 public class ProductAttributeRequest {
     String id;
     String name;
+    String status;
     List<DetailAttributeRequest> detailAttributes;
 }

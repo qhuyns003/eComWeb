@@ -1,19 +1,13 @@
 package com.qhuyns.ecomweb.service;
 
-import com.qhuyns.ecomweb.dto.request.DetailAttributeRequest;
-import com.qhuyns.ecomweb.dto.request.ProductAttributeRequest;
-import com.qhuyns.ecomweb.dto.request.ProductRequest;
+import com.qhuyns.ecomweb.constant.ImagePrefix;
+import com.qhuyns.ecomweb.dto.request.*;
 import com.qhuyns.ecomweb.dto.response.*;
-import com.qhuyns.ecomweb.entity.Product;
-import com.qhuyns.ecomweb.entity.ProductAttribute;
-import com.qhuyns.ecomweb.entity.ProductImage;
+import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.*;
-import com.qhuyns.ecomweb.repository.CategoryRepository;
-import com.qhuyns.ecomweb.repository.DetailAttributeRepository;
-import com.qhuyns.ecomweb.repository.ProductAttributeRepository;
-import com.qhuyns.ecomweb.repository.ProductRepository;
+import com.qhuyns.ecomweb.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,11 +18,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -48,6 +45,9 @@ public class ProductService {
     CategoryRepository categoryRepository;
     ProductAttributeRepository productAttributeRepository;
     DetailAttributeRepository detailAttributeRepository;
+    ProductImageRepository productImageRepository;
+    FileService fileService;
+    ProductVariantRepository productVariantRepository;
 
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
@@ -58,7 +58,7 @@ public class ProductService {
             Double rating = (Double)rs[2];
             BigDecimal count = (BigDecimal.valueOf((long)rs[1])) ;
             ProductOverviewResponse productOverviewResponse = productMapper.toProductOverviewResponse(product);
-            productOverviewResponse.setImages(productImageService.getAllById(product.getId()));
+            productOverviewResponse.setImages(productImageService.getAllByProductId(product.getId()));
             productOverviewResponse.setRating(rating != null ? rating : 0.0);
             productOverviewResponse.setNumberOfOrder(count != null ? count : BigDecimal.valueOf(0));
             productOverviewResponses.add(productOverviewResponse);
@@ -75,7 +75,7 @@ public class ProductService {
             Double rating = (Double)rs[2];
             BigDecimal count = (BigDecimal.valueOf((long)rs[1])) ;
             ProductOverviewResponse productOverviewResponse = productMapper.toProductOverviewResponse(product);
-            productOverviewResponse.setImages(productImageService.getAllById(product.getId()));
+            productOverviewResponse.setImages(productImageService.getAllByProductId(product.getId()));
             productOverviewResponse.setRating(rating != null ? rating : 0.0);
             productOverviewResponse.setNumberOfOrder(count != null ? count : BigDecimal.valueOf(0));
             productOverviewResponses.add(productOverviewResponse);
@@ -90,16 +90,16 @@ public class ProductService {
         ProductDetailResponse productDetailResponse = productMapper.toProductDetailResponse(product);
         productDetailResponse.setImages(product.getImages().stream()
                 .map(img -> productImageMapper.toProductImageResponse(img))
-                .toList());
+                .collect(Collectors.toList()));
         productDetailResponse.setNumberOfOrder(BigDecimal.valueOf((Long)((Object[]) rs[0])[0])) ;
         productDetailResponse.setRating((Double) ((Object[]) rs[0])[1]);
         productDetailResponse.setProductAttributes(product.getProductAttributes().stream().map(pa -> {
             ProductAttributeResponse productAttributeResponse = productAttributeMapper.toProductAttributeResponse(pa);
             productAttributeResponse.setDetailAttributes(pa.getDetailAttributes().stream().map(
                     da -> detailAttributeMapper.toDetailAttributeResponse(da)
-            ).toList());
+            ).collect(Collectors.toList()));
             return productAttributeResponse;
-        }).toList());
+        }).collect(Collectors.toList()));
         productDetailResponse.setShop(shopMapper.toShopResponse(product.getShop()));
 
         List<ProductVariantResponse> variantResponses = product.getProductVariants().stream()
@@ -107,12 +107,12 @@ public class ProductService {
                     ProductVariantResponse variantResponse = productVariantMapper.toProductVariantResponse(variant);
 
                     List<DetailAttributeResponse> detailAttributeResponses = variant.getDetailAttributes().stream()
-                            .map(da -> detailAttributeMapper.toDetailAttributeResponse(da)).toList();
+                            .map(da -> detailAttributeMapper.toDetailAttributeResponse(da)).collect(Collectors.toList());
                     variantResponse.setDetailAttributes(detailAttributeResponses);
                     
                     return variantResponse;
                 })
-                .toList();
+                .collect(Collectors.toList());
         
         productDetailResponse.setProductVariants(variantResponses);
         
@@ -144,18 +144,18 @@ public class ProductService {
     public ProductResponse getProductForUpdate(String id) {
         Product product = productRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         ProductResponse productResponse = productMapper.toProductResponse(product);
-        productResponse.setImages(product.getImages().stream().map(img -> productImageMapper.toProductImageResponse(img)).toList());
+        productResponse.setImages(product.getImages().stream().map(img -> productImageMapper.toProductImageResponse(img)).collect(Collectors.toList()));
         productResponse.setCategory(categoryMapper.toCategoryResponse(product.getCategory()));
         productResponse.setProductAttributes(product.getProductAttributes().stream().map(pa ->{
             ProductAttributeResponse productAttributeResponse = productAttributeMapper.toProductAttributeResponse(pa);
-            productAttributeResponse.setDetailAttributes(pa.getDetailAttributes().stream().map(da -> detailAttributeMapper.toDetailAttributeResponse(da)).toList());
+            productAttributeResponse.setDetailAttributes(pa.getDetailAttributes().stream().map(da -> detailAttributeMapper.toDetailAttributeResponse(da)).collect(Collectors.toList()));
             return productAttributeResponse;
-        }).toList());
+        }).collect(Collectors.toList()));
         productResponse.setProductVariants(product.getProductVariants().stream().map(pv -> {
             ProductVariantResponse productVariantResponse = productVariantMapper.toProductVariantResponse(pv);
-            productVariantResponse.setDetailAttributes(pv.getDetailAttributes().stream().map(da -> detailAttributeMapper.toDetailAttributeResponse(da)).toList());
+            productVariantResponse.setDetailAttributes(pv.getDetailAttributes().stream().map(da -> detailAttributeMapper.toDetailAttributeResponse(da)).collect(Collectors.toList()));
             return productVariantResponse;
-        }).toList());
+        }).collect(Collectors.toList()));
         return productResponse;
     };
 
@@ -163,24 +163,49 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         productMapper.toProduct(product,productRequest);
         product.setCategory(categoryRepository.findById(productRequest.getCategory().getId()).orElseThrow(()-> new AppException(ErrorCode.CATEGORY_NOT_FOUND)));
-        product.setImages(productRequest.getImages().stream().map(img -> productImageMapper.toProductImage(img)).toList());
-        List<ProductAttribute> productAttributes = new ArrayList<>();
-        for (ProductAttributeRequest par : productRequest.getProductAttributes()){
-            if(productAttributeRepository.existsByName(StringUtils.capitalize(par.getName().toLowerCase()))){
-                ProductAttribute productAttribute = productAttributeRepository.findByName(StringUtils.capitalize(par.getName().toLowerCase()));
-                for (DetailAttributeRequest das : par.getDetailAttributes()){
-                    if(detailAttributeRepository.existsByName(das.getName().toLowerCase())){
+        List<String> urlImageList =  productRequest.getImages().stream().map(img -> img.getUrl()).collect(Collectors.toList());
+        // xoa anh khoi bo nho vat ly
+        for(ProductImage pi : product.getImages()){
+            if(!urlImageList.contains(ImagePrefix.IMAGE_PREFIX+pi.getUrl())){
+                fileService.deleteImage(pi.getUrl());
+            }
+        }
+        // xoa anh khoi db
+        // phai co orphan remove moi go tham chieu duoc
+        product.getImages().clear();
+        // các image sẽ được tạo mới (persist) trước khi các entity bị gỡ và xóa do orphanRemoval -> phải gỡ id khi muốn tạo đối tượng mới không sẽ bị trùng
+        product.getImages().addAll(productRequest.getImages().stream().map(img -> {
+            ProductImage pi = productImageMapper.toProductImage(img);
+            pi.setId(null);
+            pi.setProduct(product);
+            return pi;
+        }).collect(Collectors.toList()));
 
-                    }
-                    else{
-                        
-                    }
-                }
+        productVariantRepository.softDeleteByIdNotIn(productRequest.getProductVariants().stream().map(pv -> pv.getId()).filter(x -> x != null).collect(Collectors.toList()));
+        for(ProductVariantRequest pvr : productRequest.getProductVariants()){
+            if(pvr.getId()!=null){
+                ProductVariant productVariant = productVariantRepository.findById(pvr.getId()).orElseThrow(()->new AppException(ErrorCode.VARIANT_NOT_FOUND));
+                productVariantMapper.toProductVariant(productVariant,pvr);
+                productVariant.setStatus("1");
             }
             else{
+                ProductVariant pv = new ProductVariant();
+                for(DetailAttributeRequest dar : pvr.getDetailAttributes()){
+                    DetailAttribute da = detailAttributeRepository.findById(dar.getId()).orElseThrow(() -> new AppException(ErrorCode.DETAIL_ATTRIBUTE_NOT_EXISTS));
+                    pv.getDetailAttributes().add(da);
+                    da.getProductVariants().add(pv);
+                }
+                productVariantMapper.toProductVariant(pv,pvr);
+                pv.setStatus("1");
+                // chi can set phia ManyToOne la du de luu quan he
+                pv.setProduct(product);
+                // van phai set vao list de no thuc hien persist cho pv neu ta khong muon goi ra pvRepository
+                product.getProductVariants().add(pv);
 
             }
         }
+        productRepository.save(product);
+        log.info("success");
     };
 
 

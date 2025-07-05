@@ -12,8 +12,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +30,14 @@ public class RoleService {
         var role = roleMapper.toRole(request);
 
         var permissions = permissionRepository.findAllById(request.getPermissions());
-        role.setPermissions(new HashSet<>(permissions));
+        role.setPermissions(new ArrayList<>(permissions));
 
         role = roleRepository.save(role);
         return roleMapper.toRoleResponse(role);
     }
 
     public List<RoleResponse> getAll() {
-        return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).toList();
+        return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).collect(Collectors.toList());
     }
 
     public void delete(String role) {

@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -18,13 +20,15 @@ public class ProductAttribute {
     String id;
 
     String name;
+    String status;
 
 
-
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productAttribute", cascade = CascadeType.ALL)
-    List<DetailAttribute> detailAttributes;
+    List<DetailAttribute> detailAttributes= new ArrayList<>();;
 
-    @ManyToMany(mappedBy = "productAttributes")
-    List<Product> products;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
 
 } 

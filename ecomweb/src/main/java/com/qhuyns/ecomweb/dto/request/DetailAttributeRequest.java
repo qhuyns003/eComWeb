@@ -12,4 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class DetailAttributeRequest {
     String id;
     String name;
+    String status;
+    ProductAttributeRequest productAttribute;
 }

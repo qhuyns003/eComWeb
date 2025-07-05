@@ -5,7 +5,8 @@ public class API_URL {
             // /* la 1 duong dan /** la nhieu duong dan
             "/categories/**",
             "/products/**",
-            "/customer_reviews/**"
+            "/customer_reviews/**",
+            "/uploads/**"
 
     };
 
@@ -23,7 +24,13 @@ public class API_URL {
             "/auth/token",
             "/auth/introspect",
             "/auth/logout",
-            "/auth/refresh"
+            "/auth/refresh",
+            "/files/**"
+
+    };
+    public static final String[] URL_ANONYMOUS_DELETE = {
+
+            "/files/**"
 
     };
 }

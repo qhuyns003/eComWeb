@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,18 +31,18 @@ public class User {
     String phone;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    List<UserCoupon> UserCoupons;
+    List<UserCoupon> UserCoupons= new ArrayList<>();;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    List<Cart> carts;
+    List<Cart> carts= new ArrayList<>();;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    List<ShopReview> shopReviews;
+    List<ShopReview> shopReviews= new ArrayList<>();;
 //    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 //    List<CustomerReview> customerReviews;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    List<Order> orders;
+    List<Order> orders= new ArrayList<>();;
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     Shop shop;
 
     @ManyToMany
-    List<Role> roles;
+    List<Role> roles= new ArrayList<>();;
 }

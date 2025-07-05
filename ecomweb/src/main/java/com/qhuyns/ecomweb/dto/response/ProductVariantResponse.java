@@ -19,6 +19,7 @@ public class ProductVariantResponse {
     String id;
     Long price;
     Long stock;
+    String status;
     List<DetailAttributeResponse> detailAttributes;
 
 }

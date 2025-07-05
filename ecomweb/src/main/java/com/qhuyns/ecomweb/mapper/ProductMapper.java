@@ -4,9 +4,7 @@ import com.qhuyns.ecomweb.dto.request.ProductRequest;
 import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.*;
 import com.qhuyns.ecomweb.entity.*;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -35,6 +33,7 @@ public interface ProductMapper {
     @Mapping(target = "shop",ignore = true)
     @Mapping(target = "productVariants",ignore = true)
     @Mapping(target = "productAttributes",ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void toProduct(@MappingTarget Product product, ProductRequest productRequest);
 
 

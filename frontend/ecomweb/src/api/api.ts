@@ -59,3 +59,19 @@ export const getProductDetailForEdit = (productId: string) => {
 export const updateProduct = (productId: string, productData: any) => {
   return axiosInstance.put(`/products/${productId}`, productData);
 };
+
+export const uploadProductImage = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return axiosInstance.post('/files/upload_image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+
+export const deleteProductImage = (imageUrl: string) => {
+  return axiosInstance.delete('/files/', { params: { url: imageUrl } });
+};
+
+export const createProduct = (imageUrl: any) => {
+  return axiosInstance.delete('/files/', { params: { url: imageUrl } });
+};
