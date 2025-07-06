@@ -10,6 +10,7 @@ interface ProductImage {
 interface DetailAttribute {
   id: string;
   name: string;
+  productAttribute?: { name: string };
 }
 interface ProductAttribute {
   id: string;
@@ -233,10 +234,22 @@ const AddProduct: React.FC<AddProductProps> = ({ onSaveSuccess, onCancel }) => {
         price: variant.price,
         stock: variant.stock,
         status: variant.status ?? (variant.enabled ? '1' : '0'),
-        detailAttributes: variant.detailAttributes.map(detail => ({
-          id: detail.id.startsWith('temp_') ? undefined : detail.id
-        }))
+        detailAttributes: variant.detailAttributes.map((detail, idx) => {
+          // Lấy productAttribute cha theo index (vì FE đang giữ đúng thứ tự)
+          const attr = product.productAttributes[idx];
+          return {
+            name: detail.name,
+            productAttribute: attr ? { name: attr.name } : undefined
+          };
+        })
       }));
+
+    const newAttributes = product.productAttributes.map(attr => ({
+      name: attr.name,
+      detailAttributes: attr.detailAttributes.map(detail => ({
+        name: detail.name
+      }))
+    }));
 
     return {
       name: product.name,
@@ -244,11 +257,37 @@ const AddProduct: React.FC<AddProductProps> = ({ onSaveSuccess, onCancel }) => {
       description: product.description,
       category: product.category ? { id: product.category.id } : null,
       images: product.images,
-      productVariants: newVariants
+      productVariants: newVariants,
+      productAttributes: newAttributes
     };
   };
 
   const handleSave = async () => {
+    // Nếu chưa có thuộc tính nào, tự động thêm thuộc tính và variant mặc định
+    if (product.productAttributes.length === 0) {
+      const defaultAttrId = createTempId();
+      const defaultDetailId = createTempId();
+      const defaultAttribute = {
+        id: defaultAttrId,
+        name: "Loại",
+        detailAttributes: [{ id: defaultDetailId, name: "Mặc định" }]
+      };
+      product.productAttributes = [defaultAttribute];
+      product.productVariants = [{
+        id: createTempId(),
+        price: product.price,
+        stock: 0,
+        detailAttributes: [{
+          id: defaultDetailId,
+          name: "Mặc định",
+          productAttribute: { name: "Loại" }
+        }],
+        enabled: true,
+        status: "1"
+      }];
+      setProduct({ ...product });
+    }
+
     if (!product.name || !product.category) {
       alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
       return;

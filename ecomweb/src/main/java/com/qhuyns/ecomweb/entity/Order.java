@@ -34,8 +34,8 @@ public class Order {
     @JoinColumn(name = "user_id")
     User user;
 
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderItem> orderItems= new ArrayList<>();;
     @Enumerated(EnumType.STRING)
     Shipment shipment;

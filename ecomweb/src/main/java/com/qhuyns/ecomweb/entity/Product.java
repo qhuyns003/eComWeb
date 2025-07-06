@@ -38,17 +38,26 @@ public class Product {
     @JoinColumn(name = "shop_id")
     Shop shop;
 
+    // default là Eager
     @ManyToOne
     @JoinColumn(name = "category_id")
     Category category;
 
+    //Default Lazy
+    // chỉ khi getList thì mới truy vấn nên data lấy được là data tại thời điểm getList
+    // kiểm tra đối tượng trong list:
+    //   + nếu id null sẽ thực hiên persist
+    //   + nếu có id sẽ thực hiện merge -> nếu k tìm thấy id tuognw ứng sẽ báo lỗi
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductImage> images = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductVariant> productVariants= new ArrayList<>();;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductAttribute> productAttributes= new ArrayList<>();;
 
 } 

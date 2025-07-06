@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,7 @@ public class ProductService {
     ProductImageRepository productImageRepository;
     FileService fileService;
     ProductVariantRepository productVariantRepository;
+    ShopRepository shopRepository;
 
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
@@ -129,7 +131,8 @@ public class ProductService {
             Product product = (Product) rs[0];
             ProductImage productImage = (ProductImage)rs[1];
             ProductResponse productResponse = productMapper.toProductResponse(product);
-            productResponse.setImages(List.of(productImageMapper.toProductImageResponse(productImage)));
+
+            productResponse.setImages(new ArrayList<>(List.of(productImageMapper.toProductImageResponse(productImage))));
             productResponses.add(productResponse);
         }
         Page<ProductResponse> productResponsePage = new PageImpl<>(
@@ -206,6 +209,60 @@ public class ProductService {
         }
         productRepository.save(product);
         log.info("success");
+    };
+
+    public void create( ProductRequest productRequest) {
+        Product product = productMapper.toProduct(productRequest);
+        product.setCategory(categoryRepository.findById(productRequest.getCategory().getId()).orElseThrow(()-> new AppException(ErrorCode.CATEGORY_NOT_FOUND)));
+        product.getImages().addAll(productRequest.getImages().stream().map(img -> {
+            ProductImage pi = productImageMapper.toProductImage(img);
+            pi.setId(null);
+            pi.setProduct(product);
+            return pi;
+        }).collect(Collectors.toList()));
+        product.setStatus("1");product.setShop(shopRepository.findByUserUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
+
+        for(ProductAttributeRequest par : productRequest.getProductAttributes()){
+            ProductAttribute pa = productAttributeMapper.toProductAttribute(par);
+            for (DetailAttributeRequest dar : par.getDetailAttributes()){
+                DetailAttribute da = detailAttributeMapper.toDetailAttribute(dar);
+                pa.getDetailAttributes().add(da);
+                da.setProductAttribute(pa);
+            }
+            product.getProductAttributes().add(pa);
+            pa.setProduct(product);
+        }
+        // khi save , trước khi được persist các annotation gen data đi UUID hay CreateDate
+        // sẽ gắn dữ liệu vào entity nên bản hất save không cập nhật ngược dữ liệu lên enotty BE
+        // nếu getList ra (TH lazy) thì sẽ cập nhật cả dữ liệu list (nếu có cascade không thì cũng không có ý nghĩa)
+        productRepository.save(product);
+     for(ProductVariantRequest pvr : productRequest.getProductVariants()){
+                ProductVariant pv = new ProductVariant();
+                for(DetailAttributeRequest dar : pvr.getDetailAttributes()){
+                    DetailAttribute da = detailAttributeRepository.findByProductIdAndAttributeNameAndDetailName(product.getId(), dar.getProductAttribute().getName(),dar.getName());
+                    pv.getDetailAttributes().add(da);
+                    da.getProductVariants().add(pv);
+                }
+                productVariantMapper.toProductVariant(pv,pvr);
+                pv.setStatus("1");
+                pv.setProduct(product);
+                product.getProductVariants().add(pv);
+        }
+        productRepository.save(product);
+    };
+
+    public void delete(List<String> ids) {
+
+        for(String id : ids){
+            Product product = productRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+            if(productRepository.existsOrderForProduct(id)){
+                throw new AppException(ErrorCode.PRODUCT_HAS_ORDER,product.getName());
+            }
+            for(ProductImage img : product.getImages()){
+                fileService.deleteImage(img.getUrl());
+            }
+        }
+        productRepository.deleteByIdIn(ids);
     };
 
 

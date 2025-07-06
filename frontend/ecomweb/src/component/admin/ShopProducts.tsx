@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getProductsByUserId } from '../../api/api';
+import { getProductsByUserId, deleteProducts } from '../../api/api';
+import { toast } from 'react-toastify';
 
 export interface ProductImage {
   id: string;
@@ -38,6 +39,7 @@ const ShopProducts: React.FC<ShopProductsProps> = ({ userId, onEdit, onAdd }) =>
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
   // Ref cho input
   const inputRef = useRef<HTMLInputElement>(null);
@@ -74,6 +76,58 @@ const ShopProducts: React.FC<ShopProductsProps> = ({ userId, onEdit, onAdd }) =>
     }
   }, [loading]);
 
+  // Hàm xử lý chọn/bỏ chọn sản phẩm
+  const handleSelectProduct = (id: string) => {
+    setSelectedProducts(prev =>
+      prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
+    );
+  };
+
+  // Hàm xử lý chọn/bỏ chọn tất cả
+  const handleSelectAll = () => {
+    if (products.every(p => selectedProducts.includes(p.id))) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(products.map(p => p.id));
+    }
+  };
+
+  // Hàm xóa sản phẩm đơn lẻ
+  const handleDeleteProduct = async (id: string) => {
+    if (!window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+    setLoading(true);
+    try {
+      await deleteProducts([id]);
+      setProducts(prev => prev.filter(p => p.id !== id));
+      setSelectedProducts(prev => prev.filter(pid => pid !== id));
+      toast.success('Xóa sản phẩm thành công!', { className: 'toastify-custom-success' });
+    } catch (error: any) {
+      const message = error?.response?.data?.message || 'Xóa sản phẩm thất bại!';
+      toast.error(message, { className: 'toastify-custom-error' });
+      console.error('Lỗi khi xóa sản phẩm:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Hàm xóa nhiều sản phẩm đã chọn
+  const handleDeleteSelected = async () => {
+    if (!window.confirm(`Bạn có chắc muốn xóa ${selectedProducts.length} sản phẩm đã chọn?`)) return;
+    setLoading(true);
+    try {
+      await deleteProducts(selectedProducts);
+      setProducts(prev => prev.filter(p => !selectedProducts.includes(p.id)));
+      setSelectedProducts([]);
+      toast.success('Đã xóa các sản phẩm đã chọn!', { className: 'toastify-custom-success' });
+    } catch (error: any) {
+      const message = error?.response?.data?.message || 'Xóa sản phẩm thất bại!';
+      toast.error(message, { className: 'toastify-custom-error' });
+      console.error('Lỗi khi xóa sản phẩm:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return <div className="text-center text-gray-500 py-16">Đang tải danh sách sản phẩm...</div>;
   }
@@ -85,7 +139,7 @@ const ShopProducts: React.FC<ShopProductsProps> = ({ userId, onEdit, onAdd }) =>
           <svg className="w-7 h-7 text-[#cc3333]" fill="none" viewBox="0 0 24 24"><path d="M3 7V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v1" stroke="#cc3333" strokeWidth="2" strokeLinecap="round"/><rect x="3" y="7" width="18" height="14" rx="2" stroke="#cc3333" strokeWidth="2"/></svg>
           Quản lý sản phẩm
         </h2>
-        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto items-center">
           <input
             ref={inputRef}
             type="text"
@@ -103,14 +157,25 @@ const ShopProducts: React.FC<ShopProductsProps> = ({ userId, onEdit, onAdd }) =>
             <option value="active">Đang bán</option>
             <option value="inactive">Ẩn</option>
           </select>
+          {selectedProducts.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="px-4 py-2 rounded bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors"
+            >
+              Xóa ({selectedProducts.length})
+            </button>
+          )}
           <button
             onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-[#cc3333] text-white rounded hover:bg-[#b82d2d] transition-colors font-medium"
+            className="relative flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-[#cc3333] to-[#ff6666] shadow-lg text-white font-semibold hover:scale-105 hover:shadow-xl transition-all duration-200"
+            style={{ minWidth: 0 }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Thêm sản phẩm
+            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 mr-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </span>
+            <span className="hidden md:inline">Thêm sản phẩm</span>
           </button>
         </div>
       </div>
@@ -119,7 +184,12 @@ const ShopProducts: React.FC<ShopProductsProps> = ({ userId, onEdit, onAdd }) =>
           <thead>
             <tr className="bg-[#faeaea] text-[#cc3333]">
               <th className="py-3 px-3 text-center rounded-tl-xl">
-                <input type="checkbox" className="accent-[#cc3333] w-4 h-4 rounded" />
+                <input 
+                  type="checkbox" 
+                  checked={products.length > 0 && products.every(p => selectedProducts.includes(p.id))}
+                  onChange={handleSelectAll}
+                  className="accent-[#cc3333] w-4 h-4 rounded" 
+                />
               </th>
               <th className="py-3 px-3 text-center">STT</th>
               <th className="py-3 px-3 text-center">Ảnh</th>
@@ -143,7 +213,12 @@ const ShopProducts: React.FC<ShopProductsProps> = ({ userId, onEdit, onAdd }) =>
                   className="hover:bg-[#fff3f3] transition-all duration-200 border-b last:border-b-0"
                 >
                   <td className="py-2 px-3 text-center">
-                    <input type="checkbox" className="accent-[#cc3333] w-4 h-4 rounded" />
+                    <input 
+                      type="checkbox" 
+                      checked={selectedProducts.includes(p.id)}
+                      onChange={() => handleSelectProduct(p.id)}
+                      className="accent-[#cc3333] w-4 h-4 rounded" 
+                    />
                   </td>
                   <td className="py-2 px-3 text-center font-semibold text-gray-500">{(currentPage - 1) * itemsPerPage + idx + 1}</td>
                   <td className="py-2 px-3 text-center">
@@ -171,17 +246,31 @@ const ShopProducts: React.FC<ShopProductsProps> = ({ userId, onEdit, onAdd }) =>
                     </span>
                   </td>
                   <td className="py-2 px-3 text-center">
-                    <button
-                      className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-blue-50 text-blue-600 transition"
-                      title="Chỉnh sửa"
-                      onClick={() => onEdit(p.id)}
-                    >
-                      <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                        <path d="M4 21h4.586a1 1 0 0 0 .707-.293l10.5-10.5a2 2 0 0 0 0-2.828l-2.172-2.172a2 2 0 0 0-2.828 0l-10.5 10.5A1 1 0 0 0 3 19.414V21a1 1 0 0 0 1 1z"
-                          stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M14.5 6.5l3 3" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-blue-50 text-blue-600 transition"
+                        title="Chỉnh sửa"
+                        onClick={() => onEdit(p.id)}
+                      >
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                          <path d="M4 21h4.586a1 1 0 0 0 .707-.293l10.5-10.5a2 2 0 0 0 0-2.828l-2.172-2.172a2 2 0 0 0-2.828 0l-10.5 10.5A1 1 0 0 0 3 19.414V21a1 1 0 0 0 1 1z"
+                            stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M14.5 6.5l3 3" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      <button
+                        className="inline-flex items-center justify-center w-8 h-8 rounded hover:bg-red-50 text-red-600 transition"
+                        title="Xóa"
+                        onClick={() => handleDeleteProduct(p.id)}
+                      >
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                          <path d="M3 6h18" stroke="#dc2626" strokeWidth="2" strokeLinecap="round"/>
+                          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#dc2626" strokeWidth="2"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke="#dc2626" strokeWidth="2"/>
+                          <path d="M10 11v6M14 11v6" stroke="#dc2626" strokeWidth="2"/>
+                        </svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

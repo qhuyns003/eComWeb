@@ -106,4 +106,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             Pageable pageable
     );
 
+    void deleteByIdIn(List<String> ids);
+
+    @Query("SELECT COUNT(oi) > 0 FROM OrderItem oi WHERE oi.productVariant.product.id = :productId")
+    boolean existsOrderForProduct(@Param("productId") String productId);
+
 }

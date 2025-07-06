@@ -22,6 +22,7 @@ public class Category {
 
     String name;
     String description;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "category", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products= new ArrayList<>();;
 } 

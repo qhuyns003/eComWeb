@@ -23,6 +23,7 @@ public class Role {
 
     String description;
 
+    @Builder.Default
     @ManyToMany
     List<Permission> permissions= new ArrayList<>();;
 }

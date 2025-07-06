@@ -44,6 +44,8 @@ public class SecurityConfig {
                             return config;
                         })
                 )
+                // luôn decode kiểm tra token trước khi permit
+                // ứng với mỗi request, sẽ có context khác nhau tùy vào token gửi theo
                 .authorizeHttpRequests(request -> request // nếu không yêu cầu token mà vẫn nhét token vào sẽ bị unauthorize
                         .requestMatchers(HttpMethod.GET, API_URL.URL_ANONYMOUS_GET).permitAll()
                         .requestMatchers(HttpMethod.POST, API_URL.URL_ANONYMOUS_POST).permitAll()

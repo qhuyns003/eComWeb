@@ -82,4 +82,23 @@ public class ProductController {
                 .result("Success")
                 .build();
     }
+
+    @PostMapping("")
+    ApiResponse<String> create(@RequestBody ProductRequest productRequest){
+        productService.create(productRequest);
+        return new ApiResponse<>().<String>builder()
+                .result("Success")
+                .build();
+    }
+
+    @DeleteMapping("")
+    ApiResponse<String> delete(@RequestBody List<String> ids){
+        productService.delete(ids);
+        return new ApiResponse<>().<String>builder()
+                .result("Success")
+                .build();
+    }
+
+
+
 }

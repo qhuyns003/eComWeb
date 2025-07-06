@@ -27,4 +27,17 @@ axiosInstance.interceptors.response.use(
     }
 );
 
+// Thêm interceptor cho request để tự động gắn token nếu có
+axiosInstance.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
 export default axiosInstance; 

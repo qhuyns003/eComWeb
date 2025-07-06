@@ -10,6 +10,9 @@ import ShopAdmin from './component/admin/ShopAdmin';
 import LogoutModal from './component/common/LogoutModal';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -64,6 +67,18 @@ function App() {
   return (
     <Provider store={store}>
       <AppInitializer>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
         <AppContent />
       </AppInitializer>
     </Provider>

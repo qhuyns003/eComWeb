@@ -22,6 +22,7 @@ public class ProductVariant {
     Long stock;
     String status;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             joinColumns = @JoinColumn(name = "product_variant_id"),
@@ -33,9 +34,11 @@ public class ProductVariant {
     @JoinColumn(name = "product_id")
     Product product;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems= new ArrayList<>();;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cart> carts= new ArrayList<>();;
 }

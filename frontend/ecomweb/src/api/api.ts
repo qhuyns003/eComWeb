@@ -72,6 +72,10 @@ export const deleteProductImage = (imageUrl: string) => {
   return axiosInstance.delete('/files/', { params: { url: imageUrl } });
 };
 
-export const createProduct = (imageUrl: any) => {
-  return axiosInstance.delete('/files/', { params: { url: imageUrl } });
+export const createProduct = (productData: any) => {
+  return axiosInstance.post('/products', productData);
+};
+
+export const deleteProducts = (ids: string[]) => {
+  return axiosInstance.delete('/products', { data: ids });
 };

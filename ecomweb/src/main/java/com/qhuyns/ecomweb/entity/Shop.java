@@ -33,8 +33,10 @@ public class Shop {
     @OneToOne
     @JoinColumn(name = "user_id")
     User user;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "shop", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShopReview> shopReviews= new ArrayList<>();;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "shop", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products= new ArrayList<>();;
 } 

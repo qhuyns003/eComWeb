@@ -20,7 +20,8 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(1011, "Category not exists", HttpStatus.BAD_REQUEST),
     CANT_NOT_UPLOAD(1012, "Can not upload image", HttpStatus.BAD_GATEWAY),
     VARIANT_NOT_FOUND(1013, "Variant not found", HttpStatus.BAD_REQUEST),
-    DETAIL_ATTRIBUTE_NOT_EXISTS(1013, "Detail attribute is not exists", HttpStatus.BAD_GATEWAY)
+    DETAIL_ATTRIBUTE_NOT_EXISTS(1013, "Detail attribute is not exists", HttpStatus.BAD_GATEWAY),
+    PRODUCT_HAS_ORDER(1014, "Không thể xóa sản phẩm '%s' do đã phát sinh đơn hàng", HttpStatus.CONFLICT)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

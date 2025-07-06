@@ -1,6 +1,7 @@
 package com.qhuyns.ecomweb.mapper;
 
 
+import com.qhuyns.ecomweb.dto.request.ProductAttributeRequest;
 import com.qhuyns.ecomweb.dto.request.UserCreationRequest;
 import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.ProductAttributeResponse;
@@ -18,6 +19,9 @@ public interface ProductAttributeMapper {
 
     @Mapping(target = "detailAttributes", ignore = true)
     ProductAttributeResponse toProductAttributeResponse(ProductAttribute productAttribute);
+
+    @Mapping(target = "detailAttributes", ignore = true)
+    ProductAttribute toProductAttribute(ProductAttributeRequest productAttributeRequest);
 
 
 }

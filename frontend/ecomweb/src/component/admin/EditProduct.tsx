@@ -334,7 +334,12 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
                   className={`h-20 w-20 object-cover rounded border-2 ${img.isMain ? 'border-[#cc3333]' : 'border-gray-200'} cursor-pointer`}
                   onClick={() => document.getElementById(`file-input-${img.id}`)?.click()}
                 />
-                <button type="button" onClick={() => handleRemoveImage(img.id)} className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs shadow hover:bg-red-100">✕</button>
+                <button type="button"
+                  onClick={() => handleRemoveImage(img.id)}
+                  disabled={product.images.length === 1}
+                  className={`absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs shadow hover:bg-red-100 ${product.images.length === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={product.images.length === 1 ? 'Phải có ít nhất 1 ảnh' : 'Xóa ảnh'}
+                >✕</button>
                 {!img.isMain && (
                   <button type="button" onClick={() => handleSetMainImage(img.id)} className="absolute bottom-1 left-1 bg-white border border-gray-300 rounded px-1 text-xs shadow hover:bg-gray-100">Chọn chính</button>
                 )}

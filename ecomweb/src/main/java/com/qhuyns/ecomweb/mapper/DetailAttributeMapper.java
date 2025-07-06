@@ -1,6 +1,7 @@
 package com.qhuyns.ecomweb.mapper;
 
 
+import com.qhuyns.ecomweb.dto.request.DetailAttributeRequest;
 import com.qhuyns.ecomweb.dto.request.UserCreationRequest;
 import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.DetailAttributeResponse;
@@ -19,6 +20,8 @@ import org.mapstruct.MappingTarget;
 public interface DetailAttributeMapper {
 
     DetailAttributeResponse toDetailAttributeResponse(DetailAttribute detailAttribute);
+
+    DetailAttribute toDetailAttribute(DetailAttributeRequest detailAttributeRequest);
 
 }
 

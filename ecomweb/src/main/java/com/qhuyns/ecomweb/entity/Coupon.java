@@ -25,6 +25,7 @@ public class Coupon {
     BigDecimal minOrder;
     LocalDate startDate;
     LocalDate endDate;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "coupon", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserCoupon> userCoupons= new ArrayList<>();;
 } 

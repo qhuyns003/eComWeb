@@ -26,6 +26,7 @@ public class DetailAttribute {
     @JoinColumn(name = "product_attribute_id")
     ProductAttribute productAttribute;
     //set list quan he phia ben khong co mapped By moi luu duoc quan he
+    @Builder.Default
     @ManyToMany(mappedBy = "detailAttributes")
     List<ProductVariant> productVariants= new ArrayList<>();;
 }

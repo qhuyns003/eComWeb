@@ -24,7 +24,7 @@ public class ProductAttribute {
 
 
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productAttribute", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productAttribute", cascade = CascadeType.ALL, orphanRemoval = true)
     List<DetailAttribute> detailAttributes= new ArrayList<>();;
 
     @ManyToOne
