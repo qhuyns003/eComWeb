@@ -36,7 +36,8 @@ public class Order {
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<OrderItem> orderItems= new ArrayList<>();;
+    List<OrderShopGroup> orderShopGroups= new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     Shipment shipment;
     @Enumerated(EnumType.STRING)

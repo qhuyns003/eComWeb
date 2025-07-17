@@ -14,7 +14,8 @@ public interface CustomerReviewRepository extends JpaRepository<CustomerReview, 
     @Query("""
         SELECT cr FROM CustomerReview cr
         LEFT JOIN FETCH cr.orderItem oi
-        LEFT JOIN FETCH oi.order od
+        LEFT JOIN FETCH oi.orderShopGroup os
+        LEFT JOIN FETCH os.order od
         LEFT JOIN FETCH od.user u 
         LEFT JOIN FETCH oi.productVariant pv
         LEFT JOIN  pv.product p

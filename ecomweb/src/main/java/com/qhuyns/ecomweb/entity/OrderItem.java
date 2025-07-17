@@ -22,8 +22,8 @@ public class OrderItem {
     BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "order_id")
-    Order order;
+    @JoinColumn(name = "order_shop_group_id")
+    OrderShopGroup orderShopGroup;
 
     @ManyToOne
     @JoinColumn(name = "product_variant_id")

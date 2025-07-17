@@ -38,7 +38,7 @@ public class CustomerReviewService {
         List<ReviewProductResponse> reviewProductResponses = new ArrayList<>();
         for (CustomerReview cr : customerReview) {
             ReviewProductResponse reviewProductResponse = customerReviewMapper.toReviewProductResponse(cr);
-            reviewProductResponse.setUser(userMapper.toUserResponse(cr.getOrderItem().getOrder().getUser()));
+            reviewProductResponse.setUser(userMapper.toUserResponse(cr.getOrderItem().getOrderShopGroup().getOrder().getUser()));
             reviewProductResponse.setProductVariant(productVariantMapper.toProductVariantResponse(cr.getOrderItem().getProductVariant()));
             reviewProductResponse.getProductVariant().setDetailAttributes(cr.getOrderItem().getProductVariant().getDetailAttributes().stream().map(
                     da -> detailAttributeMapper.toDetailAttributeResponse(da)).collect(Collectors.toList()));
