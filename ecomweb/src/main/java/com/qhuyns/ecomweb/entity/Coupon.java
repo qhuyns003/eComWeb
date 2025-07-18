@@ -21,11 +21,44 @@ public class Coupon {
     String id;
 
     String code;
+    CouponType couponType;
+    DiscountType discountType;
     BigDecimal discount;
     BigDecimal minOrder;
     LocalDate startDate;
     LocalDate endDate;
+    BigDecimal quantity;
+    boolean active;
+    boolean requireCode;
+
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserCoupon> userCoupons= new ArrayList<>();;
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "coupon_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    List<User> users= new ArrayList<>();
+
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "coupon_id"),
+            inverseJoinColumns = @JoinColumn(name = "order_id")
+    )
+    List<Order> orders= new ArrayList<>();
+
+    @Builder.Default
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "coupon_id"),
+            inverseJoinColumns = @JoinColumn(name = "order_shop_group_id")
+    )
+    List<OrderShopGroup> orderShopGroups = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "shop_id")
+    Shop shop;
+
+
+
 } 

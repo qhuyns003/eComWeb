@@ -23,8 +23,13 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    String status;
+    OrderStatus status;
+    // nen luu de tranh viec moi khi truy van phai tinh toan
     BigDecimal total;
+    BigDecimal shippingFee;
+    BigDecimal subtotal;
+    BigDecimal totalDiscount;
+
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -35,11 +40,19 @@ public class Order {
     User user;
 
     @Builder.Default
+    @ManyToMany(mappedBy = "orders")
+    List<Coupon> coupons= new ArrayList<>();
+
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderShopGroup> orderShopGroups= new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    Shipment shipment;
+    @ManyToOne
+    @JoinColumn(name = "user_address_id")
+    UserAddress userAddress;
+
     @Enumerated(EnumType.STRING)
     Payment payment;
+
+
 } 

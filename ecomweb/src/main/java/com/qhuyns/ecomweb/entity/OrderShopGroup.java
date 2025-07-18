@@ -20,6 +20,11 @@ public class OrderShopGroup {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    BigDecimal total;
+    BigDecimal subtotal;
+    BigDecimal shippingFee;
+    BigDecimal totalDiscount;
+
     @Enumerated(EnumType.STRING)
     Shipment shipment;
 
@@ -34,4 +39,8 @@ public class OrderShopGroup {
     @ManyToOne
     @JoinColumn(name = "order_id")
     Order order;
+
+    @Builder.Default
+    @ManyToMany(mappedBy = "orderShopGroups")
+    List<Coupon> coupons= new ArrayList<>();;
 } 

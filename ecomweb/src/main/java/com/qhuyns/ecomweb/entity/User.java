@@ -31,8 +31,8 @@ public class User {
     String phone;
 
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<UserCoupon> UserCoupons= new ArrayList<>();;
+    @ManyToMany(mappedBy = "users")
+    List<Coupon> coupons= new ArrayList<>();
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,4 +53,8 @@ public class User {
     @Builder.Default
     @ManyToMany
     List<Role> roles= new ArrayList<>();;
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<UserAddress> userAddresses= new ArrayList<>();
 }

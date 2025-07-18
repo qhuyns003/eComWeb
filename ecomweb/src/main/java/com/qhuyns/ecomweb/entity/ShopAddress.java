@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,19 +15,21 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DetailAttribute {
+public class ShopAddress {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+    String phoneNumber;
+    BigDecimal latitude;
+    BigDecimal longitude;
+    String fullAddress;
+    String detailAddress;
+    String ward;
+    String district;
+    String province;
+    @OneToOne
+    @JoinColumn(name = "shop_id")
+    Shop shop;
 
-    String name;
-    String status;
 
-    @ManyToOne
-    @JoinColumn(name = "product_attribute_id")
-    ProductAttribute productAttribute;
-    //set list quan he phia ben khong co mapped By moi luu duoc quan he
-    @Builder.Default
-    @ManyToMany(mappedBy = "detailAttributes")
-    List<ProductVariant> productVariants= new ArrayList<>();
-}
+} 
