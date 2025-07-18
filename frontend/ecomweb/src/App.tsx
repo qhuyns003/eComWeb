@@ -49,7 +49,7 @@ function AppContent() {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/product/:id" element={<ProductDetail />} /> 
         <Route path="/admin" element={<ShopAdmin />} />
-        <Route path="/checkout" element={<Checkout product={{}} selectedVariant={{}} quantity={1} onBack={() => {}} onConfirm={() => {}} />} />
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
       
       <LogoutModal

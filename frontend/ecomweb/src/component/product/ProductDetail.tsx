@@ -8,6 +8,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getProductDetail, getProductAttributes, getProductReviews, getProductReviewStats } from "../../api/api";
 import StarRating from "./StarRating";
 import ReviewProduct from "./ReviewProduct";
+import { useAppDispatch } from '../../store/hooks';
+import { setOrderShopGroups } from '../../store/features/orderSlice';
 
 // Import Swiper styles
 import 'swiper/swiper-bundle.css';
@@ -94,6 +96,7 @@ const ProductDetail: React.FC = () => {
     const [selectedVariant, setSelectedVariant] = useState<any>(null);
     const [quantity, setQuantity] = useState(1);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         if (id) {
@@ -208,33 +211,30 @@ const ProductDetail: React.FC = () => {
 
     const handleBuyNow = () => {
         if (!product || !selectedVariant) return;
-        navigate('/checkout', {
-            state: {
-                orderShopGroups: [
+        dispatch(setOrderShopGroups([
+            {
+                shop: product.shop,
+                shippingMethods: [
+                    { value: 'FAST', label: 'Giao hàng nhanh', fee: 25000 },
+                    { value: 'STANDARD', label: 'Giao hàng tiêu chuẩn', fee: 18000 }
+                ],
+                selectedShipping: 'FAST',
+                voucher: '',
+                products: [
                     {
-                        shop: product.shop,
-                        shippingMethods: [
-                            { value: 'FAST', label: 'Giao hàng nhanh', fee: 25000 },
-                            { value: 'STANDARD', label: 'Giao hàng tiêu chuẩn', fee: 18000 }
-                        ],
-                        selectedShipping: 'FAST',
-                        voucher: '',
-                        products: [
-                            {
-                                id: selectedVariant.id,
-                                name: product.name,
-                                price: selectedVariant.price,
-                                quantity,
-                                image: product.images?.[0]?.url || '',
-                                attrs: selectedVariant.detailAttributes?.map((a: { name: string }) => a.name) || []
-                            }
-                        ],
-                        shopDiscount: 0,
-                        shopVoucher: ''
+                        id: selectedVariant.id,
+                        name: product.name,
+                        price: selectedVariant.price,
+                        quantity,
+                        image: product.images?.[0]?.url || '',
+                        attrs: selectedVariant.detailAttributes?.map((a: { name: string }) => a.name) || []
                     }
-                ]
+                ],
+                shopDiscount: 0,
+                shopVoucher: ''
             }
-        });
+        ]));
+        navigate('/checkout');
     };
 
     return (
