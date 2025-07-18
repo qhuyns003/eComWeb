@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Checkout from './component/product/Checkout';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -48,6 +49,7 @@ function AppContent() {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/product/:id" element={<ProductDetail />} /> 
         <Route path="/admin" element={<ShopAdmin />} />
+        <Route path="/checkout" element={<Checkout product={{}} selectedVariant={{}} quantity={1} onBack={() => {}} onConfirm={() => {}} />} />
       </Routes>
       
       <LogoutModal

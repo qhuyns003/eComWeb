@@ -19,7 +19,7 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, max = 5 }) => {
       {[...Array(emptyStars)].map((_, i) => (
         <span key={i + fullStars + 1} style={{ color: "#ccc", fontSize: "1.2em" }}>★</span>
       ))}
-      <span style={{ marginLeft: 8, fontWeight: 500 }}>{rating.toFixed(1)}</span>
+      <span style={{ marginLeft: 8, fontWeight: 500 }}>{Number(rating || 0).toFixed(1)}</span>
     </span>
   );
 };

@@ -220,7 +220,8 @@ public class ProductService {
             pi.setProduct(product);
             return pi;
         }).collect(Collectors.toList()));
-        product.setStatus("1");product.setShop(shopRepository.findByUserUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
+        product.setStatus("1");
+        product.setShop(shopRepository.findByUserUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
 
         for(ProductAttributeRequest par : productRequest.getProductAttributes()){
             ProductAttribute pa = productAttributeMapper.toProductAttribute(par);

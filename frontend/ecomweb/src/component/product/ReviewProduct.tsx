@@ -32,6 +32,7 @@ const ReviewProduct: React.FC<ReviewStatProps> = ({ stat, total, avrRating, revi
   const safeTotal = total || 0;
   const safeStat = stat || {};
   const safeReviews = Array.isArray(reviews) ? reviews : [];
+  const safeAvrRatingNumber = Number(safeAvrRating) || 0;
 
   return (
     <section className="bg-white py-8 antialiased md:py-16">
@@ -46,14 +47,14 @@ const ReviewProduct: React.FC<ReviewStatProps> = ({ stat, total, avrRating, revi
                 </svg>
               ))}
             </div>
-            <p className="text-sm font-medium leading-none text-gray-500">({safeAvrRating.toFixed(2)})</p>
+            <p className="text-sm font-medium leading-none text-gray-500">({safeAvrRatingNumber.toFixed(2)})</p>
             <span className="text-sm font-medium leading-none text-gray-900 underline hover:no-underline"> {safeTotal} đánh giá </span>
           </div>
         </div>
         {/* Thống kê số lượt theo từng sao */}
         <div className="my-6 gap-8 sm:flex sm:items-start md:my-8">
           <div className="shrink-0 space-y-4">
-            <p className="text-2xl font-semibold leading-none text-gray-900">{safeAvrRating.toFixed(2)} trên 5</p>
+            <p className="text-2xl font-semibold leading-none text-gray-900">{safeAvrRatingNumber.toFixed(2)} trên 5</p>
             <span className="text-gray-500 text-sm">Tổng: {safeTotal} lượt đánh giá</span>
           </div>
           <div className="mt-6 min-w-0 flex-1 space-y-3 sm:mt-0">

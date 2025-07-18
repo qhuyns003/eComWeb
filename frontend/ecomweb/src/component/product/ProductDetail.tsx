@@ -4,7 +4,7 @@ import { Thumbs } from 'swiper/modules';
 import type { Swiper as SwiperCore } from 'swiper';
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getProductDetail, getProductAttributes, getProductReviews, getProductReviewStats } from "../../api/api";
 import StarRating from "./StarRating";
 import ReviewProduct from "./ReviewProduct";
@@ -92,6 +92,8 @@ const ProductDetail: React.FC = () => {
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperCore | null>(null);
     const [selectedOptions, setSelectedOptions] = useState<{ [attrId: string]: string }>({});
     const [selectedVariant, setSelectedVariant] = useState<any>(null);
+    const [quantity, setQuantity] = useState(1);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
@@ -196,19 +198,43 @@ const ProductDetail: React.FC = () => {
         return validValueIds;
     };
 
+    // Điều kiện đã chọn đủ thuộc tính
+    const isAllAttributesSelected = product && product.productAttributes && Object.keys(selectedOptions).length === product.productAttributes.length;
+
     if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     if (!product) return <div className="min-h-screen flex items-center justify-center text-red-500">Không tìm thấy sản phẩm</div>;
 
     console.log("ProductDetail render: product =", product);
 
     const handleBuyNow = () => {
-        console.log("Clicked Mua ngay", product);
-        if (product.productVariants.length === 0) {
-            alert("Sản phẩm này chưa có biến thể để mua!");
-            return;
-        }
-        // Thực hiện logic mua ngay ở đây
-        alert("Mua ngay thành công!");
+        if (!product || !selectedVariant) return;
+        navigate('/checkout', {
+            state: {
+                orderShopGroups: [
+                    {
+                        shop: product.shop,
+                        shippingMethods: [
+                            { value: 'FAST', label: 'Giao hàng nhanh', fee: 25000 },
+                            { value: 'STANDARD', label: 'Giao hàng tiêu chuẩn', fee: 18000 }
+                        ],
+                        selectedShipping: 'FAST',
+                        voucher: '',
+                        products: [
+                            {
+                                id: selectedVariant.id,
+                                name: product.name,
+                                price: selectedVariant.price,
+                                quantity,
+                                image: product.images?.[0]?.url || '',
+                                attrs: selectedVariant.detailAttributes?.map((a: { name: string }) => a.name) || []
+                            }
+                        ],
+                        shopDiscount: 0,
+                        shopVoucher: ''
+                    }
+                ]
+            }
+        });
     };
 
     return (
@@ -304,23 +330,27 @@ const ProductDetail: React.FC = () => {
                             {/* Quantity and Add to Cart */}
                             <div className="flex items-center flex-col min-[400px]:flex-row gap-4 mb-8">
                                 <div className="flex items-center justify-center border border-gray-300 rounded-full w-full min-[400px]:w-auto">
-                                    <button className="group p-3 rounded-l-full h-full flex items-center justify-center bg-white transition hover:bg-gray-50">
+                                    <button className="group p-3 rounded-l-full h-full flex items-center justify-center bg-white transition hover:bg-gray-50" onClick={() => setQuantity(q => Math.max(1, q - 1))}>
                                         <svg className="stroke-gray-900" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 11H5.5" stroke="" strokeWidth="1.6" strokeLinecap="round" /></svg>
                                     </button>
-                                    <input type="text" className="font-semibold text-gray-900 text-lg w-16 h-full bg-transparent text-center outline-none" placeholder="1" />
-                                    <button className="group p-3 rounded-r-full h-full flex items-center justify-center bg-white transition hover:bg-gray-50">
+                                    <input type="text" className="font-semibold text-gray-900 text-lg w-16 h-full bg-transparent text-center outline-none" value={quantity} onChange={e => setQuantity(Math.max(1, Number(e.target.value) || 1))} />
+                                    <button className="group p-3 rounded-r-full h-full flex items-center justify-center bg-white transition hover:bg-gray-50" onClick={() => setQuantity(q => q + 1)}>
                                         <svg className="stroke-gray-900" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5.5V16.5M16.5 11H5.5" stroke="" strokeWidth="1.6" strokeLinecap="round" /></svg>
                                     </button>
                                 </div>
-                                <button className="group py-3 px-5 rounded-full bg-[#faeaea] text-[#cc3333] font-semibold text-lg w-full flex items-center justify-center gap-2 transition-all duration-500 hover:bg-[#f5d5d5]">
+                                <button 
+                                    className="group py-3 px-5 rounded-full bg-[#faeaea] text-[#cc3333] font-semibold text-lg w-full flex items-center justify-center gap-2 transition-all duration-500 hover:bg-[#f5d5d5] disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!isAllAttributesSelected}
+                                >
                                     <svg className="stroke-[#cc3333]" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.7394 17.875C10.7394 18.6344 10.1062 19.25 9.32511 19.25C8.54402 19.25 7.91083 18.6344 7.91083 17.875M16.3965 17.875C16.3965 18.6344 15.7633 19.25 14.9823 19.25C14.2012 19.25 13.568 18.6344 13.568 17.875M4.1394 5.5L5.46568 12.5908C5.73339 14.0221 5.86724 14.7377 6.37649 15.1605C6.88573 15.5833 7.61377 15.5833 9.06984 15.5833H15.2379C16.6941 15.5833 17.4222 15.5833 17.9314 15.1605C18.4407 14.7376 18.5745 14.0219 18.8421 12.5906L19.3564 9.84059C19.7324 7.82973 19.9203 6.8243 19.3705 6.16215C18.8207 5.5 17.7979 5.5 15.7522 5.5H4.1394ZM4.1394 5.5L3.66797 2.75" stroke="" strokeWidth="1.6" strokeLinecap="round" /></svg>
                                     Thêm vào giỏ hàng
                                 </button>
                             </div>
                             {/* Buy Now Button */}
                             <button
-                                className="text-center w-full px-5 py-4 rounded-full bg-[#cc3333] font-semibold text-lg text-white transition-all duration-500 hover:bg-[#b82d2d]"
+                                className="text-center w-full px-5 py-4 rounded-full bg-[#cc3333] font-semibold text-lg text-white transition-all duration-500 hover:bg-[#b82d2d] disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={handleBuyNow}
+                                disabled={!isAllAttributesSelected}
                             >
                                 Mua ngay
                             </button>

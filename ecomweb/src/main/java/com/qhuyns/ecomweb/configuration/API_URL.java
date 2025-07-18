@@ -6,7 +6,8 @@ public class API_URL {
             "/categories/**",
             "/products/**",
             "/customer_reviews/**",
-            "/uploads/**"
+            "/uploads/**",
+            "/user_address/**"
 
     };
 

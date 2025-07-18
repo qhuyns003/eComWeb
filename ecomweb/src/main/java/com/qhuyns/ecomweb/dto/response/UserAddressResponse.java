@@ -1,27 +1,22 @@
-package com.qhuyns.ecomweb.entity;
+package com.qhuyns.ecomweb.dto.response;
 
+import com.qhuyns.ecomweb.entity.Order;
+import com.qhuyns.ecomweb.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserAddress {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class UserAddressResponse {
     String id;
-
     String receiverName;
     String phoneNumber;
     BigDecimal latitude;
@@ -33,12 +28,4 @@ public class UserAddress {
     String province;
     boolean isDefault;
 
-    @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "userAddress", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Order> orders= new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
-
-} 
+}
