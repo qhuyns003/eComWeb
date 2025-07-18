@@ -7,7 +7,8 @@ public class API_URL {
             "/products/**",
             "/customer_reviews/**",
             "/uploads/**",
-            "/user_address/**"
+            "/user_address/**",
+            "/ghn/**"
 
     };
 

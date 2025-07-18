@@ -88,3 +88,7 @@ export const getUserAddresses = () => {
     return [];
   });
 };
+
+export const getProvinces = () => axiosInstance.get('/ghn/provinces');
+export const getDistricts = (provinceId: number) => axiosInstance.get('/ghn/districts', { params: { provinceId } });
+export const getWards = (districtId: number) => axiosInstance.get('/ghn/wards', { params: { districtId } });

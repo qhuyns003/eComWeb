@@ -25,8 +25,11 @@ public class ShopAddress {
     String fullAddress;
     String detailAddress;
     String ward;
+    Integer wardId;
     String district;
+    Integer districtId;
     String province;
+    String provinceId;
     @OneToOne
     @JoinColumn(name = "shop_id")
     Shop shop;

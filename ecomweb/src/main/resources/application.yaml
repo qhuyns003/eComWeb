@@ -2,7 +2,6 @@ server:
   port: 8080
 #  servlet:
 #    context-path: /identity
-
 spring:
   datasource:
     url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/ecomweb}
@@ -13,13 +12,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
+ghn:
+  api-url: "https://dev-online-gateway.ghn.vn/shiip/public-api/"
+  token: "f02c23e4-63c7-11f0-9b81-222185cb68c8"
+  shop-id: "197137"
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
-
-ghn:
-  api-url: https://dev-online-gateway.ghn.vn/shiip/public-api/
-  token: f02c23e4-63c7-11f0-9b81-222185cb68c8
-  shop-id: 	197137

@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards } from '../../api/api';
 
 const paymentMethods = [
   { value: 'COD', label: 'Thanh toán khi nhận hàng', icon: <FiDollarSign className="inline mr-2 text-xl text-[#cc3333]" /> },
@@ -29,6 +29,9 @@ const Checkout: React.FC = () => {
   const [note, setNote] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [orderVoucher, setOrderVoucher] = useState('');
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
 
   // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
@@ -48,6 +51,32 @@ const Checkout: React.FC = () => {
       // Có thể dùng selectedAddress.latitude, longitude ở các bước sau
     }
   }, [selectedAddress]);
+
+  // Load provinces khi mở modal
+  useEffect(() => {
+    if (showAddAddressModal) {
+      getProvinces().then(res => setProvinces(res.data.data || []));
+    }
+  }, [showAddAddressModal]);
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const provinceId = Number(e.target.value);
+    const provinceName = provinces.find((p: any) => p.ProvinceID === provinceId)?.ProvinceName || '';
+    setNewAddress(a => ({ ...a, province: provinceName, district: '', ward: '' }));
+    getDistricts(provinceId).then(res => setDistricts(res.data.data || []));
+    setWards([]);
+  };
+  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const districtId = Number(e.target.value);
+    const districtName = districts.find((d: any) => d.DistrictID === districtId)?.DistrictName || '';
+    setNewAddress(a => ({ ...a, district: districtName, ward: '' }));
+    getWards(districtId).then(res => setWards(res.data.data || []));
+  };
+  const handleWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const wardCode = e.target.value;
+    const wardName = wards.find((w: any) => w.WardCode === wardCode)?.WardName || '';
+    setNewAddress(a => ({ ...a, ward: wardName }));
+  };
 
   // Tính toán tổng tiền
   const totalProduct = orderShopGroups.reduce((sum: number, group: any) => sum + group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0), 0);
@@ -187,12 +216,45 @@ const Checkout: React.FC = () => {
                 <button className="absolute top-3 right-3 text-gray-400 hover:text-[#cc3333] text-2xl font-bold transition" onClick={() => setShowAddAddressModal(false)} aria-label="Đóng"><FiX /></button>
                 <h2 className="text-2xl font-bold mb-4 text-[#cc3333] text-center">Thêm địa chỉ mới</h2>
                 <form onSubmit={handleAddAddress} className="flex flex-col gap-3">
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Họ tên" value={newAddress.receiverName} onChange={e => setNewAddress(a => ({ ...a, receiverName: e.target.value }))} required />
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Số điện thoại" value={newAddress.phoneNumber} onChange={e => setNewAddress(a => ({ ...a, phoneNumber: e.target.value }))} required />
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Số nhà, đường" value={newAddress.detailAddress} onChange={e => setNewAddress(a => ({ ...a, detailAddress: e.target.value }))} required />
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Phường/Xã" value={newAddress.ward} onChange={e => setNewAddress(a => ({ ...a, ward: e.target.value }))} required />
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Quận/Huyện" value={newAddress.district} onChange={e => setNewAddress(a => ({ ...a, district: e.target.value }))} required />
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Tỉnh/Thành phố" value={newAddress.province} onChange={e => setNewAddress(a => ({ ...a, province: e.target.value }))} required />
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">Họ tên</label>
+                    <input type="text" className="border rounded px-3 py-2 w-full" placeholder="Họ tên người nhận" value={newAddress.receiverName} onChange={e => setNewAddress(a => ({ ...a, receiverName: e.target.value }))} required />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">Số điện thoại</label>
+                    <input type="text" className="border rounded px-3 py-2 w-full" placeholder="Số điện thoại" value={newAddress.phoneNumber} onChange={e => setNewAddress(a => ({ ...a, phoneNumber: e.target.value }))} required />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">Tỉnh/Thành phố</label>
+                    <select required onChange={handleProvinceChange} value={provinces.find((p: any) => p.ProvinceName === newAddress.province)?.ProvinceID || ''} className="border rounded px-3 py-2 w-full">
+                      <option value="">Chọn tỉnh/thành</option>
+                      {provinces.map((p: any) => (
+                        <option key={p.ProvinceID} value={p.ProvinceID}>{p.ProvinceName}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">Quận/Huyện</label>
+                    <select required onChange={handleDistrictChange} value={districts.find((d: any) => d.DistrictName === newAddress.district)?.DistrictID || ''} disabled={!districts.length} className="border rounded px-3 py-2 w-full">
+                      <option value="">Chọn quận/huyện</option>
+                      {districts.map((d: any) => (
+                        <option key={d.DistrictID} value={d.DistrictID}>{d.DistrictName}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">Phường/Xã</label>
+                    <select required onChange={handleWardChange} value={wards.find((w: any) => w.WardName === newAddress.ward)?.WardCode || ''} disabled={!wards.length} className="border rounded px-3 py-2 w-full">
+                      <option value="">Chọn phường/xã</option>
+                      {wards.map((w: any) => (
+                        <option key={w.WardCode} value={w.WardCode}>{w.WardName}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">Địa chỉ cụ thể</label>
+                    <input type="text" className="border rounded px-3 py-2 w-full" placeholder="Số nhà, tên đường, tòa nhà..." value={newAddress.detailAddress} onChange={e => setNewAddress(a => ({ ...a, detailAddress: e.target.value }))} required />
+                  </div>
                   <button type="submit" className="w-full mt-2 py-2 rounded-full bg-[#cc3333] text-white font-bold text-lg shadow-lg hover:bg-[#b82d2d] transition">Lưu địa chỉ</button>
                 </form>
               </div>

@@ -29,8 +29,11 @@ public class UserAddress {
     String fullAddress;
     String detailAddress;
     String ward;
+    Integer wardId;
     String district;
+    Integer districtId;
     String province;
+    String provinceId;
     boolean isDefault;
 
     @Builder.Default
