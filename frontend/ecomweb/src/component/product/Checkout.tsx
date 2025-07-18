@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
+import { getUserAddresses } from '../../api/api';
 
 const paymentMethods = [
   { value: 'COD', label: 'Thanh toán khi nhận hàng', icon: <FiDollarSign className="inline mr-2 text-xl text-[#cc3333]" /> },
@@ -15,19 +16,13 @@ const orderVoucherList = [
   { value: 'ORDER20', label: 'Giảm 20k cho đơn từ 400k', icon: <FaTag className="inline mr-2 text-lg text-[#cc3333]" />, discount: 20000 },
 ];
 
-// Giả lập API lấy địa chỉ
-const getUserAddresses = async () => [
-  { id: '1', fullName: 'Nguyễn Văn A', phone: '0912345678', streetAddress: '123 Lê Lợi', ward: 'Phường 1', district: 'Quận 1', province: 'TP.HCM', isDefault: true },
-  { id: '2', fullName: 'Nguyễn Thị B', phone: '0987654321', streetAddress: '456 Trần Hưng Đạo', ward: 'Phường 2', district: 'Quận 5', province: 'TP.HCM', isDefault: false },
-];
-
 const Checkout: React.FC = () => {
   const location = useLocation();
   const [orderShopGroups, setOrderShopGroups] = useState(location.state?.orderShopGroups || []);
   const [userAddresses, setUserAddresses] = useState<any[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<any | null>(null);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
-  const [newAddress, setNewAddress] = useState({ fullName: '', phone: '', streetAddress: '', ward: '', district: '', province: '' });
+  const [newAddress, setNewAddress] = useState({ receiverName: '', phoneNumber: '', detailAddress: '', ward: '', district: '', province: '' });
   const [receiverName, setReceiverName] = useState('');
   const [receiverPhone, setReceiverPhone] = useState('');
   const [receiverAddress, setReceiverAddress] = useState('');
@@ -35,24 +30,24 @@ const Checkout: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [orderVoucher, setOrderVoucher] = useState('');
 
-  // Lấy địa chỉ khi vào trang
+  // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
     getUserAddresses().then(addresses => {
       setUserAddresses(addresses);
-      const defaultAddr = addresses.find(addr => addr.isDefault);
-      setSelectedAddressId(defaultAddr ? defaultAddr.id : addresses[0]?.id || null);
+      const defaultAddr = addresses.find((addr: any) => addr.default);
+      setSelectedAddress(defaultAddr || addresses[0] || null);
     });
   }, []);
 
   // Khi chọn địa chỉ, tự động fill thông tin người nhận
   useEffect(() => {
-    const addr = userAddresses.find(a => a.id === selectedAddressId);
-    if (addr) {
-      setReceiverName(addr.fullName);
-      setReceiverPhone(addr.phone);
-      setReceiverAddress(`${addr.streetAddress}, ${addr.ward}, ${addr.district}, ${addr.province}`);
+    if (selectedAddress) {
+      setReceiverName(selectedAddress.receiverName);
+      setReceiverPhone(selectedAddress.phoneNumber);
+      setReceiverAddress(selectedAddress.fullAddress || `${selectedAddress.detailAddress}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`);
+      // Có thể dùng selectedAddress.latitude, longitude ở các bước sau
     }
-  }, [selectedAddressId, userAddresses]);
+  }, [selectedAddress]);
 
   // Tính toán tổng tiền
   const totalProduct = orderShopGroups.reduce((sum: number, group: any) => sum + group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0), 0);
@@ -73,11 +68,11 @@ const Checkout: React.FC = () => {
   const handleAddAddress = (e: React.FormEvent) => {
     e.preventDefault();
     const id = (Math.random() * 100000).toFixed(0);
-    const addr = { ...newAddress, id, isDefault: false };
+    const addr = { ...newAddress, id, default: false };
     setUserAddresses(prev => [...prev, addr]);
-    setSelectedAddressId(id);
+    setSelectedAddress(addr);
     setShowAddAddressModal(false);
-    setNewAddress({ fullName: '', phone: '', streetAddress: '', ward: '', district: '', province: '' });
+    setNewAddress({ receiverName: '', phoneNumber: '', detailAddress: '', ward: '', district: '', province: '' });
     toast.success('Thêm địa chỉ thành công!');
   };
 
@@ -159,22 +154,22 @@ const Checkout: React.FC = () => {
               <span className="font-bold text-[#cc3333] text-lg">Thông tin nhận hàng</span>
             </div>
             <div className="flex flex-col gap-2">
-              {userAddresses.map(addr => (
-                <label key={addr.id} className={`flex items-start px-3 py-2 rounded-lg border cursor-pointer transition-all ${selectedAddressId === addr.id ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333] gap-2`}>
+              {userAddresses.map((addr: any) => (
+                <label key={addr.id} className={`flex items-start px-3 py-2 rounded-lg border cursor-pointer transition-all ${selectedAddress?.id === addr.id ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333] gap-2`}>
                   <input
                     type="radio"
                     name="userAddress"
                     value={addr.id}
-                    checked={selectedAddressId === addr.id}
-                    onChange={() => setSelectedAddressId(addr.id)}
+                    checked={selectedAddress?.id === addr.id}
+                    onChange={() => setSelectedAddress(addr)}
                     className="mr-2 accent-[#cc3333] mt-1"
                   />
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="font-semibold text-gray-900">{addr.fullName}</span>
-                    <span className="text-gray-900">{addr.phone}</span>
-                    <span className="text-gray-700 text-sm break-words">{addr.streetAddress}, {addr.ward}, {addr.district}, {addr.province}</span>
+                    <span className="font-semibold text-gray-900">{addr.receiverName}</span>
+                    <span className="text-gray-900">{addr.phoneNumber}</span>
+                    <span className="text-gray-700 text-sm break-words">{addr.fullAddress || `${addr.detailAddress}, ${addr.ward}, ${addr.district}, ${addr.province}`}</span>
                   </div>
-                  {addr.isDefault && <span className="ml-2 px-2 py-1 bg-[#cc3333] text-white text-xs rounded self-start">Mặc định</span>}
+                  {addr.default && <span className="ml-2 px-2 py-1 bg-[#cc3333] text-white text-xs rounded self-start">Mặc định</span>}
                 </label>
               ))}
               <button
@@ -192,9 +187,9 @@ const Checkout: React.FC = () => {
                 <button className="absolute top-3 right-3 text-gray-400 hover:text-[#cc3333] text-2xl font-bold transition" onClick={() => setShowAddAddressModal(false)} aria-label="Đóng"><FiX /></button>
                 <h2 className="text-2xl font-bold mb-4 text-[#cc3333] text-center">Thêm địa chỉ mới</h2>
                 <form onSubmit={handleAddAddress} className="flex flex-col gap-3">
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Họ tên" value={newAddress.fullName} onChange={e => setNewAddress(a => ({ ...a, fullName: e.target.value }))} required />
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Số điện thoại" value={newAddress.phone} onChange={e => setNewAddress(a => ({ ...a, phone: e.target.value }))} required />
-                  <input type="text" className="border rounded px-3 py-2" placeholder="Số nhà, đường" value={newAddress.streetAddress} onChange={e => setNewAddress(a => ({ ...a, streetAddress: e.target.value }))} required />
+                  <input type="text" className="border rounded px-3 py-2" placeholder="Họ tên" value={newAddress.receiverName} onChange={e => setNewAddress(a => ({ ...a, receiverName: e.target.value }))} required />
+                  <input type="text" className="border rounded px-3 py-2" placeholder="Số điện thoại" value={newAddress.phoneNumber} onChange={e => setNewAddress(a => ({ ...a, phoneNumber: e.target.value }))} required />
+                  <input type="text" className="border rounded px-3 py-2" placeholder="Số nhà, đường" value={newAddress.detailAddress} onChange={e => setNewAddress(a => ({ ...a, detailAddress: e.target.value }))} required />
                   <input type="text" className="border rounded px-3 py-2" placeholder="Phường/Xã" value={newAddress.ward} onChange={e => setNewAddress(a => ({ ...a, ward: e.target.value }))} required />
                   <input type="text" className="border rounded px-3 py-2" placeholder="Quận/Huyện" value={newAddress.district} onChange={e => setNewAddress(a => ({ ...a, district: e.target.value }))} required />
                   <input type="text" className="border rounded px-3 py-2" placeholder="Tỉnh/Thành phố" value={newAddress.province} onChange={e => setNewAddress(a => ({ ...a, province: e.target.value }))} required />
