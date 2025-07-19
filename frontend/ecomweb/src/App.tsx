@@ -14,10 +14,13 @@ import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Checkout from './component/product/Checkout';
+import { useAppDispatch } from './store/hooks';
+import { clearUser } from './store/features/userSlice';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const handleTokenExpired = () => {
@@ -32,11 +35,19 @@ function AppContent() {
   }, []);
 
   const handleLogoutConfirm = () => {
+    // Xóa dữ liệu khi user xác nhận
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    dispatch(clearUser());
     setShowLogoutModal(false);
     navigate('/login');
   };
 
   const handleLogoutCancel = () => {
+    // Xóa dữ liệu khi user đóng modal
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    dispatch(clearUser());
     setShowLogoutModal(false);
     navigate('/login');
   };

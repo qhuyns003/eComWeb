@@ -1,24 +1,21 @@
-package com.qhuyns.ecomweb.entity;
+package com.qhuyns.ecomweb.dto.request;
 
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ShopAddress {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class UserAddressRequest {
+
     String id;
+    String receiverName;
     String phoneNumber;
     BigDecimal latitude;
     BigDecimal longitude;
@@ -30,9 +27,6 @@ public class ShopAddress {
     Integer districtId;
     String province;
     String provinceId;
-    @OneToOne
-    @JoinColumn(name = "shop_id")
-    Shop shop;
+    boolean isDefault;
 
-
-} 
+}

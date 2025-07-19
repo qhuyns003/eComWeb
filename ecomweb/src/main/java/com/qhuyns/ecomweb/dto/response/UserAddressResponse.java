@@ -24,8 +24,11 @@ public class UserAddressResponse {
     String fullAddress;
     String detailAddress;
     String ward;
+    String wardCode;
     String district;
+    Integer districtId;
     String province;
+    Integer provinceId;
     boolean isDefault;
 
 }

@@ -1,11 +1,16 @@
 package com.qhuyns.ecomweb.service;
 
+import com.qhuyns.ecomweb.dto.request.UserAddressRequest;
 import com.qhuyns.ecomweb.dto.response.CategoryResponse;
 import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
+import com.qhuyns.ecomweb.entity.UserAddress;
+import com.qhuyns.ecomweb.exception.AppException;
+import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.CategoryMapper;
 import com.qhuyns.ecomweb.mapper.UserAddressMapper;
 import com.qhuyns.ecomweb.repository.CategoryRepository;
 import com.qhuyns.ecomweb.repository.UserAddressRepository;
+import com.qhuyns.ecomweb.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +29,7 @@ public class UserAddressService {
 
     UserAddressMapper userAddressMapper;
     UserAddressRepository userAddressRepository;
+    UserRepository userRepository;
 
     public List<UserAddressResponse> getAll() {
         return userAddressRepository
@@ -32,4 +38,11 @@ public class UserAddressService {
                 .collect(Collectors.toList());
 
     }
+    public void create(UserAddressRequest userAddressRequest) {
+        UserAddress userAddress = userAddressMapper.toUserAddress(userAddressRequest);
+        userAddress.setUser(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_EXISTED)));
+        userAddressRepository.save(userAddress);
+    }
+
 }

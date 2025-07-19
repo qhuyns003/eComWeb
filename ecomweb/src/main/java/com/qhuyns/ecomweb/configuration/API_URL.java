@@ -28,7 +28,8 @@ public class API_URL {
             "/auth/logout",
             "/auth/refresh",
             "/files/**",
-            "/products/**"
+            "/products/**",
+            "/user_address/**",
 
     };
     public static final String[] URL_ANONYMOUS_DELETE = {

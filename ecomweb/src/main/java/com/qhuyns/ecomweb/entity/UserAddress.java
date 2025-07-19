@@ -29,7 +29,7 @@ public class UserAddress {
     String fullAddress;
     String detailAddress;
     String ward;
-    Integer wardId;
+    String wardCode;
     String district;
     Integer districtId;
     String province;

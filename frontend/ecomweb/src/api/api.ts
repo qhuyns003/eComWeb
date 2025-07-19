@@ -90,7 +90,7 @@ export const getUserAddresses = () => {
 };
 
 export const addUserAddress = (addressData: any) => {
-  return axiosInstance.post('/user_address', addressData);
+  return axiosInstance.post('/user_address/', addressData);
 };
 
 export const getProvinces = () => axiosInstance.get('/ghn/provinces');

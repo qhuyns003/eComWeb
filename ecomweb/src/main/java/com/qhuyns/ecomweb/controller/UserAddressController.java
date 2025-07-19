@@ -2,6 +2,7 @@ package com.qhuyns.ecomweb.controller;
 
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
+import com.qhuyns.ecomweb.dto.request.UserAddressRequest;
 import com.qhuyns.ecomweb.dto.response.CategoryResponse;
 import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
 import com.qhuyns.ecomweb.service.CategoryService;
@@ -10,9 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,4 +30,13 @@ public class UserAddressController {
                 .result(userAddressService.getAll())
                 .build();
     }
+
+    @PostMapping("/")
+    ApiResponse<String> create(@RequestBody UserAddressRequest userAddressRequest) {
+        userAddressService.create(userAddressRequest);
+        return ApiResponse.<String>builder()
+                .result("Successfully created user address")
+                .build();
+    }
+
 }

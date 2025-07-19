@@ -16,8 +16,6 @@ function isTokenExpired(token: string | null) {
 const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectUserLoading);
-
-  
   // fetchUserInfo sẽ lấy lại thông tin user từ server, session và cập nhật vào Redux state.
   // đảm bảo khi f5 trang thì userStateRedux vẫn được lưu trong redux state
   // vì khi f5 trang thì userStateRedux sẽ bị mất, nên cần lấy lại thông tin user từ server, session và cập nhật vào Redux state.
@@ -29,16 +27,18 @@ const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) =
     }
   }, [dispatch]);
 
-  // Kiểm tra token hết hạn khi mount và mỗi 1 phút
   useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('token');
       if (isTokenExpired(token)) {
-        window.dispatchEvent(new CustomEvent('tokenExpired', { detail: { message: 'Phiên đăng nhập đã hết hạn' } }));
+        // Chỉ dispatch event để hiện modal, không xóa dữ liệu ngay
+        window.dispatchEvent(new CustomEvent('tokenExpired', { 
+          detail: { message: 'Phiên đăng nhập đã hết hạn' } 
+        }));
       }
     };
-    checkToken(); // kiểm tra ngay khi mount
-    const interval = setInterval(checkToken, 30000); // kiểm tra mỗi 0.5 phút
+    checkToken();
+    const interval = setInterval(checkToken, 60000);
     return () => clearInterval(interval);
   }, []);
 
