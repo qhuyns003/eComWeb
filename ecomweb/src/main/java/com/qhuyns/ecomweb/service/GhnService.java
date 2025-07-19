@@ -1,26 +1,17 @@
 package com.qhuyns.ecomweb.service;
 
-import com.qhuyns.ecomweb.dto.response.ShippingMethodResponse;
-import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
-import com.qhuyns.ecomweb.mapper.UserAddressMapper;
-import com.qhuyns.ecomweb.repository.UserAddressRepository;
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -93,18 +84,17 @@ public class GhnService {
         return response.getBody();
     }
 
-    public List<ShippingMethodResponse> getAvailableServices(Integer fromDistrictId,Integer toDistrictId) {
-        String url = "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services";
-
+    public Map<String, Object> getAvailableService(Integer fromDistrictId, Integer toDistrictId) {
+        String url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Token", ghnToken);
-        headers.set("ShopId", String.valueOf(ghnShopId));
+        headers.set("ShopId", ghnShopId);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("shop_id", ghnShopId);
+        body.put("shop_id", Integer.valueOf(ghnShopId));
         body.put("from_district", fromDistrictId);
         body.put("to_district", toDistrictId);
 
@@ -112,17 +102,10 @@ public class GhnService {
 
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
 
-        List<Map<String, Object>> data = (List<Map<String, Object>>) ((Map) response.getBody()).get("data");
-        List<ShippingMethodResponse> result = new ArrayList<>();
-        for (Map<String, Object> item : data) {
-            ShippingMethodResponse method = new ShippingMethodResponse();
-            method.setService_id((Integer) item.get("service_id"));
-            method.setShort_name((String) item.get("short_name"));
-            method.setService_type_id((Integer) item.get("service_type_id"));
-            method.setService_name((String) item.get("service_name"));
-            result.add(method);
-        }
-        return result;
+        // Trả về toàn bộ data hoặc chỉ serviceId mong muốn
+        return (Map<String, Object>) response.getBody();
     }
+
+
 
 }

@@ -22,6 +22,10 @@ public class ProductResponse {
     String description;
     BigDecimal price;
     String status;
+    BigDecimal weight;
+    BigDecimal length;
+    BigDecimal width;
+    BigDecimal height;
     LocalDateTime createdAt;
     CategoryResponse category;
     ShopResponse shop;

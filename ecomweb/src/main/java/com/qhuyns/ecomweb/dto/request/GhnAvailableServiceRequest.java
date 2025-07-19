@@ -3,7 +3,7 @@ package com.qhuyns.ecomweb.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ShippingMethodRequest {
-    Integer toDistrictId;
+public class GhnAvailableServiceRequest {
+    String  shopId;
     Integer fromDistrictId;
+    Integer toDistrictId;
 
 }

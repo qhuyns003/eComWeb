@@ -38,6 +38,10 @@ interface Product {
   images: ProductImage[];
   productAttributes: ProductAttribute[];
   productVariants: ProductVariant[];
+  weight: string;
+  length: string;
+  width: string;
+  height: string;
 }
 
 interface EditProductProps {
@@ -63,6 +67,11 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
           ...v,
           enabled: v.status === '1'
         }));
+        // Khi khởi tạo product từ API, ép các trường này về string:
+        prod.weight = prod.weight?.toString() || "";
+        prod.length = prod.length?.toString() || "";
+        prod.width = prod.width?.toString() || "";
+        prod.height = prod.height?.toString() || "";
         setProduct(prod);
         setLoading(false);
       })
@@ -214,7 +223,11 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
       description: product.description,
       category: product.category ? { id: product.category.id } : null,
       images: product.images,
-      productVariants: newVariants
+      productVariants: newVariants,
+      weight: Number(product.weight) || 0,
+      length: Number(product.length) || 0,
+      width: Number(product.width) || 0,
+      height: Number(product.height) || 0,
     };
   };
 
@@ -360,6 +373,69 @@ const EditProduct: React.FC<EditProductProps> = ({ productId, onSaveSuccess, onC
               }}
             />
             <button type="button" onClick={() => document.getElementById('add-new-image-input')?.click()} className="h-20 w-20 flex items-center justify-center border-2 border-dashed rounded text-gray-400 hover:border-[#cc3333]">+</button>
+          </div>
+        </div>
+      </div>
+      {/* Trọng lượng & Kích thước */}
+      <div className="col-span-2 mb-8">
+        <div className="font-bold text-base text-black mb-2">Trọng lượng & Kích thước</div>
+        <div className="text-xs text-red-500 mb-3">Nên nhập kích thước và trọng lượng ứng với biến thể lớn nhất để tránh rủi ro đơn vị vận chuyển từ chối nhận hàng do sai sót thông tin.</div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold mb-1 text-gray-600">Trọng lượng (g)</label>
+            <input
+              type="number"
+              name="weight"
+              value={product?.weight || ''}
+              onChange={handleBasicChange}
+              min={0}
+              step={0.01}
+              required
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-[#cc3333] focus:ring-2 focus:ring-[#cc3333] transition-all shadow-sm bg-white placeholder-gray-400 text-base"
+              placeholder="VD: 500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold mb-1 text-gray-600">Dài (cm)</label>
+            <input
+              type="number"
+              name="length"
+              value={product?.length || ''}
+              onChange={handleBasicChange}
+              min={0}
+              step={0.01}
+              required
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-[#cc3333] focus:ring-2 focus:ring-[#cc3333] transition-all shadow-sm bg-white placeholder-gray-400 text-base"
+              placeholder="VD: 20"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold mb-1 text-gray-600">Rộng (cm)</label>
+            <input
+              type="number"
+              name="width"
+              value={product?.width || ''}
+              onChange={handleBasicChange}
+              min={0}
+              step={0.01}
+              required
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-[#cc3333] focus:ring-2 focus:ring-[#cc3333] transition-all shadow-sm bg-white placeholder-gray-400 text-base"
+              placeholder="VD: 10"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold mb-1 text-gray-600">Cao (cm)</label>
+            <input
+              type="number"
+              name="height"
+              value={product?.height || ''}
+              onChange={handleBasicChange}
+              min={0}
+              step={0.01}
+              required
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-2 focus:border-[#cc3333] focus:ring-2 focus:ring-[#cc3333] transition-all shadow-sm bg-white placeholder-gray-400 text-base"
+              placeholder="VD: 5"
+            />
           </div>
         </div>
       </div>

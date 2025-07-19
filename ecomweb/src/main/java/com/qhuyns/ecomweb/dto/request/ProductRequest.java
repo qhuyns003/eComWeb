@@ -19,6 +19,10 @@ public class ProductRequest {
     String description;
     BigDecimal price;
     String status;
+    BigDecimal weight;
+    BigDecimal length;
+    BigDecimal width;
+    BigDecimal height;
     LocalDateTime createdAt;
     CategoryRequest category;
     ShopRequest shop;

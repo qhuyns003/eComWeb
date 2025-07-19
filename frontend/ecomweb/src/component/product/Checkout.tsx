@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup } from '../../api/api';
 import OrderShopGroup from './OrderShopGroup';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { clearOrder } from '../../store/features/orderSlice';
@@ -36,6 +36,7 @@ const Checkout: React.FC = () => {
   const [provinces, setProvinces] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [wards, setWards] = useState<any[]>([]);
+  const [shippingInfo, setShippingInfo] = useState<any[]>([]);
 
   // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
@@ -63,6 +64,22 @@ const Checkout: React.FC = () => {
     }
   }, [showAddAddressModal]);
 
+  useEffect(() => {
+    if (!selectedAddress || !orderShopGroups.length) return;
+    const payload = orderShopGroups.map((group: any) => ({
+      shopId: group.shop.id,
+      fromDistrictId: group.shop.districtId,
+      toDistrictId: selectedAddress.districtId,
+    }));
+    getGhnServiceForOrderGroup(payload)
+      .then(res => {
+        setShippingInfo(res.data.result);
+      })
+      .catch(() => {
+        setShippingInfo([]);
+      });
+  }, [selectedAddress, orderShopGroups]);
+
   const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const provinceId = Number(e.target.value);
     const provinceName = provinces.find((p: any) => p.ProvinceID === provinceId)?.ProvinceName || '';
@@ -82,6 +99,21 @@ const Checkout: React.FC = () => {
     setNewAddress(a => ({ ...a, ward: wardName }));
   };
 
+  // Hàm tính tổng khối lượng cho 1 group
+  const calcTotalWeight = (group: any) => {
+    return group.products.reduce((sum: number, p: any) => sum + (Number(p.weight) || 0) * (p.quantity || 1), 0);
+  };
+  // Hàm tính tổng kích thước (ví dụ, có thể cộng dồn hoặc lấy max tuỳ quy tắc đóng gói)
+  const calcTotalDimensions = (group: any) => {
+    let length = 0, width = 0, height = 0;
+    group.products.forEach((p: any) => {
+      length = Math.max(length, Number(p.length) || 0);
+      width = Math.max(width, Number(p.width) || 0);
+      height += (Number(p.height) || 0) * (p.quantity || 1);
+    });
+    return { length, width, height };
+  };
+
   // Tính toán tổng tiền
   const totalProduct = orderShopGroups.reduce((sum: number, group: any) => sum + group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0), 0);
   const totalShipping = orderShopGroups.reduce((sum: number, group: any) => sum + (group.shippingMethods.find((m: any) => m.value === group.selectedShipping)?.fee || 0), 0);
@@ -89,11 +121,31 @@ const Checkout: React.FC = () => {
   const orderVoucherDiscount = orderVoucherList.find((v: any) => v.value === orderVoucher)?.discount || 0;
   const finalAmount = totalProduct + totalShipping - totalShopDiscount - orderVoucherDiscount;
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!receiverName || !receiverPhone || !receiverAddress) {
       toast.error('Vui lòng nhập đầy đủ thông tin nhận hàng!');
       return;
     }
+    // Đóng gói orderGroup gửi về BE
+    const payload = orderShopGroups.map((group: any) => {
+      const totalWeight = calcTotalWeight(group);
+      const { length, width, height } = calcTotalDimensions(group);
+      return {
+        shopId: group.shop.id,
+        fromDistrictId: group.shop.districtId,
+        toDistrictId: selectedAddress.districtId,
+        toWardCode: selectedAddress.wardCode,
+        totalWeight,
+        length,
+        width,
+        height,
+        products: group.products,
+        address: selectedAddress,
+        // ... các thông tin khác cần thiết
+      };
+    });
+    // Gửi payload này về BE qua API tính phí ship
+    // await api.calculateShippingFee(payload) // TODO: gọi API thực tế
     toast.success('Đặt hàng thành công!');
     dispatch(clearOrder());
   };

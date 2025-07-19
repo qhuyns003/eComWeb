@@ -2,18 +2,19 @@ package com.qhuyns.ecomweb.controller;
 
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.ShippingMethodRequest;
-import com.qhuyns.ecomweb.dto.response.ShippingMethodResponse;
-import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
+import com.qhuyns.ecomweb.dto.request.GhnAvailableServiceRequest;
 import com.qhuyns.ecomweb.service.GhnService;
-import com.qhuyns.ecomweb.service.UserAddressService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ghn")
@@ -38,10 +39,21 @@ public class GhnController {
         return ghnService.getWards(districtId);
     }
 
-    @PostMapping("/methods")
-    public List<ShippingMethodResponse> getShippingMethods(@RequestBody ShippingMethodRequest request) {
-        return ghnService.getAvailableServices(request.getFromDistrictId(), request.getToDistrictId());
+
+    @PostMapping("/available-service")
+    public ApiResponse<?> getGhnServiceForOrderGroup(@RequestBody List<GhnAvailableServiceRequest> orderGroups) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (GhnAvailableServiceRequest group : orderGroups) {
+            Map<String, Object> serviceInfo = ghnService.getAvailableService(group.getFromDistrictId(), group.getToDistrictId());
+            serviceInfo.put("shopId", group.getShopId());
+            result.add(serviceInfo);
+        }
+        return ApiResponse.builder()
+                .result(result)
+                .build();
     }
+
+    
 
 
 }

@@ -29,6 +29,10 @@ public class Product {
     String description;
     BigDecimal price;
     String status;
+    BigDecimal weight;
+    BigDecimal length;
+    BigDecimal width;
+    BigDecimal height;
 
     @CreationTimestamp
     @Column(updatable = false)

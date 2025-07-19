@@ -96,3 +96,8 @@ export const addUserAddress = (addressData: any) => {
 export const getProvinces = () => axiosInstance.get('/ghn/provinces');
 export const getDistricts = (provinceId: number) => axiosInstance.get('/ghn/districts', { params: { provinceId } });
 export const getWards = (districtId: number) => axiosInstance.get('/ghn/wards', { params: { districtId } });
+
+export const getGhnServiceForOrderGroup = (orderGroupPayload: any) => {
+  // Gửi về endpoint backend, ví dụ /api/shipping/ghn-service
+  return axiosInstance.post('/ghn/available-service', orderGroupPayload);
+};
