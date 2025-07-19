@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class UserAddress {
     Integer districtId;
     String province;
     String provinceId;
+    // tranh su dung is o ten bien vi de bi loi mapper
     boolean isDefault;
 
     @Builder.Default

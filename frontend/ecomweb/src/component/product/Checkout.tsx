@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee } from '../../api/api';
 import OrderShopGroup from './OrderShopGroup';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { clearOrder } from '../../store/features/orderSlice';
@@ -37,12 +37,13 @@ const Checkout: React.FC = () => {
   const [districts, setDistricts] = useState<any[]>([]);
   const [wards, setWards] = useState<any[]>([]);
   const [shippingInfo, setShippingInfo] = useState<any[]>([]);
+  const [shippingFeeResult, setShippingFeeResult] = useState<any[]>([]);
 
   // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
     getUserAddresses().then(addresses => {
       setUserAddresses(addresses);
-      const defaultAddr = addresses.find((addr: any) => addr.default);
+      const defaultAddr = addresses.find((addr: any) => addr.isDefault);
       setSelectedAddress(defaultAddr || addresses[0] || null);
     });
   }, []);
@@ -80,6 +81,90 @@ const Checkout: React.FC = () => {
       });
   }, [selectedAddress, orderShopGroups]);
 
+  // Hàm tính tổng khối lượng cho 1 group
+  const calcTotalWeight = (group: any) => {
+    return group.products.reduce((sum: number, p: any) => sum + (Number(p.weight) || 0) * (p.quantity || 1), 0);
+  };
+
+  // Mapping serviceId phù hợp cho từng orderGroup
+  const orderGroupsWithServiceId = orderShopGroups.map((group: any) => {
+    const totalWeight = calcTotalWeight(group);
+    const info = shippingInfo.find((s: any) => String(s.shopId) === String(group.shop.id));
+    let serviceId = null;
+    let serviceTypeId = 2;
+    if (info && Array.isArray(info.data)) {
+      if (totalWeight >= 20000) {
+        // Hàng nặng
+        const heavy = info.data.find((d: any) => d.service_type_id === 5);
+        serviceId = heavy?.service_id;
+        serviceTypeId = 5;
+      } else {
+        // Hàng nhẹ
+        const light = info.data.find((d: any) => d.service_type_id === 2);
+        serviceId = light?.service_id;
+        serviceTypeId = 2;
+      }
+    }
+    return {
+      ...group,
+      serviceId,
+      serviceTypeId,
+      totalWeight,
+    };
+  });
+
+  // Khi đã có serviceId, tự động gọi BE để tính phí ship
+  useEffect(() => {
+    if (!orderGroupsWithServiceId.length || orderGroupsWithServiceId.some(g => !g.serviceId)) return;
+    const payloadForFee = orderGroupsWithServiceId.map(group => {
+      const { length, width, height } = calcTotalDimensions(group);
+      if (group.serviceTypeId === 5) {
+        // Hàng nặng: truyền items
+        const items = group.products.map((p: any) => ({
+          name: p.name,
+          quantity: p.quantity,
+          length: Number(p.length) || 0,
+          width: Number(p.width) || 0,
+          height: Number(p.height) || 0,
+          weight: Number(p.weight) || 0,
+        }));
+        return {
+          shopId: group.shop.id,
+          serviceId: group.serviceId,
+          serviceTypeId: group.serviceTypeId,
+          fromDistrictId: group.shop.districtId,
+          toDistrictId: selectedAddress.districtId,
+          toWardCode: selectedAddress.wardCode,
+          insurance_value: 0,
+          coupon: null,
+          items,
+        };
+      } else {
+        // Hàng nhẹ: truyền weight, length, width, height
+        return {
+          shopId: group.shop.id,
+          serviceId: group.serviceId,
+          serviceTypeId: group.serviceTypeId,
+          fromDistrictId: group.shop.districtId,
+          toDistrictId: selectedAddress.districtId,
+          toWardCode: selectedAddress.wardCode,
+          weight: group.totalWeight,
+          length,
+          width,
+          height,
+          insurance_value: 0,
+          coupon: null,
+        };
+      }
+    });
+    calculateShippingFee(payloadForFee)
+      .then(res => {
+        setShippingFeeResult(res.data);
+        console.log('Shipping fee result:', res.data);
+      })
+      .catch(() => setShippingFeeResult([]));
+  }, [orderGroupsWithServiceId, selectedAddress]);
+
   const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const provinceId = Number(e.target.value);
     const provinceName = provinces.find((p: any) => p.ProvinceID === provinceId)?.ProvinceName || '';
@@ -99,10 +184,6 @@ const Checkout: React.FC = () => {
     setNewAddress(a => ({ ...a, ward: wardName }));
   };
 
-  // Hàm tính tổng khối lượng cho 1 group
-  const calcTotalWeight = (group: any) => {
-    return group.products.reduce((sum: number, p: any) => sum + (Number(p.weight) || 0) * (p.quantity || 1), 0);
-  };
   // Hàm tính tổng kích thước (ví dụ, có thể cộng dồn hoặc lấy max tuỳ quy tắc đóng gói)
   const calcTotalDimensions = (group: any) => {
     let length = 0, width = 0, height = 0;
@@ -167,7 +248,7 @@ const Checkout: React.FC = () => {
       fullAddress: `${newAddress.detailAddress}, ${newAddress.ward}, ${newAddress.district}, ${newAddress.province}`,
       latitude: null, // Có thể lấy từ API bản đồ nếu cần
       longitude: null,
-      default: false
+      isDefault: false
     };
     await addUserAddress(addressData);
     // Sau khi lưu thành công, reload lại danh sách địa chỉ và chọn địa chỉ vừa thêm
@@ -228,7 +309,7 @@ const Checkout: React.FC = () => {
                     <span className="text-gray-900">{addr.phoneNumber}</span>
                     <span className="text-gray-700 text-sm break-words">{addr.fullAddress || `${addr.detailAddress}, ${addr.ward}, ${addr.district}, ${addr.province}`}</span>
                   </div>
-                  {addr.default && <span className="ml-2 px-2 py-1 bg-[#cc3333] text-white text-xs rounded self-start">Mặc định</span>}
+                  {(addr.isDefault === true ) && <span className="ml-2 px-2 py-1 bg-[#cc3333] text-white text-xs rounded self-start">Mặc định</span>}
                 </label>
               ))}
               <button

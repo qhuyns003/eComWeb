@@ -1,5 +1,6 @@
 package com.qhuyns.ecomweb.service;
 
+import com.qhuyns.ecomweb.dto.request.ShippingFeeRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -106,6 +107,41 @@ public class GhnService {
         return (Map<String, Object>) response.getBody();
     }
 
+
+    public Map<String, Object> calculateFee(ShippingFeeRequest req) {
+        String url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee";
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Token", ghnToken);
+        headers.set("ShopId", ghnShopId);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("service_id", req.getServiceId());
+        body.put("from_district_id", req.getFromDistrictId());
+        body.put("to_district_id", req.getToDistrictId());
+        body.put("to_ward_code", req.getToWardCode());
+        body.put("insurance_value", req.getInsurance_value());
+        body.put("coupon", req.getCoupon());
+
+        if (req.getServiceTypeId() != null && req.getServiceTypeId() == 5 && req.getItems() != null) {
+            // Hàng nặng
+            body.put("items", req.getItems());
+        } else {
+            // Hàng nhẹ
+            body.put("weight", req.getWeight());
+            body.put("length", req.getLength());
+            body.put("width", req.getWidth());
+            body.put("height", req.getHeight());
+        }
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+
+        return response.getBody();
+    }
 
 
 }

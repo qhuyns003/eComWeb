@@ -3,6 +3,7 @@ package com.qhuyns.ecomweb.controller;
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.request.GhnAvailableServiceRequest;
+import com.qhuyns.ecomweb.dto.request.ShippingFeeRequest;
 import com.qhuyns.ecomweb.service.GhnService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,18 @@ public class GhnController {
                 .build();
     }
 
+    @PostMapping("/calculate-fee")
+    public  ApiResponse<?> calculateShippingFee(@RequestBody List<ShippingFeeRequest> orderGroups) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (ShippingFeeRequest group : orderGroups) {
+            Map<String, Object> feeInfo = ghnService.calculateFee(group);
+            feeInfo.put("shopId", group.getShopId());
+            result.add(feeInfo);
+        }
+        return ApiResponse.builder()
+                .result(result)
+                .build();
+    }
     
 
 

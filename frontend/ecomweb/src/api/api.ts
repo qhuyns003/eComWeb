@@ -101,3 +101,7 @@ export const getGhnServiceForOrderGroup = (orderGroupPayload: any) => {
   // Gửi về endpoint backend, ví dụ /api/shipping/ghn-service
   return axiosInstance.post('/ghn/available-service', orderGroupPayload);
 };
+
+export const calculateShippingFee = (payload: any) => {
+  return axiosInstance.post('/api/shipping/calculate-fee', payload);
+};

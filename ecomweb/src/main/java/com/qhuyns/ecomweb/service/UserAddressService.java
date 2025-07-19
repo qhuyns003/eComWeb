@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,13 @@ public class UserAddressService {
     UserRepository userRepository;
 
     public List<UserAddressResponse> getAll() {
+        List<UserAddress> userAddressList = userAddressRepository
+                .findAllByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+    List<UserAddressResponse>  userAddressResponses = userAddressRepository
+            .findAllByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+            .stream().map(ua -> userAddressMapper.toUserAddressResponse(ua))
+            .collect(Collectors.toList());
+
         return userAddressRepository
                 .findAllByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
                 .stream().map(ua -> userAddressMapper.toUserAddressResponse(ua))

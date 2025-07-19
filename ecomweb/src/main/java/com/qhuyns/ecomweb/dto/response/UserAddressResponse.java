@@ -1,5 +1,6 @@
 package com.qhuyns.ecomweb.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.qhuyns.ecomweb.entity.Order;
 import com.qhuyns.ecomweb.entity.User;
 import jakarta.persistence.*;
@@ -29,6 +30,8 @@ public class UserAddressResponse {
     Integer districtId;
     String province;
     Integer provinceId;
+    // khi ap sang JSON sẽ tự đôgnj bỏ is -> thêm jsonProp để giữ is
+    @JsonProperty("isDefault")
     boolean isDefault;
 
 }
