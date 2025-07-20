@@ -1,18 +1,56 @@
 import React from 'react';
-import { FiMapPin, FiGift, FiChevronDown } from 'react-icons/fi';
+import { FiMapPin, FiGift, FiChevronDown, FiPhone } from 'react-icons/fi';
 import { FaTag } from 'react-icons/fa';
 
 interface OrderShopGroupProps {
   group: any;
   idx: number;
+  shopInfo?: any; // Thêm prop shopInfo từ API
+  shippingFee?: any; // Thêm prop shippingFee từ GHN API
 }
 
-const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx }) => {
+const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, shippingFee }) => {
+  // Tính phí ship thực tế từ GHN API hoặc fallback về dữ liệu giả định
+  const actualShippingFee = shippingFee?.data?.service_fee || 
+    group.shippingMethods.find((m: any) => m.value === group.selectedShipping)?.fee || 0;
+  
+  // Debug log
+  console.log(`[OrderShopGroup ${group.shop.id}] shippingFee:`, shippingFee);
+  console.log(`[OrderShopGroup ${group.shop.id}] actualShippingFee:`, actualShippingFee);
+  
   return (
     <div className="mb-8 border rounded-xl shadow-sm bg-[#faeaea] border-[#f5d5d5]">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-[#f5d5d5]">
         <span className="text-[#cc3333] font-bold text-lg"><FiMapPin className="inline mr-1" />{group.shop.name}</span>
       </div>
+      
+      {/* Hiển thị thông tin vị trí shop nếu có */}
+      {shopInfo && (
+        <div className="px-4 py-2 bg-white border-b border-[#f5d5d5]">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <FiMapPin className="text-[#cc3333]" />
+            <span className="font-medium">Địa chỉ shop:</span>
+          </div>
+          
+          {/* Hiển thị địa chỉ đầy đủ */}
+          <div className="text-sm text-gray-800 font-medium mt-1">
+            {shopInfo.fullAddress || shopInfo.detailAddress || 'Chưa có thông tin địa chỉ'}
+          </div>
+          
+          {/* Thông tin bổ sung */}
+          <div className="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
+            {shopInfo.phoneNumber && (
+              <div className="flex items-center gap-1">
+                <FiPhone className="text-[#cc3333]" />
+                <span>{shopInfo.phoneNumber}</span>
+              </div>
+            )}
+           
+            
+          </div>
+        </div>
+      )}
+      
       <div className="divide-y divide-[#f5d5d5]">
         {group.products.map((p: any, i: number) => (
           <div key={p.id} className="flex items-center gap-4 px-4 py-3">
@@ -34,17 +72,6 @@ const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx }) => {
           </div>
         ))}
       </div>
-      {/* Shipping method */}
-      <div className="px-4 py-3 flex items-center gap-2">
-        <span className="font-semibold text-gray-700">Giao hàng:</span>
-        <div className="flex gap-2">
-          {group.shippingMethods.map((method: any) => (
-            <button key={method.value} className={`flex items-center px-3 py-1 rounded-full border text-sm font-semibold transition-all duration-300 ${group.selectedShipping === method.value ? 'bg-[#cc3333] text-white border-[#cc3333]' : 'bg-white text-[#cc3333] border-[#cc3333]'} hover:bg-[#f5d5d5]`}>
-              {method.icon}{method.label} <span className="ml-1">+{method.fee.toLocaleString()}₫</span>
-            </button>
-          ))}
-        </div>
-      </div>
       {/* Voucher shop */}
       <div className="px-4 pb-3 flex items-center gap-2">
         <span className="font-semibold text-gray-700"><FiGift className="inline mr-1 text-[#cc3333]" />Voucher shop:</span>
@@ -57,9 +84,9 @@ const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx }) => {
       {/* Tổng kết từng shop */}
       <div className="px-4 pb-4">
         <div className="flex justify-between text-sm text-gray-700"><span>Tổng tiền hàng:</span><span>{group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0).toLocaleString()}₫</span></div>
-        <div className="flex justify-between text-sm text-gray-700"><span>Phí vận chuyển:</span><span>{group.shippingMethods.find((m: any) => m.value === group.selectedShipping)?.fee.toLocaleString()}₫</span></div>
+        <div className="flex justify-between text-sm text-gray-700"><span>Phí vận chuyển:</span><span>{actualShippingFee.toLocaleString()}₫</span></div>
         <div className="flex justify-between text-sm text-gray-700"><span>Giảm giá shop:</span><span>-{group.shopDiscount.toLocaleString()}₫</span></div>
-        <div className="flex justify-between text-base font-bold text-[#cc3333] mt-2"><span>Thành tiền:</span><span>{(group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0) + (group.shippingMethods.find((m: any) => m.value === group.selectedShipping)?.fee || 0) - group.shopDiscount).toLocaleString()}₫</span></div>
+        <div className="flex justify-between text-base font-bold text-[#cc3333] mt-2"><span>Thành tiền:</span><span>{(group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0) + actualShippingFee - group.shopDiscount).toLocaleString()}₫</span></div>
       </div>
     </div>
   );

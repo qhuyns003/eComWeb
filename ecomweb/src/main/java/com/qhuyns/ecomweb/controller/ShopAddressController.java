@@ -25,7 +25,7 @@ public class ShopAddressController {
     ShopAddressService shopAddressService;
 
     @GetMapping("/")
-    ApiResponse<List<ShopAddressResponse>> getAll(@RequestBody List<String> ids) {
+    ApiResponse<List<ShopAddressResponse>> getAll(@RequestParam List<String> ids) {
         return ApiResponse.<List<ShopAddressResponse>>builder()
                 .result(shopAddressService.getAll(ids))
                 .build();

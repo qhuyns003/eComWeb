@@ -19,6 +19,10 @@ interface ProductDetailResponse {
   name: string;
   description: string;
   price: number;
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
   shop:{
     id: string;
     name: string;
@@ -227,7 +231,11 @@ const ProductDetail: React.FC = () => {
                         price: selectedVariant.price,
                         quantity,
                         image: product.images?.[0]?.url || '',
-                        attrs: selectedVariant.detailAttributes?.map((a: { name: string }) => a.name) || []
+                        attrs: selectedVariant.detailAttributes?.map((a: { name: string }) => a.name) || [],
+                        weight: product.weight ?? 150,
+                        length: product.length ?? 0,
+                        width: product.width ?? 0,
+                        height: product.height ?? 0
                     }
                 ],
                 shopDiscount: 0,

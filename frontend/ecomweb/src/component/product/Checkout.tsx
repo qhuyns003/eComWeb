@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
@@ -98,41 +98,61 @@ const Checkout: React.FC = () => {
 
   // Hàm tính tổng khối lượng cho 1 group
   const calcTotalWeight = (group: any) => {
-    return group.products.reduce((sum: number, p: any) => sum + (Number(p.weight) || 0) * (p.quantity || 1), 0);
+    group.products.forEach((p: any, idx: number) => {
+      console.log(`[Shop ${group.shop.id}] Product ${idx}: name=${p.name}, weight=${p.weight}, quantity=${p.quantity}`);
+    });
+    const totalWeight = group.products.reduce((sum: number, p: any) => {
+      const productWeight = Number(p.weight) || 150; // Mặc định 100g nếu không có weight
+      return sum + productWeight * (p.quantity || 1);
+    }, 0);
+    console.log(`[Shop ${group.shop.id}] => Total weight: ${totalWeight}`);
+    return totalWeight;
   };
 
   // Mapping serviceId phù hợp cho từng orderGroup
-  const orderGroupsWithServiceId = orderShopGroups.map((group: any) => {
-    const totalWeight = calcTotalWeight(group);
-    const info = shippingInfo.find((s: any) => String(s.shopId) === String(group.shop.id));
-    let serviceId = null;
-    let serviceTypeId = 2;
-    if (info && Array.isArray(info.data)) {
-      if (totalWeight >= 20000) {
-        // Hàng nặng
-        const heavy = info.data.find((d: any) => d.service_type_id === 5);
-        serviceId = heavy?.service_id;
-        serviceTypeId = 5;
-      } else {
-        // Hàng nhẹ
-        const light = info.data.find((d: any) => d.service_type_id === 2);
-        serviceId = light?.service_id;
-        serviceTypeId = 2;
+  const orderGroupsWithServiceId = useMemo(() => {
+    return orderShopGroups.map((group: any) => {
+      const totalWeight = calcTotalWeight(group);
+      const info = shippingInfo.find((s: any) => String(s.shopId) === String(group.shop.id));
+      let serviceId = null;
+      let serviceTypeId = 2;
+      if (info && Array.isArray(info.data)) {
+        if (totalWeight >= 20000) {
+          // Hàng nặng
+          const heavy = info.data.find((d: any) => d.service_type_id === 5);
+          serviceId = heavy?.service_id;
+          serviceTypeId = 5;
+        } else {
+          // Hàng nhẹ
+          const light = info.data.find((d: any) => d.service_type_id === 2);
+          serviceId = light?.service_id;
+          serviceTypeId = 2;
+        }
       }
-    }
-    return {
-      ...group,
-      serviceId,
-      serviceTypeId,
-      totalWeight,
-    };
-  });
+      return {
+        ...group,
+        serviceId,
+        serviceTypeId,
+        totalWeight,
+      };
+    });
+  }, [orderShopGroups, shippingInfo]);
+
+  // Ref để lưu payload cuối cùng
+  const lastPayloadRef = useRef<string>("");
 
   // Khi đã có serviceId, tự động gọi BE để tính phí ship
   useEffect(() => {
     if (!orderGroupsWithServiceId.length || orderGroupsWithServiceId.some(g => !g.serviceId)) return;
     const payloadForFee = orderGroupsWithServiceId.map(group => {
       const { length, width, height } = calcTotalDimensions(group);
+      const shopInfo = shopInfos.find((s: any) => String(s.id) === String(group.shop.id));
+      const fromDistrictId = shopInfo?.districtId;
+      const fromWardCode = shopInfo?.wardCode;
+      const toDistrictId = selectedAddress.districtId;
+      const toWardCode = selectedAddress.wardCode;
+      const insuranceValue = 0;
+      const coupon = "";
       if (group.serviceTypeId === 5) {
         // Hàng nặng: truyền items
         const items = group.products.map((p: any) => ({
@@ -145,40 +165,47 @@ const Checkout: React.FC = () => {
         }));
         return {
           shopId: group.shop.id,
-          serviceId: group.serviceId,
           serviceTypeId: group.serviceTypeId,
-          fromDistrictId: group.shop.districtId,
-          toDistrictId: selectedAddress.districtId,
-          toWardCode: selectedAddress.wardCode,
-          insurance_value: 0,
-          coupon: null,
-          items,
+          fromDistrictId,
+          fromWardCode,
+          toDistrictId,
+          toWardCode,
+          insuranceValue,
+          coupon,
+          items
         };
       } else {
         // Hàng nhẹ: truyền weight, length, width, height
         return {
           shopId: group.shop.id,
-          serviceId: group.serviceId,
           serviceTypeId: group.serviceTypeId,
-          fromDistrictId: group.shop.districtId,
-          toDistrictId: selectedAddress.districtId,
-          toWardCode: selectedAddress.wardCode,
+          fromDistrictId,
+          fromWardCode,
+          toDistrictId,
+          toWardCode,
           weight: group.totalWeight,
           length,
           width,
           height,
-          insurance_value: 0,
-          coupon: null,
+          insuranceValue,
+          coupon
         };
       }
     });
+    const payloadString = JSON.stringify(payloadForFee);
+    if (lastPayloadRef.current === payloadString) return;
+    lastPayloadRef.current = payloadString;
+    console.log('Shipping fee payload:', payloadForFee);
     calculateShippingFee(payloadForFee)
       .then(res => {
         setShippingFeeResult(res.data);
         console.log('Shipping fee result:', res.data);
       })
-      .catch(() => setShippingFeeResult([]));
-  }, [orderGroupsWithServiceId, selectedAddress]);
+      .catch((err) => {
+        console.error('Shipping fee error:', err);
+        setShippingFeeResult([]);
+      });
+  }, [orderGroupsWithServiceId, selectedAddress, shopInfos]);
 
   const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const provinceId = Number(e.target.value);
@@ -212,7 +239,30 @@ const Checkout: React.FC = () => {
 
   // Tính toán tổng tiền
   const totalProduct = orderShopGroups.reduce((sum: number, group: any) => sum + group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0), 0);
-  const totalShipping = orderShopGroups.reduce((sum: number, group: any) => sum + (group.shippingMethods.find((m: any) => m.value === group.selectedShipping)?.fee || 0), 0);
+  
+  // Tính phí ship từ GHN API response
+  const totalShipping = useMemo(() => {
+    if (!shippingFeeResult) return 0;
+    
+    // Xử lý response mới (không có result array)
+    if (!Array.isArray(shippingFeeResult) && (shippingFeeResult as any).code === 200) {
+      return (shippingFeeResult as any).data?.service_fee || 0;
+    }
+    
+    // Xử lý response cũ (có result array)
+    const shippingFeeArray = Array.isArray(shippingFeeResult) ? shippingFeeResult : 
+      ((shippingFeeResult as any)?.result && Array.isArray((shippingFeeResult as any).result)) ? (shippingFeeResult as any).result : [];
+    
+    if (!Array.isArray(shippingFeeArray)) return 0;
+    
+    return shippingFeeArray.reduce((sum: number, result: any) => {
+      if (result.code === 200 && result.data) {
+        return sum + (result.data.service_fee || 0);
+      }
+      return sum;
+    }, 0);
+  }, [shippingFeeResult]);
+  
   const totalShopDiscount = orderShopGroups.reduce((sum: number, group: any) => sum + (group.shopDiscount || 0), 0);
   const orderVoucherDiscount = orderVoucherList.find((v: any) => v.value === orderVoucher)?.discount || 0;
   const finalAmount = totalProduct + totalShipping - totalShopDiscount - orderVoucherDiscount;
@@ -226,9 +276,10 @@ const Checkout: React.FC = () => {
     const payload = orderShopGroups.map((group: any) => {
       const totalWeight = calcTotalWeight(group);
       const { length, width, height } = calcTotalDimensions(group);
+      const shopInfo = shopInfos.find((s: any) => String(s.id) === String(group.shop.id));
       return {
         shopId: group.shop.id,
-        fromDistrictId: group.shop.districtId,
+        fromDistrictId: shopInfo?.districtId, // Lấy từ shopInfo
         toDistrictId: selectedAddress.districtId,
         toWardCode: selectedAddress.wardCode,
         totalWeight,
@@ -292,13 +343,23 @@ const Checkout: React.FC = () => {
         <div className="w-full h-12 md:hidden" /> {/* spacing cho mobile */}
         {/* Bên trái: Thông tin sản phẩm, shop, shipping, voucher shop */}
         <div className="flex-1 min-w-0 mt-16 md:mt-0">
-          {orderShopGroups.map((group: any, idx: number) => (
-            <OrderShopGroup
-              key={group.shop.id}
-              group={group}
-              idx={idx}
-            />
-          ))}
+          {orderShopGroups.map((group: any, idx: number) => {
+            const shopInfo = shopInfos.find((s: any) => String(s.id) === String(group.shop.id));
+            // Xử lý shippingFeeResult có thể là object hoặc array
+            const shippingFeeArray = Array.isArray(shippingFeeResult) ? shippingFeeResult : 
+              ((shippingFeeResult as any)?.result && Array.isArray((shippingFeeResult as any).result)) ? (shippingFeeResult as any).result : [];
+            // Lấy phí ship cho shop (chỉ lấy phần tử đầu tiên)
+            const shippingFeeForShop = shippingFeeArray[0];
+            return (
+              <OrderShopGroup
+                key={group.shop.id}
+                group={group}
+                idx={idx}
+                shopInfo={shopInfo}
+                shippingFee={shippingFeeForShop}
+              />
+            );
+          })}
         </div>
         {/* Bên phải: Địa chỉ, người nhận, payment, voucher toàn đơn, submit */}
         <div className="w-full md:w-[350px] flex-shrink-0 flex flex-col gap-6 mt-16 md:mt-0">

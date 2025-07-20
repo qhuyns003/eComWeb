@@ -25,6 +25,10 @@ public class ProductDetailResponse {
     String name;
     Long price;
     String description;
+    BigDecimal weight;
+    BigDecimal length;
+    BigDecimal width;
+    BigDecimal height;
     ShopResponse shop;
     CategoryResponse category;
     List<ProductImageResponse> images;

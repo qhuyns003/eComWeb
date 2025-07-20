@@ -12,17 +12,19 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShippingFeeRequest {
+
+
     private Integer shopId;
-    private Integer serviceId;
     private Integer serviceTypeId;
     private Integer fromDistrictId;
+    private String fromWardCode;
     private Integer toDistrictId;
     private String toWardCode;
     private Integer weight;
     private Integer length;
     private Integer width;
     private Integer height;
-    private Integer insurance_value;
+    private Integer insuranceValue;
     private String coupon;
     private List<Item> items;
 

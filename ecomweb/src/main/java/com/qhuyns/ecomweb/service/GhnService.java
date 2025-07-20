@@ -108,7 +108,7 @@ public class GhnService {
     }
 
 
-    public Map<String, Object> calculateFee(ShippingFeeRequest req) {
+    public Map<String, Object> calculateFee(ShippingFeeRequest request) {
         String url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee";
         RestTemplate restTemplate = new RestTemplate();
 
@@ -117,26 +117,34 @@ public class GhnService {
         headers.set("ShopId", ghnShopId);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("service_id", req.getServiceId());
-        body.put("from_district_id", req.getFromDistrictId());
-        body.put("to_district_id", req.getToDistrictId());
-        body.put("to_ward_code", req.getToWardCode());
-        body.put("insurance_value", req.getInsurance_value());
-        body.put("coupon", req.getCoupon());
-
-        if (req.getServiceTypeId() != null && req.getServiceTypeId() == 5 && req.getItems() != null) {
-            // Hàng nặng
-            body.put("items", req.getItems());
-        } else {
-            // Hàng nhẹ
-            body.put("weight", req.getWeight());
-            body.put("length", req.getLength());
-            body.put("width", req.getWidth());
-            body.put("height", req.getHeight());
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("service_type_id", request.getServiceTypeId());
+        payload.put("from_district_id", request.getFromDistrictId());
+        payload.put("from_ward_code", request.getFromWardCode());
+        payload.put("to_district_id", request.getToDistrictId());
+        payload.put("to_ward_code", request.getToWardCode());
+        payload.put("weight", request.getWeight());
+        payload.put("length", request.getLength());
+        payload.put("width", request.getWidth());
+        payload.put("height", request.getHeight());
+        payload.put("insurance_value", request.getInsuranceValue() != null ? request.getInsuranceValue() : 0);
+        payload.put("coupon", request.getCoupon() != null ? request.getCoupon() : "");
+        if (request.getServiceTypeId() == 5) {
+            payload.put("items", request.getItems());
         }
 
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+        if (request.getServiceTypeId() != null && request.getServiceTypeId() == 5 && request.getItems() != null) {
+            // Hàng nặng
+            payload.put("items", request.getItems());
+        } else {
+            // Hàng nhẹ
+            payload.put("weight", request.getWeight());
+            payload.put("length", request.getLength());
+            payload.put("width", request.getWidth());
+            payload.put("height", request.getHeight());
+        }
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
 
