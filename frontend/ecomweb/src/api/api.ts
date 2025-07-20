@@ -105,3 +105,8 @@ export const getGhnServiceForOrderGroup = (orderGroupPayload: any) => {
 export const calculateShippingFee = (payload: any) => {
   return axiosInstance.post('/api/shipping/calculate-fee', payload);
 };
+
+export const getShopInfo = (shopIds: string[]) => {
+  // Giả sử backend có endpoint /shops/info nhận mảng shopIds
+  return axiosInstance.post('/shop_address', { shopIds });
+};

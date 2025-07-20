@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo } from '../../api/api';
 import OrderShopGroup from './OrderShopGroup';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { clearOrder } from '../../store/features/orderSlice';
@@ -38,6 +38,7 @@ const Checkout: React.FC = () => {
   const [wards, setWards] = useState<any[]>([]);
   const [shippingInfo, setShippingInfo] = useState<any[]>([]);
   const [shippingFeeResult, setShippingFeeResult] = useState<any[]>([]);
+  const [shopInfos, setShopInfos] = useState<any[]>([]);
 
   // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
@@ -65,13 +66,27 @@ const Checkout: React.FC = () => {
     }
   }, [showAddAddressModal]);
 
+  // Lấy thông tin shop khi vào trang
   useEffect(() => {
-    if (!selectedAddress || !orderShopGroups.length) return;
-    const payload = orderShopGroups.map((group: any) => ({
-      shopId: group.shop.id,
-      fromDistrictId: group.shop.districtId,
-      toDistrictId: selectedAddress.districtId,
-    }));
+    // Lấy danh sách shopId từ orderShopGroups
+    const shopIds = orderShopGroups.map((group: any) => group.shop.id);
+    if (shopIds.length) {
+      getShopInfo(shopIds).then(res => {
+        setShopInfos(res.data.result);
+      });
+    }
+  }, [orderShopGroups]);
+
+  useEffect(() => {
+    if (!selectedAddress || !orderShopGroups.length || !shopInfos.length) return;
+    const payload = orderShopGroups.map((group: any) => {
+      const shopInfo = shopInfos.find((s: any) => String(s.id) === String(group.shop.id));
+      return {
+        shopId: group.shop.id,
+        fromDistrictId: shopInfo?.districtId, // Lấy từ shopInfo
+        toDistrictId: selectedAddress.districtId,
+      };
+    });
     getGhnServiceForOrderGroup(payload)
       .then(res => {
         setShippingInfo(res.data.result);
@@ -79,7 +94,7 @@ const Checkout: React.FC = () => {
       .catch(() => {
         setShippingInfo([]);
       });
-  }, [selectedAddress, orderShopGroups]);
+  }, [selectedAddress, orderShopGroups, shopInfos]);
 
   // Hàm tính tổng khối lượng cho 1 group
   const calcTotalWeight = (group: any) => {

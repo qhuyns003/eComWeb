@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchUserInfo, selectUserLoading } from '../store/features/userSlice';
+import { fetchUserInfo, selectUserLoading, selectUser } from '../store/features/userSlice';
 
 function isTokenExpired(token: string | null) {
   if (!token) return true;
@@ -16,6 +16,7 @@ function isTokenExpired(token: string | null) {
 const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectUserLoading);
+  const user = useAppSelector(selectUser);
   // fetchUserInfo sẽ lấy lại thông tin user từ server, session và cập nhật vào Redux state.
   // đảm bảo khi f5 trang thì userStateRedux vẫn được lưu trong redux state
   // vì khi f5 trang thì userStateRedux sẽ bị mất, nên cần lấy lại thông tin user từ server, session và cập nhật vào Redux state.
@@ -30,7 +31,9 @@ const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) =
   useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('token');
-      if (isTokenExpired(token)) {
+      
+      // Chỉ kiểm tra token khi user đã đăng nhập
+      if (user && token && isTokenExpired(token)) {
         // Chỉ dispatch event để hiện modal, không xóa dữ liệu ngay
         window.dispatchEvent(new CustomEvent('tokenExpired', { 
           detail: { message: 'Phiên đăng nhập đã hết hạn' } 
@@ -40,7 +43,7 @@ const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) =
     checkToken();
     const interval = setInterval(checkToken, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
