@@ -10,6 +10,7 @@ public class API_URL {
             "/user_address/**",
             "/ghn/**",
             "/shop_address/**",
+            "/coupons/**",
 
     };
 

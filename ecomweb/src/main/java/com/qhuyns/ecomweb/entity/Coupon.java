@@ -21,7 +21,9 @@ public class Coupon {
     String id;
 
     String code;
+    @Enumerated(EnumType.STRING)
     CouponType couponType;
+    @Enumerated(EnumType.STRING)
     DiscountType discountType;
     BigDecimal discount;
     BigDecimal minOrder;

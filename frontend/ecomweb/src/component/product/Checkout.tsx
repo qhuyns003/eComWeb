@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId } from '../../api/api';
 import OrderShopGroup from './OrderShopGroup';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { clearOrder } from '../../store/features/orderSlice';
@@ -39,6 +39,7 @@ const Checkout: React.FC = () => {
   const [shippingInfo, setShippingInfo] = useState<any[]>([]);
   const [shippingFeeResult, setShippingFeeResult] = useState<any[]>([]);
   const [shopInfos, setShopInfos] = useState<any[]>([]);
+  const [shopCoupons, setShopCoupons] = useState<{ [shopId: string]: any[] }>({});
 
   // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
@@ -95,6 +96,17 @@ const Checkout: React.FC = () => {
         setShippingInfo([]);
       });
   }, [selectedAddress, orderShopGroups, shopInfos]);
+
+  // Lấy coupon cho từng shop khi có shopInfos
+  useEffect(() => {
+    if (!shopInfos.length) return;
+    shopInfos.forEach((shop: any) => {
+      getCouponsByShopId(shop.id)
+        .then(res => {
+          setShopCoupons(prev => ({ ...prev, [shop.id]: res.data.result || [] }));
+        });
+    });
+  }, [shopInfos]);
 
   // Hàm tính tổng khối lượng cho 1 group
   const calcTotalWeight = (group: any) => {
@@ -350,6 +362,7 @@ const Checkout: React.FC = () => {
               ((shippingFeeResult as any)?.result && Array.isArray((shippingFeeResult as any).result)) ? (shippingFeeResult as any).result : [];
             // Lấy phí ship cho shop (chỉ lấy phần tử đầu tiên)
             const shippingFeeForShop = shippingFeeArray[0];
+            const coupons = shopCoupons[group.shop.id] || [];
             return (
               <OrderShopGroup
                 key={group.shop.id}
@@ -357,6 +370,7 @@ const Checkout: React.FC = () => {
                 idx={idx}
                 shopInfo={shopInfo}
                 shippingFee={shippingFeeForShop}
+                coupons={coupons}
               />
             );
           })}

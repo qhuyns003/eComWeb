@@ -112,3 +112,7 @@ export const getShopInfo = (shopIds: string[]) => {
   shopIds.forEach(id => params.append('ids', id));
   return axiosInstance.get(`/shop_address/?${params.toString()}`);
 };
+
+export const getCouponsByShopId = (shopId: string) => {
+  return axiosInstance.get(`/coupons/shop?shopId=${shopId}`);
+};
