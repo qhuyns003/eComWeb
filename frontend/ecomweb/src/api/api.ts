@@ -116,3 +116,5 @@ export const getShopInfo = (shopIds: string[]) => {
 export const getCouponsByShopId = (shopId: string) => {
   return axiosInstance.get(`/coupons/shop?shopId=${shopId}`);
 };
+
+export const getUserOrderCoupons = () => axiosInstance.get('/coupons/user');

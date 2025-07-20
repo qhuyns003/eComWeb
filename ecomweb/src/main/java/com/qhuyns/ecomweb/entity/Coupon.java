@@ -30,6 +30,7 @@ public class Coupon {
     LocalDate startDate;
     LocalDate endDate;
     BigDecimal quantity;
+    BigDecimal used;
     boolean active;
     boolean requireCode;
 

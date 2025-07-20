@@ -24,6 +24,7 @@ public class CouponResponse {
     LocalDate startDate;
     LocalDate endDate;
     BigDecimal quantity;
+    BigDecimal used;
     boolean active;
     boolean requireCode;
 }

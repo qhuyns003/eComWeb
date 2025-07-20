@@ -8,9 +8,10 @@ interface OrderShopGroupProps {
   shopInfo?: any;
   shippingFee?: any;
   coupons?: any[];
+  onDiscountChange?: (productDiscount: number, shippingDiscount: number, groupId: string) => void;
 }
 
-const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, shippingFee, coupons = [] }) => {
+const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, shippingFee, coupons = [], onDiscountChange }) => {
   const [showCouponModal, setShowCouponModal] = useState(false);
   const [selectedDiscountCoupon, setSelectedDiscountCoupon] = useState<any>(null);
   const [selectedFreeshipCoupon, setSelectedFreeshipCoupon] = useState<any>(null);
@@ -53,6 +54,12 @@ const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, s
   const totalProduct = group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0);
   const availableDiscountCoupons = discountCoupons.filter(coupon => totalProduct >= (coupon.minOrder ?? 0));
   const availableFreeshipCoupons = freeshipCoupons.filter(coupon => totalProduct >= (coupon.minOrder ?? 0));
+
+  React.useEffect(() => {
+    if (onDiscountChange) {
+      onDiscountChange(productDiscount, shippingDiscount, group.shop.id);
+    }
+  }, [productDiscount, shippingDiscount]);
 
   return (
     <div className="mb-8 border rounded-xl shadow-sm bg-[#faeaea] border-[#f5d5d5]">

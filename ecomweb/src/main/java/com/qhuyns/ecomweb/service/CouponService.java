@@ -28,4 +28,8 @@ public class CouponService {
         return couponRepository.findAvailableCouponsForShopAndUser(shopId, SecurityContextHolder.getContext().getAuthentication().getName())
                 .stream().map(cp -> couponMapper.toCouponResponse(cp)).collect(Collectors.toList());
     };
+    public List<CouponResponse> getByUserId() {
+        return couponRepository.findValidUnusedCouponsOfUser(SecurityContextHolder.getContext().getAuthentication().getName())
+                .stream().map(cp -> couponMapper.toCouponResponse(cp)).collect(Collectors.toList());
+    };
 }

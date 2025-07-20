@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId, getUserOrderCoupons } from '../../api/api';
 import OrderShopGroup from './OrderShopGroup';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { clearOrder } from '../../store/features/orderSlice';
@@ -40,6 +40,16 @@ const Checkout: React.FC = () => {
   const [shippingFeeResult, setShippingFeeResult] = useState<any[]>([]);
   const [shopInfos, setShopInfos] = useState<any[]>([]);
   const [shopCoupons, setShopCoupons] = useState<{ [shopId: string]: any[] }>({});
+  const [orderCoupons, setOrderCoupons] = useState<any[]>([]);
+  const [selectedOrderCoupon, setSelectedOrderCoupon] = useState<any>(null);
+  const [showOrderCouponModal, setShowOrderCouponModal] = useState(false);
+  const [groupDiscounts, setGroupDiscounts] = useState<{ [groupId: string]: { productDiscount: number, shippingDiscount: number } }>({});
+
+  // Phân loại voucher toàn đơn
+  const orderDiscountCoupons = orderCoupons.filter(c => c.couponType === 'DISCOUNT');
+  const orderShippingCoupons = orderCoupons.filter(c => c.couponType === 'SHIPPING');
+  const [selectedOrderDiscountCoupon, setSelectedOrderDiscountCoupon] = useState<any>(null);
+  const [selectedOrderShippingCoupon, setSelectedOrderShippingCoupon] = useState<any>(null);
 
   // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
@@ -107,6 +117,12 @@ const Checkout: React.FC = () => {
         });
     });
   }, [shopInfos]);
+
+  useEffect(() => {
+    getUserOrderCoupons().then(res => {
+      setOrderCoupons(res.data.result || []);
+    });
+  }, []);
 
   // Hàm tính tổng khối lượng cho 1 group
   const calcTotalWeight = (group: any) => {
@@ -275,9 +291,27 @@ const Checkout: React.FC = () => {
     }, 0);
   }, [shippingFeeResult]);
   
-  const totalShopDiscount = orderShopGroups.reduce((sum: number, group: any) => sum + (group.shopDiscount || 0), 0);
-  const orderVoucherDiscount = orderVoucherList.find((v: any) => v.value === orderVoucher)?.discount || 0;
-  const finalAmount = totalProduct + totalShipping - totalShopDiscount - orderVoucherDiscount;
+  // Tổng giảm giá các group
+  const orderDiscountVoucherDiscount = selectedOrderDiscountCoupon
+    ? (selectedOrderDiscountCoupon.discountType === 'AMOUNT'
+        ? selectedOrderDiscountCoupon.discount
+        : Math.round(totalProduct * selectedOrderDiscountCoupon.discount / 100))
+    : 0;
+  const orderShippingVoucherDiscount = selectedOrderShippingCoupon
+    ? (selectedOrderShippingCoupon.discountType === 'AMOUNT'
+        ? Math.min(selectedOrderShippingCoupon.discount, totalShipping)
+        : Math.round(totalShipping * selectedOrderShippingCoupon.discount / 100))
+    : 0;
+  const handleGroupDiscountChange = (productDiscount: number, shippingDiscount: number, groupId: string) => {
+    setGroupDiscounts(prev => ({
+      ...prev,
+      [groupId]: { productDiscount, shippingDiscount }
+    }));
+  };
+  // Tổng giảm giá các group (cộng dồn từ state groupDiscounts)
+  const totalGroupDiscount = Object.values(groupDiscounts).reduce((sum, d) => sum + (d.productDiscount || 0) + (d.shippingDiscount || 0), 0);
+  const totalDiscount = totalGroupDiscount + orderDiscountVoucherDiscount + orderShippingVoucherDiscount;
+  const finalAmount = totalProduct + totalShipping - totalDiscount;
 
   const handleConfirm = async () => {
     if (!receiverName || !receiverPhone || !receiverAddress) {
@@ -371,6 +405,7 @@ const Checkout: React.FC = () => {
                 shopInfo={shopInfo}
                 shippingFee={shippingFeeForShop}
                 coupons={coupons}
+                onDiscountChange={handleGroupDiscountChange}
               />
             );
           })}
@@ -483,33 +518,145 @@ const Checkout: React.FC = () => {
               ))}
             </div>
           </div>
-          <div className="bg-[#faeaea] border border-[#f5d5d5] rounded-xl p-4 flex flex-col gap-3">
-            <div className="flex items-center gap-2 mb-2">
-              <FaGift className="text-[#cc3333] text-xl" />
-              <span className="font-bold text-[#cc3333] text-lg">Voucher toàn đơn</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              {orderVoucherList.map(v => (
-                <label key={v.value} className={`flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all ${orderVoucher === v.value ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}>
-                  <input
-                    type="radio"
-                    name="orderVoucher"
-                    value={v.value}
-                    checked={orderVoucher === v.value}
-                    onChange={() => setOrderVoucher(v.value)}
-                    className="mr-2 accent-[#cc3333]"
-                  />
-                  {v.icon}
-                  <span className="font-medium text-gray-900">{v.label}</span>
-                  <span className="ml-auto text-green-600 font-bold">-{v.discount.toLocaleString()}₫</span>
-                </label>
-              ))}
-            </div>
+          {/* Voucher toàn đơn */}
+          <div className="flex items-center gap-2 mb-2">
+            <FaGift className="text-[#cc3333] text-xl" />
+            <span className="font-bold text-[#cc3333] text-lg">Voucher toàn đơn</span>
+            <button
+              className="ml-2 px-3 py-1 rounded-full border border-[#cc3333] text-[#cc3333] font-semibold text-sm hover:bg-[#f5d5d5]"
+              onClick={() => setShowOrderCouponModal(true)}
+            >
+              {selectedOrderDiscountCoupon || selectedOrderShippingCoupon ? 'Đã chọn' : 'Chọn voucher'}
+              <FiChevronDown className="ml-1" />
+            </button>
           </div>
+          {/* Hiển thị voucher đã chọn */}
+          {(selectedOrderDiscountCoupon || selectedOrderShippingCoupon) && (
+            <div className="flex flex-col gap-1 mb-2 ml-8">
+              {selectedOrderDiscountCoupon && (
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <span className="font-bold">Mã giảm giá:</span>
+                  <span className="font-semibold">{selectedOrderDiscountCoupon.code}</span>
+                  <span>
+                    {selectedOrderDiscountCoupon.discountType === 'AMOUNT'
+                      ? `- ${selectedOrderDiscountCoupon.discount.toLocaleString()}₫`
+                      : `- ${selectedOrderDiscountCoupon.discount}%`}
+                  </span>
+                </div>
+              )}
+              {selectedOrderShippingCoupon && (
+                <div className="flex items-center gap-2 text-sm text-blue-700">
+                  <span className="font-bold">Mã vận chuyển:</span>
+                  <span className="font-semibold">{selectedOrderShippingCoupon.code}</span>
+                  <span>
+                    {selectedOrderShippingCoupon.discountType === 'AMOUNT'
+                      ? `- ${selectedOrderShippingCoupon.discount.toLocaleString()}₫`
+                      : `- ${selectedOrderShippingCoupon.discount}%`}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+          {showOrderCouponModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md relative animate-fadeIn">
+                <button className="absolute top-3 right-3 text-gray-400 hover:text-[#cc3333] text-2xl font-bold transition" onClick={() => setShowOrderCouponModal(false)} aria-label="Đóng">×</button>
+                <h2 className="text-2xl font-bold mb-4 text-[#cc3333] text-center">Chọn voucher toàn đơn</h2>
+                <div className="flex flex-col gap-4 max-h-80 overflow-y-auto">
+                  {/* Mã giảm giá */}
+                  <div>
+                    <div className="font-semibold text-[#cc3333] mb-2">Mã giảm giá</div>
+                    <div className="flex flex-col gap-1">
+                      <label className={`flex items-center w-full p-3 rounded-lg border ${!selectedOrderDiscountCoupon ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}>
+                        <input
+                          type="radio"
+                          name="order-discount-coupon"
+                          checked={!selectedOrderDiscountCoupon}
+                          onChange={() => setSelectedOrderDiscountCoupon(null)}
+                          className="mr-2 accent-[#cc3333]"
+                        />
+                        <span className="font-medium text-gray-700">Không dùng mã giảm giá</span>
+                      </label>
+                      {orderDiscountCoupons.length === 0 && <div className="text-gray-500 text-center">Không có mã giảm giá</div>}
+                      {orderDiscountCoupons.map((v: any) => (
+                        <label
+                          key={v.id}
+                          className={`flex flex-col items-start w-full p-3 rounded-lg border ${selectedOrderDiscountCoupon?.id === v.id ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}
+                        >
+                          <input
+                            type="radio"
+                            name="order-discount-coupon"
+                            checked={selectedOrderDiscountCoupon?.id === v.id}
+                            onChange={() => setSelectedOrderDiscountCoupon(v)}
+                            className="mr-2"
+                          />
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold text-[#cc3333]">{v.code}</span>
+                            <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700 font-semibold">
+                              {v.discountType === 'AMOUNT' ? 'Số tiền' : 'Phần trăm'}
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-700">
+                            {v.discountType === 'AMOUNT'
+                              ? `Giảm ${v.discount.toLocaleString()}₫ cho đơn tối thiểu ${v.minOrder.toLocaleString()}₫`
+                              : `Giảm ${v.discount}% cho đơn tối thiểu ${v.minOrder.toLocaleString()}₫`}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">HSD: {v.endDate}</div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Voucher vận chuyển */}
+                  <div>
+                    <div className="font-semibold text-[#cc3333] mb-2">Voucher vận chuyển</div>
+                    <div className="flex flex-col gap-1">
+                      <label className={`flex items-center w-full p-3 rounded-lg border ${!selectedOrderShippingCoupon ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}>
+                        <input
+                          type="radio"
+                          name="order-shipping-coupon"
+                          checked={!selectedOrderShippingCoupon}
+                          onChange={() => setSelectedOrderShippingCoupon(null)}
+                          className="mr-2 accent-[#cc3333]"
+                        />
+                        <span className="font-medium text-gray-700">Không dùng voucher vận chuyển</span>
+                      </label>
+                      {orderShippingCoupons.length === 0 && <div className="text-gray-500 text-center">Không có voucher vận chuyển</div>}
+                      {orderShippingCoupons.map((v: any) => (
+                        <label
+                          key={v.id}
+                          className={`flex flex-col items-start w-full p-3 rounded-lg border ${selectedOrderShippingCoupon?.id === v.id ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}
+                        >
+                          <input
+                            type="radio"
+                            name="order-shipping-coupon"
+                            checked={selectedOrderShippingCoupon?.id === v.id}
+                            onChange={() => setSelectedOrderShippingCoupon(v)}
+                            className="mr-2"
+                          />
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold text-[#cc3333]">{v.code}</span>
+                            <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700 font-semibold">Vận chuyển</span>
+                          </div>
+                          <div className="text-sm text-gray-700">
+                            {`Giảm tối đa ${v.discount.toLocaleString()}₫ phí vận chuyển`}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">HSD: {v.endDate}</div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end mt-4 gap-2">
+                  <button className="px-4 py-2 rounded bg-gray-200 text-gray-700 font-semibold" onClick={() => setShowOrderCouponModal(false)}>Đóng</button>
+                  <button className="px-4 py-2 rounded bg-[#cc3333] text-white font-bold" onClick={() => setShowOrderCouponModal(false)}>Xác nhận</button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="bg-white border border-[#f5d5d5] rounded-xl p-4 flex flex-col gap-2 shadow">
             <div className="flex justify-between text-base font-semibold text-gray-700"><span>Tổng tiền hàng:</span><span>{totalProduct.toLocaleString()}₫</span></div>
             <div className="flex justify-between text-base font-semibold text-gray-700"><span>Tổng phí ship:</span><span>{totalShipping.toLocaleString()}₫</span></div>
-            <div className="flex justify-between text-base font-semibold text-gray-700"><span>Tổng giảm giá:</span><span>-{(totalShopDiscount + orderVoucherDiscount).toLocaleString()}₫</span></div>
+            <div className="flex justify-between text-base font-semibold text-gray-700"><span>Tổng giảm giá:</span><span>-{totalDiscount.toLocaleString()}₫</span></div>
             <div className="flex justify-between text-xl font-extrabold text-[#cc3333] mt-2"><span>Thành tiền:</span><span>{finalAmount.toLocaleString()}₫</span></div>
             <button
               className="w-full mt-2 py-3 rounded-full bg-[#cc3333] text-white font-bold text-lg shadow-lg hover:bg-[#b82d2d] transition disabled:opacity-50 disabled:cursor-not-allowed"

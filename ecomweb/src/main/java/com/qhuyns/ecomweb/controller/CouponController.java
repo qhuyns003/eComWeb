@@ -32,4 +32,10 @@ public class CouponController {
                 .result(couponService.getByShopId(shopId))
                 .build();
     }
+    @GetMapping("/user")
+    ApiResponse<List<CouponResponse>> getByUserId(){
+        return ApiResponse.<List<CouponResponse>>builder()
+                .result(couponService.getByUserId())
+                .build();
+    }
 }
