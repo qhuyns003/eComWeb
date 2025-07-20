@@ -49,6 +49,11 @@ const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, s
   const discountCoupons = coupons.filter(c => c.couponType === 'DISCOUNT');
   const freeshipCoupons = coupons.filter(c => c.couponType === 'SHIPPING');
 
+  // Filter voucher đủ điều kiện minOrder
+  const totalProduct = group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0);
+  const availableDiscountCoupons = discountCoupons.filter(coupon => totalProduct >= (coupon.minOrder ?? 0));
+  const availableFreeshipCoupons = freeshipCoupons.filter(coupon => totalProduct >= (coupon.minOrder ?? 0));
+
   return (
     <div className="mb-8 border rounded-xl shadow-sm bg-[#faeaea] border-[#f5d5d5]">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-[#f5d5d5]">
@@ -122,8 +127,8 @@ const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, s
                     <input type="radio" name={`discount-coupon-${group.shop.id}`} checked={!selectedDiscountCoupon} onChange={() => setSelectedDiscountCoupon(null)} className="mr-2" />
                     <span className="font-medium text-gray-700">Không dùng voucher</span>
                   </label>
-                  {discountCoupons.length === 0 && <div className="text-gray-500 text-center">Không có voucher giảm giá</div>}
-                  {discountCoupons.map((coupon: any) => (
+                  {availableDiscountCoupons.length === 0 && <div className="text-gray-500 text-center">Không có voucher giảm giá</div>}
+                  {availableDiscountCoupons.map((coupon: any) => (
                     <label key={coupon.id} className={`flex flex-col items-start w-full p-3 rounded-lg border ${selectedDiscountCoupon?.id === coupon.id ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}>
                       <input type="radio" name={`discount-coupon-${group.shop.id}`} checked={selectedDiscountCoupon?.id === coupon.id} onChange={() => setSelectedDiscountCoupon(coupon)} className="mr-2" />
                       <div className="flex items-center gap-2 mb-1">
@@ -147,8 +152,8 @@ const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, s
                     <input type="radio" name={`freeship-coupon-${group.shop.id}`} checked={!selectedFreeshipCoupon} onChange={() => setSelectedFreeshipCoupon(null)} className="mr-2" />
                     <span className="font-medium text-gray-700">Không dùng voucher</span>
                   </label>
-                  {freeshipCoupons.length === 0 && <div className="text-gray-500 text-center">Không có voucher vận chuyển</div>}
-                  {freeshipCoupons.map((coupon: any) => (
+                  {availableFreeshipCoupons.length === 0 && <div className="text-gray-500 text-center">Không có voucher vận chuyển</div>}
+                  {availableFreeshipCoupons.map((coupon: any) => (
                     <label key={coupon.id} className={`flex flex-col items-start w-full p-3 rounded-lg border ${selectedFreeshipCoupon?.id === coupon.id ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}>
                       <input type="radio" name={`freeship-coupon-${group.shop.id}`} checked={selectedFreeshipCoupon?.id === coupon.id} onChange={() => setSelectedFreeshipCoupon(coupon)} className="mr-2" />
                       <div className="flex items-center gap-2 mb-1">
