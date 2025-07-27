@@ -20,3 +20,9 @@ jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
+vnpay:
+  tmnCode: "OWEBIU9I"
+  hashSecret: "0G59Z6IMX91B2X8GEIGHHHCQDJE3XY04"
+  paymentUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  returnUrl: "http://localhost:3000/payment/success"
+  ipnUrl: "http://localhost:8080/api/vnpay/ipn"
