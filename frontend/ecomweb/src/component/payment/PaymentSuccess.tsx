@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { FaMoneyBillWave, FaReceipt } from 'react-icons/fa';
+import { getOrderPaymentStatus } from '../../api/api';
 
 const PaymentSuccess: React.FC = () => {
   const location = useLocation();
@@ -24,7 +25,7 @@ const PaymentSuccess: React.FC = () => {
 
     // Gọi API backend xác thực lại trạng thái đơn hàng
     if (vnp_TxnRef) {
-      axios.get(`/api/orders/payment-status?vnp_TxnRef=${vnp_TxnRef}`)
+      getOrderPaymentStatus(vnp_TxnRef)
         .then(res => {
           if (res.data && res.data.code === 1000) {
             setStatus('success');

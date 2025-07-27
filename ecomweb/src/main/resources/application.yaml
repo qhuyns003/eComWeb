@@ -24,5 +24,5 @@ vnpay:
   tmnCode: "OWEBIU9I"
   hashSecret: "0G59Z6IMX91B2X8GEIGHHHCQDJE3XY04"
   paymentUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-  returnUrl: "http://localhost:3000/payment/success"
+  returnUrl: "http://localhost:5173/payment/success"
   ipnUrl: "http://localhost:8080/api/vnpay/ipn"
