@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Checkout from './component/product/Checkout';
 import { useAppDispatch } from './store/hooks';
 import { clearUser } from './store/features/userSlice';
+import PaymentSuccess from './component/payment/PaymentSuccess';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -61,6 +62,7 @@ function AppContent() {
         <Route path="/product/:id" element={<ProductDetail />} /> 
         <Route path="/admin" element={<ShopAdmin />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
       </Routes>
       
       <LogoutModal
