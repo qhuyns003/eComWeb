@@ -3,15 +3,14 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId, getUserOrderCoupons } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId, getUserOrderCoupons, createOrder } from '../../api/api';
 import OrderShopGroup from './OrderShopGroup';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { clearOrder } from '../../store/features/orderSlice';
 
 const paymentMethods = [
   { value: 'COD', label: 'Thanh toán khi nhận hàng', icon: <FiDollarSign className="inline mr-2 text-xl text-[#cc3333]" /> },
-  { value: 'CARD', label: 'Thẻ ngân hàng', icon: <FiCreditCard className="inline mr-2 text-xl text-[#cc3333]" /> },
-  { value: 'EWALLET', label: 'Ví điện tử', icon: <FiSmartphone className="inline mr-2 text-xl text-[#cc3333]" /> },
+  { value: 'BANKING', label: 'Chuyển khoản ngân hàng', icon: <FiCreditCard className="inline mr-2 text-xl text-[#cc3333]" /> },
 ];
 
 const orderVoucherList = [
@@ -44,6 +43,8 @@ const Checkout: React.FC = () => {
   const [selectedOrderCoupon, setSelectedOrderCoupon] = useState<any>(null);
   const [showOrderCouponModal, setShowOrderCouponModal] = useState(false);
   const [groupDiscounts, setGroupDiscounts] = useState<{ [groupId: string]: { productDiscount: number, shippingDiscount: number } }>({});
+  const [selectedShopCoupons, setSelectedShopCoupons] = useState<{ [shopId: string]: any[] }>({});
+  const [shopCalculations, setShopCalculations] = useState<{ [shopId: string]: { subtotal: number, shippingFee: number, totalDiscount: number, total: number } }>({});
 
   // Phân loại voucher toàn đơn
   const orderDiscountCoupons = orderCoupons.filter(c => c.couponType === 'DISCOUNT');
@@ -308,6 +309,20 @@ const Checkout: React.FC = () => {
       [groupId]: { productDiscount, shippingDiscount }
     }));
   };
+
+  const handleShopCouponChange = (shopId: string, selectedCoupons: any[]) => {
+    setSelectedShopCoupons(prev => ({
+      ...prev,
+      [shopId]: selectedCoupons
+    }));
+  };
+
+  const handleShopCalculationChange = (shopId: string, calculation: { subtotal: number, shippingFee: number, totalDiscount: number, total: number }) => {
+    setShopCalculations(prev => ({
+      ...prev,
+      [shopId]: calculation
+    }));
+  };
   // Tổng giảm giá các group (cộng dồn từ state groupDiscounts)
   const totalGroupDiscount = Object.values(groupDiscounts).reduce((sum, d) => sum + (d.productDiscount || 0) + (d.shippingDiscount || 0), 0);
   const totalDiscount = totalGroupDiscount + orderDiscountVoucherDiscount + orderShippingVoucherDiscount;
@@ -318,29 +333,78 @@ const Checkout: React.FC = () => {
       toast.error('Vui lòng nhập đầy đủ thông tin nhận hàng!');
       return;
     }
-    // Đóng gói orderGroup gửi về BE
-    const payload = orderShopGroups.map((group: any) => {
-      const totalWeight = calcTotalWeight(group);
-      const { length, width, height } = calcTotalDimensions(group);
-      const shopInfo = shopInfos.find((s: any) => String(s.id) === String(group.shop.id));
-      return {
-        shopId: group.shop.id,
-        fromDistrictId: shopInfo?.districtId, // Lấy từ shopInfo
-        toDistrictId: selectedAddress.districtId,
-        toWardCode: selectedAddress.wardCode,
-        totalWeight,
-        length,
-        width,
-        height,
-        products: group.products,
-        address: selectedAddress,
-        // ... các thông tin khác cần thiết
-      };
-    });
-    // Gửi payload này về BE qua API tính phí ship
-    // await api.calculateShippingFee(payload) // TODO: gọi API thực tế
-    toast.success('Đặt hàng thành công!');
-    dispatch(clearOrder());
+    
+    // Đóng gói dữ liệu gửi về BE để tạo đơn hàng
+    const payload = {
+      // Order fields
+      userAddressId: selectedAddress.id,
+      payment: paymentMethod, // Payment enum
+      total: finalAmount,
+      subtotal: totalProduct,
+      shippingFee: totalShipping,
+      totalDiscount: totalDiscount,
+      
+      // OrderShopGroups
+      orderShopGroups: orderShopGroups.map((group: any) => {
+        // Lấy thông tin tính toán từ OrderShopGroup component
+        const calculation = shopCalculations[group.shop.id] || {
+          subtotal: 0,
+          shippingFee: 0,
+          totalDiscount: 0,
+          total: 0
+        };
+        
+        
+        // Lấy coupon IDs đã chọn cho shop này
+        const selectedCouponIds = (selectedShopCoupons[group.shop.id] || [])
+          .map((coupon: any) => coupon.id);
+        
+        return {
+          shopId: group.shop.id,
+          total: calculation.total,
+          subTotal: calculation.subtotal,
+          shippingFee: calculation.shippingFee,
+          totalDiscount: calculation.totalDiscount,
+          
+          // OrderItems
+          orderItems: group.products.map((p: any) => ({
+            productVariantId: p.id, // ProductVariant ID
+            quantity: p.quantity,
+            price: p.price
+          })),
+          
+          // Coupons cho shop này (đã chọn)
+          shopCouponIds: selectedCouponIds
+        };
+      }),
+      
+      // Coupons cho toàn đơn
+      couponIds: [
+        selectedOrderDiscountCoupon?.id,
+        selectedOrderShippingCoupon?.id
+      ].filter(Boolean)
+    };
+    
+    console.log('Order payload:', payload);
+    try {
+      const response = await createOrder(payload);
+      const responseData = response.data;
+      if (responseData && responseData.code === 1000) {
+        toast.success('Thành công!', {
+          style: {
+            backgroundColor: '#4ade80',
+            color: 'white',
+            fontWeight: 'bold'
+          }
+        });
+        dispatch(clearOrder());
+      } else {
+        toast.error(responseData?.message || 'Đặt hàng thất bại.');
+      }
+    } catch (error) {
+      console.error('Create order error:', error);
+      toast.error('Đặt hàng thất bại do lỗi kết nối.');
+    }
   };
 
   // Thêm địa chỉ mới
@@ -406,6 +470,8 @@ const Checkout: React.FC = () => {
                 shippingFee={shippingFeeForShop}
                 coupons={coupons}
                 onDiscountChange={handleGroupDiscountChange}
+                onCouponChange={handleShopCouponChange}
+                onCalculationChange={handleShopCalculationChange}
               />
             );
           })}

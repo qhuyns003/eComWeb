@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
@@ -22,6 +24,10 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class VnpayController {
     VnpayService vnpayService;
+
+    @NonFinal
+    @Value("${vnpay.hashSecret}")
+    String hashSecret;
 
     @PostMapping("/create-payment")
     public ApiResponse<?> createPayment(@RequestBody VnpayPaymentRequest req, HttpServletRequest request) {
@@ -49,7 +55,7 @@ public class VnpayController {
             hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
             if (i < fieldNames.size() - 1) hashData.append('&');
         }
-        String vnp_HashSecret = "SECRETKEY123";
+        String vnp_HashSecret = hashSecret;
         String checkSum = hmacSHA512(vnp_HashSecret, hashData.toString());
         String orderId = params.get("vnp_TxnRef");
         String responseCode = params.get("vnp_ResponseCode");

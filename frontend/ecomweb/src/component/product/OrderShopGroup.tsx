@@ -9,9 +9,11 @@ interface OrderShopGroupProps {
   shippingFee?: any;
   coupons?: any[];
   onDiscountChange?: (productDiscount: number, shippingDiscount: number, groupId: string) => void;
+  onCouponChange?: (shopId: string, selectedCoupons: any[]) => void;
+  onCalculationChange?: (shopId: string, calculation: { subtotal: number, shippingFee: number, totalDiscount: number, total: number }) => void;
 }
 
-const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, shippingFee, coupons = [], onDiscountChange }) => {
+const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, shippingFee, coupons = [], onDiscountChange, onCouponChange, onCalculationChange }) => {
   const [showCouponModal, setShowCouponModal] = useState(false);
   const [selectedDiscountCoupon, setSelectedDiscountCoupon] = useState<any>(null);
   const [selectedFreeshipCoupon, setSelectedFreeshipCoupon] = useState<any>(null);
@@ -60,6 +62,27 @@ const OrderShopGroup: React.FC<OrderShopGroupProps> = ({ group, idx, shopInfo, s
       onDiscountChange(productDiscount, shippingDiscount, group.shop.id);
     }
   }, [productDiscount, shippingDiscount]);
+
+  // Thông báo coupon đã chọn cho component cha
+  React.useEffect(() => {
+    if (onCouponChange) {
+      const selectedCoupons = [];
+      if (selectedDiscountCoupon) selectedCoupons.push(selectedDiscountCoupon);
+      if (selectedFreeshipCoupon) selectedCoupons.push(selectedFreeshipCoupon);
+      onCouponChange(group.shop.id, selectedCoupons);
+    }
+  }, [selectedDiscountCoupon, selectedFreeshipCoupon]);
+
+  React.useEffect(() => {
+    if (onCalculationChange) {
+      onCalculationChange(group.shop.id, {
+        subtotal: group.products.reduce((s: number, p: any) => s + p.price * p.quantity, 0),
+        shippingFee: finalShippingFee,
+        totalDiscount: productDiscount + shippingDiscount,
+        total: finalAmount,
+      });
+    }
+  }, [productDiscount, shippingDiscount, finalShippingFee, finalAmount]);
 
   return (
     <div className="mb-8 border rounded-xl shadow-sm bg-[#faeaea] border-[#f5d5d5]">

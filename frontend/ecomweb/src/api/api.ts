@@ -119,5 +119,9 @@ export const getCouponsByShopId = (shopId: string) => {
 
 export const getUserOrderCoupons = () => axiosInstance.get('/coupons/user');
 
+export const createOrder = (orderData: any) => {
+  return axiosInstance.post('/orders', orderData);
+};
+
 export const getOrderPaymentStatus = (orderId: string) =>
   axiosInstance.get(`/api/orders/payment-status?vnp_TxnRef=${orderId}`);
