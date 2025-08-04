@@ -40,7 +40,11 @@ public class Order {
     User user;
 
     @Builder.Default
-    @ManyToMany(mappedBy = "orders")
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "coupon_id")
+    )
     List<Coupon> coupons= new ArrayList<>();
 
     @Builder.Default

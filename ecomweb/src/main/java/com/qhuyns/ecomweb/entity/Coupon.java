@@ -43,19 +43,11 @@ public class Coupon {
     List<User> users= new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "coupon_id"),
-            inverseJoinColumns = @JoinColumn(name = "order_id")
-    )
+    @ManyToMany(mappedBy = "coupons")
     List<Order> orders= new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "coupon_id"),
-            inverseJoinColumns = @JoinColumn(name = "order_shop_group_id")
-    )
+    @ManyToMany(mappedBy = "coupons")
     List<OrderShopGroup> orderShopGroups = new ArrayList<>();
 
     @ManyToOne

@@ -41,7 +41,7 @@ const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) =
       }
     };
     checkToken();
-    const interval = setInterval(checkToken, 60000);
+    const interval = setInterval(checkToken, 5000);
     return () => clearInterval(interval);
   }, [user]);
 
