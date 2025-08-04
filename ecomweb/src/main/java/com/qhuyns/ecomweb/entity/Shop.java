@@ -44,7 +44,7 @@ public class Shop {
     private List<OrderShopGroup> orderShopGroups= new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Coupon> coupons= new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)

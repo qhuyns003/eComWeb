@@ -2,12 +2,17 @@ package com.qhuyns.ecomweb.service;
 
 
 import com.qhuyns.ecomweb.configuration.VnpayConfig;
+import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -22,6 +27,9 @@ import java.util.*;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class VnpayService {
+    @NonFinal
+    @Value("${vnpay.hashSecret}")
+    String hashSecret;
     VnpayConfig vnpayConfig;
 
     public String createPaymentUrl(String orderId, BigDecimal amount, String orderInfo, String clientIp) {
@@ -71,6 +79,50 @@ public class VnpayService {
         query.append("&vnp_SecureHash=").append(vnp_SecureHash);
 
         return vnpayConfig.getPaymentUrl() + "?" + query.toString();
+    }
+
+
+    public ApiResponse<String> vnpayIpn(Map<String, String> params) {
+        String vnp_SecureHash = params.get("vnp_SecureHash");
+        params.remove("vnp_SecureHash");
+        params.remove("vnp_SecureHashType");
+
+        List<String> fieldNames = new ArrayList<>(params.keySet());
+        Collections.sort(fieldNames);
+        StringBuilder hashData = new StringBuilder();
+        for (int i = 0; i < fieldNames.size(); i++) {
+            String fieldName = fieldNames.get(i);
+            String fieldValue = params.get(fieldName);
+            hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+            if (i < fieldNames.size() - 1) hashData.append('&');
+        }
+        String vnp_HashSecret = hashSecret;
+        String checkSum = hmacSHA512(vnp_HashSecret, hashData.toString());
+        String orderId = params.get("vnp_TxnRef");
+        String responseCode = params.get("vnp_ResponseCode");
+        if (checkSum.equalsIgnoreCase(vnp_SecureHash)) {
+            if ("00".equals(responseCode)) {
+                // Cập nhật trạng thái đơn hàng thành PAID ở đây
+                return ApiResponse.<String>builder()
+                        .code(1000)
+                        .message("IPN: Thanh toán thành công cho đơn hàng: " + orderId)
+                        .result("00")
+                        .build();
+            } else {
+                // Cập nhật trạng thái đơn hàng thành FAILED ở đây
+                return ApiResponse.<String>builder()
+                        .code(1002)
+                        .message("IPN: Thanh toán thất bại, mã lỗi: " + responseCode)
+                        .result("00")
+                        .build();
+            }
+        } else {
+            return ApiResponse.<String>builder()
+                    .code(400)
+                    .message("Sai checksum!")
+                    .result("97")
+                    .build();
+        }
     }
 
     private String hmacSHA512(String key, String data) {

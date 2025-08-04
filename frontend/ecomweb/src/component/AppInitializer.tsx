@@ -32,18 +32,22 @@ const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) =
     const checkToken = () => {
       const token = localStorage.getItem('token');
       
-      // Chỉ kiểm tra token khi user đã đăng nhập
-      if (user && token && isTokenExpired(token)) {
+      // Kiểm tra token nếu có token (không cần đợi user load)
+      if (token && isTokenExpired(token)) {
         // Chỉ dispatch event để hiện modal, không xóa dữ liệu ngay
         window.dispatchEvent(new CustomEvent('tokenExpired', { 
           detail: { message: 'Phiên đăng nhập đã hết hạn' } 
         }));
       }
     };
+    
+    // Kiểm tra ngay lập tức khi component mount
     checkToken();
+    
+    // Kiểm tra định kỳ mỗi 5 giây
     const interval = setInterval(checkToken, 5000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, []); // Bỏ dependency [user] để chạy ngay khi mount
 
   if (loading) {
     return (

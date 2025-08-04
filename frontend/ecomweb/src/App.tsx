@@ -24,6 +24,25 @@ function AppContent() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    // Kiểm tra token khi component mount
+    const token = localStorage.getItem('token');
+    
+    // Chỉ kiểm tra nếu có token (user đã đăng nhập)
+    if (token) {
+      try {
+        const tokenData = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Date.now() / 1000;
+        if (tokenData.exp < currentTime) {
+          setShowLogoutModal(true);
+          return;
+        }
+      } catch (error) {
+        // Token không hợp lệ (có token nhưng format sai)
+        setShowLogoutModal(true);
+        return;
+      }
+    }
+
     const handleTokenExpired = () => {
       setShowLogoutModal(true);
     };

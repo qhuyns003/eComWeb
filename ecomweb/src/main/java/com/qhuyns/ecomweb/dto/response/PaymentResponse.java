@@ -16,9 +16,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryResponse {
-    String id;
+public class PaymentResponse {
+
     String name;
     String description;
-    List<ProductResponse> products;
 }

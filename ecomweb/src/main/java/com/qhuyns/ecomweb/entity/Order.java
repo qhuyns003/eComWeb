@@ -23,6 +23,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Enumerated(EnumType.STRING)
     OrderStatus status;
     // nen luu de tranh viec moi khi truy van phai tinh toan
     BigDecimal total;

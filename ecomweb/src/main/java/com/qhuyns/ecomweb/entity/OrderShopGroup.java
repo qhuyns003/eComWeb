@@ -46,5 +46,5 @@ public class OrderShopGroup {
             joinColumns = @JoinColumn(name = "order_shop_group_id"),
             inverseJoinColumns = @JoinColumn(name = "coupon_id")
     )
-    List<Coupon> coupons= new ArrayList<>();
+    List<Coupon> coupons= new ArrayList<>();;
 } 

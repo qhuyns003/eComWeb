@@ -124,4 +124,12 @@ export const createOrder = (orderData: any) => {
 };
 
 export const getOrderPaymentStatus = (orderId: string) =>
-  axiosInstance.get(`/api/orders/payment-status?vnp_TxnRef=${orderId}`);
+  axiosInstance.get(`/vnpay/payment-status?vnp_TxnRef=${orderId}`);
+
+export const getPaymentMethods = () => {
+  return axiosInstance.get('/payments');
+};
+
+export const createPayment = (paymentData: any) => {
+  return axiosInstance.post('/vnpay/create-payment', paymentData);
+};

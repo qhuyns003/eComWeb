@@ -11,7 +11,8 @@ public class API_URL {
             "/ghn/**",
             "/shop_address/**",
             "/coupons/**",
-            "/vnpay/**"
+            "/vnpay/**",
+            "/payments/**"
 
     };
 

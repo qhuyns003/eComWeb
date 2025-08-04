@@ -4,6 +4,7 @@ package com.qhuyns.ecomweb.controller;
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.request.OrderRequest;
 import com.qhuyns.ecomweb.dto.request.RoleRequest;
+import com.qhuyns.ecomweb.dto.response.OrderResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
 import com.qhuyns.ecomweb.service.OrderService;
 import com.qhuyns.ecomweb.service.RoleService;
@@ -24,9 +25,11 @@ public class OrderController {
 
     OrderService orderService;
     @PostMapping("")
-    ApiResponse<?> create(@RequestBody OrderRequest orderRequest) {
-    orderService.create(orderRequest);
-    return new ApiResponse<>(200, "success", orderRequest);
+    ApiResponse<OrderResponse> create(@RequestBody OrderRequest orderRequest) {
+
+    return new ApiResponse().<OrderResponse>builder()
+            .result(orderService.create(orderRequest))
+            .build();
     };
 
 }

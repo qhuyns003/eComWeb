@@ -3,15 +3,16 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
-import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId, getUserOrderCoupons, createOrder } from '../../api/api';
+import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId, getUserOrderCoupons, createOrder, getPaymentMethods, createPayment } from '../../api/api';
 import OrderShopGroup from './OrderShopGroup';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { clearOrder } from '../../store/features/orderSlice';
 
-const paymentMethods = [
-  { value: 'COD', label: 'Thanh toán khi nhận hàng', icon: <FiDollarSign className="inline mr-2 text-xl text-[#cc3333]" /> },
-  { value: 'BANKING', label: 'Chuyển khoản ngân hàng', icon: <FiCreditCard className="inline mr-2 text-xl text-[#cc3333]" /> },
-];
+// XÓA mảng paymentMethods cứng
+// const paymentMethods = [
+//   { value: 'COD', label: 'Thanh toán khi nhận hàng', icon: <FiDollarSign className="inline mr-2 text-xl text-[#cc3333]" /> },
+//   { value: 'BANKING', label: 'Chuyển khoản ngân hàng', icon: <FiCreditCard className="inline mr-2 text-xl text-[#cc3333]" /> },
+// ];
 
 const orderVoucherList = [
   { value: 'ORDER10', label: 'Giảm 10k cho đơn từ 200k', icon: <FaTag className="inline mr-2 text-lg text-[#cc3333]" />, discount: 10000 },
@@ -51,6 +52,9 @@ const Checkout: React.FC = () => {
   const orderShippingCoupons = orderCoupons.filter(c => c.couponType === 'SHIPPING');
   const [selectedOrderDiscountCoupon, setSelectedOrderDiscountCoupon] = useState<any>(null);
   const [selectedOrderShippingCoupon, setSelectedOrderShippingCoupon] = useState<any>(null);
+
+  // Trong component Checkout:
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
 
   // Lấy địa chỉ thật khi vào trang
   useEffect(() => {
@@ -122,6 +126,12 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     getUserOrderCoupons().then(res => {
       setOrderCoupons(res.data.result || []);
+    });
+  }, []);
+
+  useEffect(() => {
+    getPaymentMethods().then(res => {
+      setPaymentMethods(res.data.result || []);
     });
   }, []);
 
@@ -390,14 +400,40 @@ const Checkout: React.FC = () => {
       const response = await createOrder(payload);
       const responseData = response.data;
       if (responseData && responseData.code === 1000) {
-        toast.success('Thành công!', {
-          style: {
-            backgroundColor: '#4ade80',
-            color: 'white',
-            fontWeight: 'bold'
+        // Nếu thanh toán bằng BANKING, tạo payment URL và chuyển hướng
+        if (paymentMethod === 'BANKING') {
+          try {
+            const orderId = responseData.result?.id; // Lấy order ID từ response
+            const paymentPayload = {
+              orderId: orderId,
+              amount: finalAmount,
+              orderInfo: `Thanh toan don hang ${orderId}`
+            };
+            
+            const paymentResponse = await createPayment(paymentPayload);
+            const paymentData = paymentResponse.data;
+            
+            if (paymentData && paymentData.result?.paymentUrl) {
+              // Chuyển hướng đến trang thanh toán VNPAY
+              window.location.href = paymentData.result.paymentUrl;
+            } else {
+              toast.error('Không thể tạo URL thanh toán.');
+            }
+          } catch (paymentError) {
+            console.error('Create payment error:', paymentError);
+            toast.error('Lỗi khi tạo thanh toán.');
           }
-        });
-        dispatch(clearOrder());
+        } else {
+          // COD - hiển thị thông báo thành công
+          toast.success('Đặt hàng thành công!', {
+            style: {
+              backgroundColor: '#4ade80',
+              color: 'white',
+              fontWeight: 'bold'
+            }
+          });
+          dispatch(clearOrder());
+        }
       } else {
         toast.error(responseData?.message || 'Đặt hàng thất bại.');
       }
@@ -569,17 +605,17 @@ const Checkout: React.FC = () => {
             </div>
             <div className="flex flex-col gap-2">
               {paymentMethods.map(method => (
-                <label key={method.value} className={`flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all ${paymentMethod === method.value ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}>
+                <label key={method.name} className={`flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all ${paymentMethod === method.name ? 'border-[#cc3333] bg-[#fff]' : 'border-gray-200 bg-[#faeaea]'} hover:border-[#cc3333]`}>
                   <input
                     type="radio"
                     name="paymentMethod"
-                    value={method.value}
-                    checked={paymentMethod === method.value}
-                    onChange={() => setPaymentMethod(method.value)}
+                    value={method.name}
+                    checked={paymentMethod === method.name}
+                    onChange={() => setPaymentMethod(method.name)}
                     className="mr-2 accent-[#cc3333]"
                   />
-                  {method.icon}
-                  <span className="font-medium text-gray-900">{method.label}</span>
+                  {/* Nếu muốn có icon, có thể map theo method.name */}
+                  <span className="font-medium text-gray-900">{method.description}</span>
                 </label>
               ))}
             </div>

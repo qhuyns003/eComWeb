@@ -5,6 +5,7 @@ import com.qhuyns.ecomweb.dto.request.OrderItemRequest;
 import com.qhuyns.ecomweb.dto.request.OrderRequest;
 import com.qhuyns.ecomweb.dto.request.OrderShopGroupRequest;
 import com.qhuyns.ecomweb.dto.request.RoleRequest;
+import com.qhuyns.ecomweb.dto.response.OrderResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
 import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
@@ -39,7 +40,7 @@ public class OrderService {
     CouponRepository  couponRepository;
     OrderRepository orderRepository;
     UserRepository userRepository;
-    public void create(OrderRequest orderRequest) {
+    public OrderResponse create(OrderRequest orderRequest) {
         // kiem tra khong trung
       Order order = orderMapper.toOrder(orderRequest);
       order.setStatus(OrderStatus.PENDING);
@@ -74,7 +75,11 @@ public class OrderService {
           order.getOrderShopGroups().add(orderShopGroup);
       }
       orderRepository.save(order);
+      return orderMapper.toOrderResponse(order);
     }
+     public void existingOrder(String orderId) {
+        orderRepository.findById(orderId).orElseThrow(()-> new AppException(ErrorCode.ORDER_NOT_EXISTS));
+     }
 
 
 }
