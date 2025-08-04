@@ -6,10 +6,7 @@ import com.qhuyns.ecomweb.dto.request.OrderRequest;
 import com.qhuyns.ecomweb.dto.request.OrderShopGroupRequest;
 import com.qhuyns.ecomweb.dto.request.RoleRequest;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
-import com.qhuyns.ecomweb.entity.Coupon;
-import com.qhuyns.ecomweb.entity.Order;
-import com.qhuyns.ecomweb.entity.OrderItem;
-import com.qhuyns.ecomweb.entity.OrderShopGroup;
+import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.OrderItemMapper;
@@ -21,8 +18,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,19 +38,31 @@ public class OrderService {
     UserAddressRepository  userAddressRepository;
     CouponRepository  couponRepository;
     OrderRepository orderRepository;
+    UserRepository userRepository;
     public void create(OrderRequest orderRequest) {
+        // kiem tra khong trung
       Order order = orderMapper.toOrder(orderRequest);
+      order.setStatus(OrderStatus.PENDING);
+      order.setUser(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(
+              ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
+      ));
       order.setUserAddress(userAddressRepository.findById(orderRequest.getUserAddressId()).orElseThrow(
               () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
       ));
       for(String couponId : orderRequest.getCouponIds()) {
           Coupon coupon = couponRepository.findById(couponId).orElseThrow(()-> new AppException(ErrorCode.COUPON_NOT_EXISTS));
+          if(coupon.getUsed().compareTo(coupon.getQuantity())<0){
+            coupon.setUsed(coupon.getUsed().add(BigDecimal.ONE));
+          }
           order.getCoupons().add(coupon);
       }
       for(OrderShopGroupRequest orderShopGroupRequest : orderRequest.getOrderShopGroups()){
           OrderShopGroup orderShopGroup = orderShopGroupMapper.toOrderShopGroup(orderShopGroupRequest);
           for(String shopCouponId : orderShopGroupRequest.getShopCouponIds()) {
               Coupon shopCoupon = couponRepository.findById(shopCouponId).orElseThrow(()-> new AppException(ErrorCode.COUPON_NOT_EXISTS));
+              if(shopCoupon.getUsed().compareTo(shopCoupon.getQuantity())<0){
+                  shopCoupon.setUsed(shopCoupon.getUsed().add(BigDecimal.ONE));
+              }
               orderShopGroup.getCoupons().add(shopCoupon);
           }
           for(OrderItemRequest oir: orderShopGroupRequest.getOrderItems()){
