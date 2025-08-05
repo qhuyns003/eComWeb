@@ -14,6 +14,7 @@ public class API_URL {
             "/vnpay/**",
             "/payments/**",
             "/orders/**",
+            "/carts/**"
 
     };
 
