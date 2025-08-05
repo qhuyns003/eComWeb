@@ -12,7 +12,8 @@ public class API_URL {
             "/shop_address/**",
             "/coupons/**",
             "/vnpay/**",
-            "/payments/**"
+            "/payments/**",
+            "/orders/**",
 
     };
 
@@ -20,7 +21,8 @@ public class API_URL {
             // /* la 1 duong dan /** la nhieu duong dan
             "/categories/**",
             "/products/**",
-            "/customer_reviews/**"
+            "/customer_reviews/**",
+            "/orders/**",
 
     };
 
@@ -36,13 +38,15 @@ public class API_URL {
             "/user_address/**",
             "/ghn/**",
             "/shop_address/**",
-            "/vnpay/**"
+            "/vnpay/**",
+            "/orders/**",
 
     };
     public static final String[] URL_ANONYMOUS_DELETE = {
 
             "/files/**",
-            "/products/**"
+            "/products/**",
+            "/orders/**",
 
     };
 }

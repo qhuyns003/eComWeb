@@ -44,7 +44,7 @@ public class VnpayController {
                 .build();
     }
 
-    @PostMapping("/ipn")
+    @RequestMapping(value = "/IPN", method = {RequestMethod.GET, RequestMethod.POST})
     public ApiResponse<String> vnpayIpn(@RequestParam Map<String, String> params) {
        return vnpayService.vnpayIpn(params);
     }

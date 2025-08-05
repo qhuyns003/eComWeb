@@ -25,4 +25,6 @@ vnpay:
   hashSecret: "0G59Z6IMX91B2X8GEIGHHHCQDJE3XY04"
   paymentUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   returnUrl: "http://localhost:5173/payment/success"
-  ipnUrl: "http://localhost:8080/vnpay/ipn"
+#  phai config trong quan tri https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login, phai dung ngrok
+  ipnUrl: "https://572362ca02eb.ngrok-free.app/vnpay/IPN"
+#            "http://localhost:8080/vnpay/IPN"

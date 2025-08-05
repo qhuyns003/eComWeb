@@ -3,6 +3,8 @@ package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.configuration.VnpayConfig;
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
+import com.qhuyns.ecomweb.entity.OrderStatus;
+import com.qhuyns.ecomweb.repository.OrderRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +33,8 @@ public class VnpayService {
     @Value("${vnpay.hashSecret}")
     String hashSecret;
     VnpayConfig vnpayConfig;
+    OrderService orderService;
+
 
     public String createPaymentUrl(String orderId, BigDecimal amount, String orderInfo, String clientIp) {
         String vnp_Version = "2.1.0";
@@ -43,6 +47,7 @@ public class VnpayService {
         String vnp_OrderType = "other"; // hoặc billpayment
         String vnp_Locale = "vn";
         String vnp_ReturnUrl = vnpayConfig.getReturnUrl();
+//        String vnp_IpnUrl = vnpayConfig.getIpnUrl(); // Thêm IPN URL
         String vnp_IpAddr = clientIp;
         String vnp_CreateDate = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 
@@ -57,6 +62,7 @@ public class VnpayService {
         vnp_Params.put("vnp_OrderType", vnp_OrderType);
         vnp_Params.put("vnp_Locale", vnp_Locale);
         vnp_Params.put("vnp_ReturnUrl", vnp_ReturnUrl);
+//        vnp_Params.put("vnp_IpnUrl", vnp_IpnUrl); // Thêm IPN URL vào params
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
@@ -102,7 +108,7 @@ public class VnpayService {
         String responseCode = params.get("vnp_ResponseCode");
         if (checkSum.equalsIgnoreCase(vnp_SecureHash)) {
             if ("00".equals(responseCode)) {
-                // Cập nhật trạng thái đơn hàng thành PAID ở đây
+                orderService.changeStatus(OrderStatus.PAID,orderId);
                 return ApiResponse.<String>builder()
                         .code(1000)
                         .message("IPN: Thanh toán thành công cho đơn hàng: " + orderId)
@@ -110,6 +116,7 @@ public class VnpayService {
                         .build();
             } else {
                 // Cập nhật trạng thái đơn hàng thành FAILED ở đây
+                orderService.changeStatus(OrderStatus.FAILED,orderId);
                 return ApiResponse.<String>builder()
                         .code(1002)
                         .message("IPN: Thanh toán thất bại, mã lỗi: " + responseCode)
@@ -117,12 +124,14 @@ public class VnpayService {
                         .build();
             }
         } else {
+            orderService.changeStatus(OrderStatus.FAILED,orderId);
             return ApiResponse.<String>builder()
                     .code(400)
                     .message("Sai checksum!")
                     .result("97")
                     .build();
         }
+        // gọi api tạo đơn hàng, tạo store cho từng shop nếu chưa đăng kí
     }
 
     private String hmacSHA512(String key, String data) {

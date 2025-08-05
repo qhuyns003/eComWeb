@@ -81,5 +81,15 @@ public class OrderService {
         orderRepository.findById(orderId).orElseThrow(()-> new AppException(ErrorCode.ORDER_NOT_EXISTS));
      }
 
+     public void changeStatus(OrderStatus orderStatus,String id) {
+        Order order = orderRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.ORDER_NOT_EXISTS));
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+     }
+
+    public void delete(String id) {
+       orderRepository.deleteById(id);
+    }
+
 
 }

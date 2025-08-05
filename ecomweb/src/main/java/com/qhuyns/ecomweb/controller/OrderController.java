@@ -31,5 +31,12 @@ public class OrderController {
             .result(orderService.create(orderRequest))
             .build();
     };
+    @DeleteMapping("/{id}")
+    ApiResponse<String> delete(@PathVariable String id) {
+        orderService.delete(id);
+        return new ApiResponse().<String>builder()
+                .result("success")
+                .build();
+    };
 
 }
