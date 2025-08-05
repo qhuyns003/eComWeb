@@ -40,6 +40,8 @@ public class OrderService {
     CouponRepository  couponRepository;
     OrderRepository orderRepository;
     UserRepository userRepository;
+    ProductVariantRepository  productVariantRepository;
+    ShopRepository  shopRepository;
     public OrderResponse create(OrderRequest orderRequest) {
         // kiem tra khong trung
       Order order = orderMapper.toOrder(orderRequest);
@@ -59,6 +61,8 @@ public class OrderService {
       }
       for(OrderShopGroupRequest orderShopGroupRequest : orderRequest.getOrderShopGroups()){
           OrderShopGroup orderShopGroup = orderShopGroupMapper.toOrderShopGroup(orderShopGroupRequest);
+          orderShopGroup.setShop(shopRepository.findById(orderShopGroupRequest.getShopId()).orElseThrow(
+                  ()->new AppException(ErrorCode.SHOP_NOT_EXISTS)));
           for(String shopCouponId : orderShopGroupRequest.getShopCouponIds()) {
               Coupon shopCoupon = couponRepository.findById(shopCouponId).orElseThrow(()-> new AppException(ErrorCode.COUPON_NOT_EXISTS));
               if(shopCoupon.getUsed().compareTo(shopCoupon.getQuantity())<0){
@@ -68,6 +72,9 @@ public class OrderService {
           }
           for(OrderItemRequest oir: orderShopGroupRequest.getOrderItems()){
               OrderItem orderItem = orderItemMapper.toOrderItem(oir);
+              ProductVariant productVariant = productVariantRepository.findById(oir.getProductVariantId()).orElseThrow(
+                      () -> new AppException(ErrorCode.VARIANT_NOT_FOUND));
+              orderItem.setProductVariant(productVariant);
               orderItem.setOrderShopGroup(orderShopGroup);
               orderShopGroup.getOrderItems().add(orderItem);
           }

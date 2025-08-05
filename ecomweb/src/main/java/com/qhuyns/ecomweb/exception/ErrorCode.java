@@ -24,7 +24,8 @@ public enum ErrorCode {
     PRODUCT_HAS_ORDER(1015, "Không thể xóa sản phẩm '%s' do đã phát sinh đơn hàng", HttpStatus.CONFLICT),
     USER_ADDRESS_NOT_EXISTS(1016, "Không tồn tại địa chỉ khách hàng này", HttpStatus.NOT_FOUND),
     COUPON_NOT_EXISTS(1017, "Không tồn tại mã giảm giá này", HttpStatus.NOT_FOUND),
-    ORDER_NOT_EXISTS(1018, "Không tồn tại đơn hàng này", HttpStatus.NOT_FOUND)
+    ORDER_NOT_EXISTS(1018, "Không tồn tại đơn hàng này", HttpStatus.NOT_FOUND),
+    SHOP_NOT_EXISTS(1019, "Không tồn tại shop này", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

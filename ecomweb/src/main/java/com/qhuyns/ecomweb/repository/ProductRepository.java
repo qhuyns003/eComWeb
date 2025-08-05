@@ -1,6 +1,7 @@
 package com.qhuyns.ecomweb.repository;
 
 import com.qhuyns.ecomweb.entity.Category;
+import com.qhuyns.ecomweb.entity.OrderStatus;
 import com.qhuyns.ecomweb.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,6 +39,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     LEFT JOIN p.productVariants v
     LEFT JOIN v.orderItems oi
     LEFT JOIN oi.customerReview cr
+    LEFT JOIN oi.orderShopGroup osg
+    LEFT JOIN osg.order o
+    WHERE o.status = com.qhuyns.ecomweb.entity.OrderStatus.PAID OR o.id IS NULL
     GROUP BY p
     ORDER BY COUNT(oi) DESC
 """)
@@ -73,9 +77,11 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     LEFT JOIN p.productVariants v
     LEFT JOIN v.orderItems oi
     LEFT JOIN oi.customerReview cr
-    WHERE p.id = :id
+    LEFT JOIN oi.orderShopGroup osg
+    LEFT JOIN osg.order o
+    WHERE p.id = :id and o.status = :status
 """)
-    Object[] findNumberOfOrderAndRating(@Param("id") String id);
+    Object[] findNumberOfOrderAndRating(@Param("id") String id,@Param("status") OrderStatus status);
  // khong can fetch de lay quan he, select luon anh cho nhanh
 
     @Query(

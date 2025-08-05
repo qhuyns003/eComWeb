@@ -86,7 +86,7 @@ public class ProductService {
     }
 
     public ProductDetailResponse getDetailProduct(String id) {
-        Object[] rs = productRepository.findNumberOfOrderAndRating(id);
+        Object[] rs = productRepository.findNumberOfOrderAndRating(id,OrderStatus.PAID);
         Product product = productRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         
         ProductDetailResponse productDetailResponse = productMapper.toProductDetailResponse(product);
