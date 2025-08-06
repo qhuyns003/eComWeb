@@ -2,6 +2,7 @@ package com.qhuyns.ecomweb.controller;
 
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
+import com.qhuyns.ecomweb.dto.request.CartRequest;
 import com.qhuyns.ecomweb.dto.request.RoleRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
@@ -27,6 +28,13 @@ public class CartController {
     ApiResponse<List<CartResponse>> getAll() {
         return ApiResponse.<List<CartResponse>>builder()
                 .result(cartService.getAll())
+                .build();
+    }
+    @PostMapping
+    ApiResponse<?> addToCart(@RequestBody CartRequest cartRequest) {
+        cartService.addToCart(cartRequest);
+        return ApiResponse.<String>builder()
+                .result("success")
                 .build();
     }
 

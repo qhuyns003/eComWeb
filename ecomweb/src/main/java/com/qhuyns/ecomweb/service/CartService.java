@@ -1,5 +1,7 @@
 package com.qhuyns.ecomweb.service;
 
+import com.qhuyns.ecomweb.constant.ImagePrefix;
+import com.qhuyns.ecomweb.dto.request.CartRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
 import com.qhuyns.ecomweb.dto.response.PaymentResponse;
 import com.qhuyns.ecomweb.entity.*;
@@ -7,6 +9,7 @@ import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.ShopMapper;
 import com.qhuyns.ecomweb.repository.CartRepository;
+import com.qhuyns.ecomweb.repository.ProductVariantRepository;
 import com.qhuyns.ecomweb.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class CartService {
     UserRepository userRepository;
     CartRepository cartRepository;
     ShopMapper shopMapper;
+    ProductVariantRepository pvRepository;;
     public List<CartResponse> getAll() {
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(
                 ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
@@ -51,10 +55,28 @@ public class CartService {
                     .weight(product.getWeight())
                     .shop(shopMapper.toShopResponse(product.getShop()))
                     .detailAttributes(dan)
-                    .imageUrl(product.getImages().stream().filter(img -> img.getIsMain()==true).findFirst().get().getUrl())
+                    .imageUrl(ImagePrefix.IMAGE_PREFIX+product.getImages().stream().filter(img -> img.getIsMain()==true).findFirst().get().getUrl())
                     .build();
             cartResponseList.add(cartResponse);
         };
         return cartResponseList;
+    }
+
+    public void addToCart(CartRequest cartRequest) {
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(
+                ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
+        );
+        ProductVariant pv = pvRepository.findById(cartRequest.getProductVariantId()).orElseThrow(
+                () -> new AppException(ErrorCode.VARIANT_NOT_FOUND)
+        );
+        if(pv.getStock()<=0){
+            throw new AppException(ErrorCode.DONNT_ENOUGH_PRODUCT);
+        }
+        Cart cart = Cart.builder()
+                .user(user)
+                .quantity(cartRequest.getQuantity())
+                .productVariant(pv)
+                .build();
+        cartRepository.save(cart);
     }
 }

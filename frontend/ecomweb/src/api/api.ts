@@ -133,3 +133,14 @@ export const getPaymentMethods = () => {
 export const createPayment = (paymentData: any) => {
   return axiosInstance.post('/vnpay/create-payment', paymentData);
 };
+
+export const getCartItems = () => {
+  return axiosInstance.get('/carts');
+};
+
+export const addToCart = (productVariantId: string, quantity: number) => {
+  return axiosInstance.post('/carts', {
+    productVariantId,
+    quantity
+  });
+};

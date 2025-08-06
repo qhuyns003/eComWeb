@@ -60,6 +60,7 @@ export default function HomePage() {
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [topSellingProducts, setTopSellingProducts] = useState<ProductOverviewResponse[]>([]);
   const [newestProducts, setNewestProducts] = useState<ProductOverviewResponse[]>([]);
+  const [animateSection, setAnimateSection] = useState('');
 
   // Auto slide
   useEffect(() => {
@@ -91,132 +92,157 @@ export default function HomePage() {
       .catch(err => console.error(err));
   }, []);
 
+  // Scroll với animation
+  const scrollToSection = (sectionId: string) => {
+    setAnimateSection(''); // Reset animation
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    
+    // Trigger animation sau khi scroll
+    setTimeout(() => {
+      setAnimateSection(sectionId);
+    }, 500);
+  };
+
+  // Expose scrollToSection globally cho Header
+  useEffect(() => {
+    (window as any).scrollToSection = scrollToSection;
+    return () => {
+      delete (window as any).scrollToSection;
+    };
+  }, []);
+
   return (
     <>
       <Header />
-      {/* Category bar dưới header */}
-      <div className="w-full bg-white shadow-sm px-4 md:px-16 lg:px-24 xl:px-32 py-2 border-b border-gray-100 relative">
-        <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 pb-1">
-          {(showAllCategories ? categories : categories.slice(0, MAX_VISIBLE)).map((cat) => (
-            <button
-              key={cat.id}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-gray-700 hover:bg-[#cc3333] hover:text-white transition whitespace-nowrap shadow-sm min-w-[110px] justify-center"
-            >
-            
-              <span className="text-sm font-medium">{cat.name}</span>
-            </button>
-          ))}
-          {categories.length > MAX_VISIBLE && !showAllCategories && (
-            <button
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#cc3333] text-white font-semibold border-2 border-[#cc3333] shadow-lg min-w-[110px] justify-center hover:bg-[#b82d2d] transition"
-              onClick={() => setShowAllCategories(true)}
-            >
-              <span className="text-sm font-medium">Xem thêm</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-          )}
-        </div>
-        {/* Dropdown toàn bộ category */}
-        {showAllCategories && (
-          <div className="absolute left-0 w-full bg-white shadow-lg rounded p-4 z-50 top-full mt-2 flex flex-wrap gap-2">
-            {/* Nút Đóng nổi bật */}
-            <button
-              className="absolute top-2 right-4 bg-[#cc3333] text-white rounded-full p-2 shadow-lg z-50 hover:bg-[#b82d2d] transition"
-              onClick={() => setShowAllCategories(false)}
-              aria-label="Đóng"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-gray-700 hover:bg-[#cc3333] hover:text-white transition whitespace-nowrap shadow-sm min-w-[110px] justify-center"
-              >
-               
-                <span className="text-sm font-medium">{cat.name}</span>
-              </button>
-            ))}
+     
+      {/* Layout với sidebar danh mục bên trái */}
+      <div className="flex gap-8 px-4 md:px-8 lg:px-16 xl:px-24 py-6">
+        {/* Sidebar danh mục bên trái */}
+        <aside className="w-72 flex-shrink-0">
+          <div className="bg-white rounded-xl shadow-lg p-4 sticky top-[90px]">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 pb-2 border-b">Danh mục</h3>
+            <div className="space-y-2">
+              {categories.map((cat, index) => {
+                const icons = ['📱', '👕', '🎮', '📚', '🏠', '⚽', '💄', '🚗', '🍔', '🎵', '💊', '🎁'];
+                return (
+                  <button
+                    key={cat.id}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg hover:bg-[#f5d5d5] transition-colors font-medium text-gray-700 hover:text-[#cc3333]"
+                  >
+                    <span className="text-lg">{icons[index % icons.length]}</span>
+                    <span>{cat.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        )}
-      </div>
-      {/* Banner carousel */}
-      <div className="w-full flex justify-center bg-white py-6">
-        <div className="relative w-full max-w-4xl rounded-2xl overflow-hidden shadow-xl">
-          <img
-            src={banners[bannerIdx].img}
-            alt={banners[bannerIdx].alt}
-            className="w-full h-56 md:h-80 object-cover transition-all duration-500"
-          />
-          {/* Nút chuyển trái */}
-          <button
-            className="absolute top-1/2 left-3 -translate-y-1/2 bg-white/80 hover:bg-[#cc3333] hover:text-white text-gray-700 rounded-full p-2 shadow transition"
-            onClick={() => setBannerIdx((prev) => (prev - 1 + banners.length) % banners.length)}
-            aria-label="prev"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          {/* Nút chuyển phải */}
-          <button
-            className="absolute top-1/2 right-3 -translate-y-1/2 bg-white/80 hover:bg-[#cc3333] hover:text-white text-gray-700 rounded-full p-2 shadow transition"
-            onClick={() => setBannerIdx((prev) => (prev + 1) % banners.length)}
-            aria-label="next"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-          {/* Dots */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-            {banners.map((_, idx) => (
-              <span
-                key={idx}
-                className={`w-3 h-3 rounded-full ${idx === bannerIdx ? 'bg-[#cc3333]' : 'bg-gray-300'} block transition`}
+        </aside>
+        {/* Nội dung chính bên phải */}
+        <main className="flex-1">
+          {/* Banner carousel */}
+          <div className="w-full flex justify-center bg-white py-6">
+            <div className="relative w-full max-w-4xl rounded-2xl overflow-hidden shadow-xl">
+              <img
+                src={banners[bannerIdx].img}
+                alt={banners[bannerIdx].alt}
+                className="w-full h-56 md:h-80 object-cover transition-all duration-500"
               />
-            ))}
+              {/* Nút chuyển trái */}
+              <button
+                className="absolute top-1/2 left-3 -translate-y-1/2 bg-white/80 hover:bg-[#cc3333] hover:text-white text-gray-700 rounded-full p-2 shadow transition"
+                onClick={() => setBannerIdx((prev) => (prev - 1 + banners.length) % banners.length)}
+                aria-label="prev"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              {/* Nút chuyển phải */}
+              <button
+                className="absolute top-1/2 right-3 -translate-y-1/2 bg-white/80 hover:bg-[#cc3333] hover:text-white text-gray-700 rounded-full p-2 shadow transition"
+                onClick={() => setBannerIdx((prev) => (prev + 1) % banners.length)}
+                aria-label="next"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              {/* Dots */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                {banners.map((_, idx) => (
+                  <span
+                    key={idx}
+                    className={`w-3 h-3 rounded-full ${idx === bannerIdx ? 'bg-[#cc3333]' : 'bg-gray-300'} block transition`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+          {/* Section: Hàng mới */}
+          <section id="newest-section" className="max-w-6xl mx-auto py-8 px-4">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Hàng mới</h2>
+            <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 ${
+              animateSection === 'newest-section' ? 'animate-fade-in' : ''
+            }`}>
+              {newestProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className={`transform transition-all duration-500 ${
+                    animateSection === 'newest-section' 
+                      ? 'translate-y-0 opacity-100' 
+                      : 'translate-y-4 opacity-90'
+                  }`}
+                  style={{ 
+                    animationDelay: animateSection === 'newest-section' ? `${index * 0.1}s` : '0s',
+                    transition: `all 0.6s ease-out ${index * 0.1}s`
+                  }}
+                >
+                  <ProductCard
+                    id={product.id}
+                    name={product.name}
+                    price={Number(product.price)}
+                    images={product.images}
+                    rating={Number(product.rating)}
+                    numberOfOrder={Number(product.numberOfOrder)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+          {/* Section: Top bán chạy */}
+          <section id="banchay-section" className="max-w-6xl mx-auto py-8 px-4">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Top bán chạy</h2>
+            <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 ${
+              animateSection === 'banchay-section' ? 'animate-fade-in' : ''
+            }`}>
+              {topSellingProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className={`transform transition-all duration-500 ${
+                    animateSection === 'banchay-section' 
+                      ? 'translate-y-0 opacity-100' 
+                      : 'translate-y-4 opacity-90'
+                  }`}
+                  style={{ 
+                    animationDelay: animateSection === 'banchay-section' ? `${index * 0.1}s` : '0s',
+                    transition: `all 0.6s ease-out ${index * 0.1}s`
+                  }}
+                >
+                  <ProductCard
+                    id={product.id}
+                    name={product.name}
+                    price={Number(product.price)}
+                    images={product.images}
+                    rating={Number(product.rating)}
+                    numberOfOrder={Number(product.numberOfOrder)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+          <CompanyMarquee />
+        </main>
       </div>
-      {/* Section: Hàng mới */}
-      <section className="max-w-6xl mx-auto py-8 px-4">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Hàng mới</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {newestProducts.map(product => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={Number(product.price)}
-              images={product.images}
-              rating={Number(product.rating)}
-              numberOfOrder={Number(product.numberOfOrder)}
-            />
-          ))}
-        </div>
-      </section>
-      {/* Section: Top bán chạy */}
-      <section className="max-w-6xl mx-auto py-8 px-4">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Top bán chạy</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {topSellingProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={Number(product.price)}
-              images={product.images}
-              rating={Number(product.rating)}
-              numberOfOrder={Number(product.numberOfOrder)}
-            />
-          ))}
-        </div>
-      </section>
-      <CompanyMarquee />
       <Footer />
     </>
   );

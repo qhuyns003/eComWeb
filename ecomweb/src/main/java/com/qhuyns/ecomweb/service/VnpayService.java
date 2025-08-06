@@ -3,8 +3,11 @@ package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.configuration.VnpayConfig;
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.entity.OrderStatus;
+import com.qhuyns.ecomweb.entity.*;
+import com.qhuyns.ecomweb.exception.AppException;
+import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.repository.OrderRepository;
+import com.qhuyns.ecomweb.repository.ProductVariantRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,7 +37,8 @@ public class VnpayService {
     String hashSecret;
     VnpayConfig vnpayConfig;
     OrderService orderService;
-
+    ProductVariantRepository productVariantRepository;
+    OrderRepository orderRepository;
 
     public String createPaymentUrl(String orderId, BigDecimal amount, String orderInfo, String clientIp) {
         String vnp_Version = "2.1.0";
@@ -109,6 +113,17 @@ public class VnpayService {
         if (checkSum.equalsIgnoreCase(vnp_SecureHash)) {
             if ("00".equals(responseCode)) {
                 orderService.changeStatus(OrderStatus.PAID,orderId);
+                // tru stock
+                Order order = orderRepository.findById(orderId).orElseThrow(
+                        ()-> new AppException(ErrorCode.ORDER_NOT_EXISTS)
+                );
+                for(OrderShopGroup osg : order.getOrderShopGroups()){
+                    for(OrderItem oi : osg.getOrderItems()){
+                        ProductVariant pv =oi.getProductVariant();
+                        pv.setStock(pv.getStock()-oi.getQuantity());
+                        productVariantRepository.save(pv);
+                    }
+                }
                 return ApiResponse.<String>builder()
                         .code(1000)
                         .message("IPN: Thanh toán thành công cho đơn hàng: " + orderId)

@@ -26,6 +26,7 @@ public enum ErrorCode {
     COUPON_NOT_EXISTS(1017, "Không tồn tại mã giảm giá này", HttpStatus.NOT_FOUND),
     ORDER_NOT_EXISTS(1018, "Không tồn tại đơn hàng này", HttpStatus.NOT_FOUND),
     SHOP_NOT_EXISTS(1019, "Không tồn tại shop này", HttpStatus.NOT_FOUND),
+    DONNT_ENOUGH_PRODUCT(1020, "Hết hàng", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

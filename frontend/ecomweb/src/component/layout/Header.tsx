@@ -1,6 +1,6 @@
 import React from "react";
 import UserMenu from "../homepage/UserMenu";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
 
@@ -8,6 +8,7 @@ const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
+  const location = useLocation();
 
   return (
     <nav className="h-[70px] relative w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-30 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all">
@@ -22,7 +23,22 @@ const Header: React.FC = () => {
         <input type="text" className="w-full h-full outline-none text-sm text-gray-500" placeholder="Tìm kiếm sản phẩm..." />
         <button type="submit" className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white mr-[5px] hover:bg-[#b82d2d] transition">Search</button>
       </form>
-
+      {location.pathname === '/' && (
+        <div className="flex items-center gap-3 mx-4">
+                      <button
+              className="font-medium text-white bg-transparent hover:bg-white/20 hover:text-[#cc3333] text-base px-3 py-1 rounded-full transition flex items-center gap-1"
+              onClick={() => (window as any).scrollToSection?.('newest-section')}
+            >
+              Hàng mới
+            </button>
+            <button
+              className="font-medium text-white bg-transparent hover:bg-white/20 hover:text-[#cc3333] text-base px-3 py-1 rounded-full transition flex items-center gap-1"
+              onClick={() => (window as any).scrollToSection?.('banchay-section')}
+            >
+              Bán chạy
+            </button>
+        </div>
+      )}
       <div className="flex gap-3">
         {user ? (
           <UserMenu />
