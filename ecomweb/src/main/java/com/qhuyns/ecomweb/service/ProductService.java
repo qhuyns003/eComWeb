@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,8 +142,13 @@ public class ProductService {
     }
 
     public Page<ProductResponse> searchProduct(int page, int size,String search, int status,ProductFilterRequest productFilterRequest) {
-
-        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = Sort.unsorted();
+        if ("asc".equalsIgnoreCase(productFilterRequest.getSortPrice())) {
+            sort = Sort.by("price").ascending();
+        } else if ("desc".equalsIgnoreCase(productFilterRequest.getSortPrice())) {
+            sort = Sort.by("price").descending();
+        }
+        Pageable pageable = PageRequest.of(page, size,sort);
         Page<Object[]> results = productRepository.searchProduct(search,status,pageable,productFilterRequest);
         List<ProductResponse> productResponses = new ArrayList<>();
         for(Object[] rs : results.getContent()) {

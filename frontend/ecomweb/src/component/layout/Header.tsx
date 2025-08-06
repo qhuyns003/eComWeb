@@ -12,7 +12,7 @@ const Header: React.FC = () => {
   const location = useLocation();
 
   return (
-    <nav className="h-[70px] relative w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-30 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all">
+    <nav className="h-[70px] sticky top-0 w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-50 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all shadow">
       <button
         type="button"
         className="bg-transparent border-none outline-none p-0 m-0"

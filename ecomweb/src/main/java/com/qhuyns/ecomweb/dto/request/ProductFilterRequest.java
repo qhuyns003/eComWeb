@@ -14,4 +14,7 @@ import java.math.BigDecimal;
 public class ProductFilterRequest {
     BigDecimal minPrice;
     BigDecimal maxPrice;
+    String categoryId;
+    String provinceId;
+    String sortPrice;
 }

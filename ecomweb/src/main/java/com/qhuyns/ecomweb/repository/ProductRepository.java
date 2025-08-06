@@ -121,6 +121,11 @@ public interface ProductRepository extends JpaRepository<Product, String> {
         WHERE
           (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
           AND (:status IS NULL OR p.status = :status)
+          AND (:#{#productFilterRequest.categoryId} IS NULL OR p.category.id = :#{#productFilterRequest.categoryId})
+          AND (:#{#productFilterRequest.provinceId} IS NULL OR p.shop.shopAddress.provinceId = :#{#productFilterRequest.provinceId})
+          AND (:#{#productFilterRequest.minPrice} IS NULL OR p.price >= :#{#productFilterRequest.minPrice})
+          AND (:#{#productFilterRequest.maxPrice} IS NULL OR p.price <= :#{#productFilterRequest.maxPrice})
+          
         """,
             countQuery = """
         SELECT COUNT(p)
@@ -128,6 +133,10 @@ public interface ProductRepository extends JpaRepository<Product, String> {
         WHERE 
           (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
           AND (:status IS NULL OR p.status = :status)
+          AND (:#{#productFilterRequest.categoryId} IS NULL OR p.category.id = :#{#productFilterRequest.categoryId})
+          AND (:#{#productFilterRequest.provinceId} IS NULL OR p.shop.shopAddress.provinceId = :#{#productFilterRequest.provinceId})
+          AND (:#{#productFilterRequest.minPrice} IS NULL OR p.price >= :#{#productFilterRequest.minPrice})
+          AND (:#{#productFilterRequest.maxPrice} IS NULL OR p.price <= :#{#productFilterRequest.maxPrice})
         """
     )
     Page<Object[]> searchProduct(
