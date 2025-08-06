@@ -2,6 +2,7 @@ package com.qhuyns.ecomweb.controller;
 
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
+import com.qhuyns.ecomweb.dto.request.ProductFilterRequest;
 import com.qhuyns.ecomweb.dto.request.ProductRequest;
 import com.qhuyns.ecomweb.dto.response.*;
 import com.qhuyns.ecomweb.exception.AppException;
@@ -50,6 +51,8 @@ public class ProductController {
                 .build();
     }
 
+
+
     @GetMapping("/shop_list_product/{id}")
     ApiResponse<Page<ProductResponse>> findProductsWithMainImageByUserId(
             @PathVariable("id") String id,
@@ -63,6 +66,19 @@ public class ProductController {
         return ApiResponse.<Page<ProductResponse>>builder()
                 .result(productService.
                         findProductsWithMainImageByUserId(id,page,size,search,status))
+                .build();
+    }
+
+    @GetMapping("/searching")
+    ApiResponse<Page<ProductResponse>> searchProduct(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value = "search", required = false,defaultValue = "") String search,
+            @RequestParam(value = "status",required = false,defaultValue = "1") int status,
+            @ModelAttribute ProductFilterRequest productFilterRequest) {
+
+        return ApiResponse.<Page<ProductResponse>>builder()
+                .result(productService.searchProduct(page,size,search,status,productFilterRequest))
                 .build();
     }
 

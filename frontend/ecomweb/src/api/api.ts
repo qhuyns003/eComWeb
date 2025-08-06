@@ -144,3 +144,7 @@ export const addToCart = (productVariantId: string, quantity: number) => {
     quantity
   });
 };
+
+export const searchProduct = (params: { page: number; size: number; search?: string; status?: number; minPrice?: number; maxPrice?: number }) => {
+  return axiosInstance.get('/products/searching', { params });
+};

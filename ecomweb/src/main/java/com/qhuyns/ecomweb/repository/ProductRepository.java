@@ -1,5 +1,6 @@
 package com.qhuyns.ecomweb.repository;
 
+import com.qhuyns.ecomweb.dto.request.ProductFilterRequest;
 import com.qhuyns.ecomweb.entity.Category;
 import com.qhuyns.ecomweb.entity.OrderStatus;
 import com.qhuyns.ecomweb.entity.Product;
@@ -110,6 +111,30 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             @Param("search") String search,
             @Param("status") Integer status,
             Pageable pageable
+    );
+
+    @Query(
+            value = """
+        SELECT p, img
+        FROM Product p
+        LEFT JOIN p.images img WITH img.isMain = true
+        WHERE
+          (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
+          AND (:status IS NULL OR p.status = :status)
+        """,
+            countQuery = """
+        SELECT COUNT(p)
+        FROM Product p
+        WHERE 
+          (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
+          AND (:status IS NULL OR p.status = :status)
+        """
+    )
+    Page<Object[]> searchProduct(
+            @Param("search") String search,
+            @Param("status") Integer status,
+            Pageable pageable,
+            @Param("productFilterRequest") ProductFilterRequest productFilterRequest
     );
 
     void deleteByIdIn(List<String> ids);

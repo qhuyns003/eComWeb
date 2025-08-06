@@ -144,6 +144,28 @@ public class ProductService {
         return productResponsePage;
     }
 
+    public Page<ProductResponse> searchProduct(int page, int size,String search, int status,ProductFilterRequest productFilterRequest) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Object[]> results = productRepository.searchProduct(search,status,pageable,productFilterRequest);
+        List<ProductResponse> productResponses = new ArrayList<>();
+        for(Object[] rs : results.getContent()) {
+            Product product = (Product) rs[0];
+            ProductImage productImage = (ProductImage)rs[1];
+            ProductResponse productResponse = productMapper.toProductResponse(product);
+
+            productResponse.setImages(new ArrayList<>(List.of(productImageMapper.toProductImageResponse(productImage))));
+            productResponses.add(productResponse);
+        }
+        Page<ProductResponse> productResponsePage = new PageImpl<>(
+                productResponses,
+                results.getPageable(),
+                results.getTotalPages()
+        );
+
+        return productResponsePage;
+    }
+
     public ProductResponse getProductForUpdate(String id) {
         Product product = productRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         ProductResponse productResponse = productMapper.toProductResponse(product);
