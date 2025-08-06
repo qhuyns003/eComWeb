@@ -6,21 +6,41 @@ import { selectUser } from "../../store/features/userSlice";
 
 const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const location = useLocation();
 
   return (
     <nav className="h-[70px] relative w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-30 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all">
-      <a href="#">
+      <button
+        type="button"
+        className="bg-transparent border-none outline-none p-0 m-0"
+        onClick={() => navigate('/')}
+        aria-label="Go to homepage"
+      >
         <img className="h-9" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/dummyLogo/dummyLogoWhite.svg" alt="dummyLogoWhite" />
-      </a>
+      </button>
 
-      <form className="flex items-center border pl-4 gap-2 bg-white border-gray-500/30 h-[46px] rounded-full overflow-hidden max-w-md w-full">
+      <form
+        className="flex items-center border pl-4 gap-2 bg-white border-gray-500/30 h-[46px] rounded-full overflow-hidden max-w-md w-full"
+        onSubmit={e => {
+          e.preventDefault();
+          if (searchValue.trim()) {
+            navigate(`/search?search=${encodeURIComponent(searchValue.trim())}`);
+          }
+        }}
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="#6B7280">
           <path d="M13 3C7.489 3 3 7.489 3 13s4.489 10 10 10a9.95 9.95 0 0 0 6.322-2.264l5.971 5.971a1 1 0 1 0 1.414-1.414l-5.97-5.97A9.95 9.95 0 0 0 23 13c0-5.511-4.489-10-10-10m0 2c4.43 0 8 3.57 8 8s-3.57 8-8 8-8-3.57-8-8 3.57-8 8-8"/>
         </svg>
-        <input type="text" className="w-full h-full outline-none text-sm text-gray-500" placeholder="Tìm kiếm sản phẩm..." />
+        <input
+          type="text"
+          className="w-full h-full outline-none text-sm text-gray-500"
+          placeholder="Tìm kiếm sản phẩm..."
+          value={searchValue}
+          onChange={e => setSearchValue(e.target.value)}
+        />
         <button type="submit" className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white mr-[5px] hover:bg-[#b82d2d] transition">Search</button>
       </form>
       {location.pathname === '/' && (
