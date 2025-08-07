@@ -19,6 +19,7 @@ import { clearUser } from './store/features/userSlice';
 import PaymentSuccess from './component/payment/PaymentSuccess';
 import Cart from './component/product/Cart';
 import SearchResultPage from './component/homepage/SearchResultPage';
+import UserProfileEdit from './component/homepage/UserProfileEdit';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -86,6 +87,7 @@ function AppContent() {
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/search" element={<SearchResultPage />} />
+        <Route path="/profile" element={<UserProfileEdit />} />
       </Routes>
       
       <LogoutModal

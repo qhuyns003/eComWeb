@@ -24,6 +24,7 @@ public class API_URL {
             "/products/**",
             "/customer_reviews/**",
             "/orders/**",
+            "/users/**"
 
     };
 

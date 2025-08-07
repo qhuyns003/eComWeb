@@ -68,15 +68,29 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @PostAuthorize("returnObject.username == authentication.name")
-    public UserResponse updateUser(String userId, UserUpdateRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+//    @PostAuthorize("returnObject.username == authentication.name")
+    public UserResponse updateUser( UserUpdateRequest request) {
+
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if(request.getPassword()!=null && !request.getPassword().equals(request.getRepeatPassword())){
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        if(request.getPassword()!=null){
+            if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+            } else {
+                throw new AppException(ErrorCode.WRONG_PASSWORD);
+            }
+        }
 
-        var roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(new ArrayList<>(roles));
+        if(request.getRoles()!=null){
+            var roles = roleRepository.findAllById(request.getRoles());
+            user.setRoles(new ArrayList<>(roles));
+        }
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

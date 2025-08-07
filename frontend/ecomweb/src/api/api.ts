@@ -1,3 +1,7 @@
+// Cập nhật thông tin user
+export const updateUser = (userData: any) => {
+  return axiosInstance.put('/users/my-info', userData);
+};
 import axiosInstance from './axiosInstance';
 
 export const login = (username: string, password: string) => {

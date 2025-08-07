@@ -1,5 +1,6 @@
 package com.qhuyns.ecomweb.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -27,6 +28,9 @@ public class UserAddressRequest {
     Integer districtId;
     String province;
     String provinceId;
+
+    // them anno nay de tranh loi khi dat ten truong co prefix la is
+    @JsonProperty("isDefault")
     boolean isDefault;
 
 }

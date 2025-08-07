@@ -48,6 +48,13 @@ public class UserAddressService {
     }
     public void create(UserAddressRequest userAddressRequest) {
         UserAddress userAddress = userAddressMapper.toUserAddress(userAddressRequest);
+        if(userAddressRequest.isDefault()){
+            List<UserAddress> userAddressList = userAddressRepository.findAllByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            for(UserAddress userAddress1 : userAddressList){
+                userAddress1.setDefault(false);
+                userAddressRepository.save(userAddress1);
+            }
+        }
         userAddress.setUser(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_EXISTED)));
         userAddressRepository.save(userAddress);

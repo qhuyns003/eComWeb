@@ -1,6 +1,7 @@
 package com.qhuyns.ecomweb.dto.request;
 
 import com.qhuyns.ecomweb.validator.DobConstraint;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,7 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
+    String oldPassword;
+    @Size(min = 6, message = "INVALID_PASSWORD")
     String password;
+    String repeatPassword;
     String fullName;
     String email;
     String phone;
