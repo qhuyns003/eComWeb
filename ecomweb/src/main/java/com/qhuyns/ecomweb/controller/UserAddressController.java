@@ -38,5 +38,21 @@ public class UserAddressController {
                 .result("Successfully created user address")
                 .build();
     }
+    @DeleteMapping("/{id}")
+    ApiResponse<?> delete(@PathVariable String id) {
+        userAddressService.delete(id);
+        return ApiResponse.<String>builder()
+                .result("Successfully deleted user address")
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    ApiResponse<?> update(@PathVariable String id,@RequestBody UserAddressRequest userAddressRequest) {
+        userAddressService.update(id, userAddressRequest);
+        return ApiResponse.<String>builder()
+                .result("Successfully updated user address")
+                .build();
+    }
+
 
 }

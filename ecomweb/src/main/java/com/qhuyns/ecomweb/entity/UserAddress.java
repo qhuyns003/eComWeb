@@ -36,14 +36,14 @@ public class UserAddress {
     String province;
     String provinceId;
     // tranh su dung is o ten bien vi de bi loi mapper
-    boolean isDefault;
+    boolean defaultAddress;
 
-    @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "userAddress", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Order> orders= new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     User user;
+
+
+
 
 } 

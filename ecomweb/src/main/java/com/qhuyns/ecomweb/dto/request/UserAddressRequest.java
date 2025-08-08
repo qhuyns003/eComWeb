@@ -30,7 +30,7 @@ public class UserAddressRequest {
     String provinceId;
 
     // them anno nay de tranh loi khi dat ten truong co prefix la is
-    @JsonProperty("isDefault")
-    boolean isDefault;
+
+    boolean defaultAddress;
 
 }

@@ -48,10 +48,10 @@ public class UserAddressService {
     }
     public void create(UserAddressRequest userAddressRequest) {
         UserAddress userAddress = userAddressMapper.toUserAddress(userAddressRequest);
-        if(userAddressRequest.isDefault()){
+        if(userAddressRequest.isDefaultAddress()){
             List<UserAddress> userAddressList = userAddressRepository.findAllByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
             for(UserAddress userAddress1 : userAddressList){
-                userAddress1.setDefault(false);
+                userAddress1.setDefaultAddress(false);
                 userAddressRepository.save(userAddress1);
             }
         }
@@ -59,5 +59,35 @@ public class UserAddressService {
                 .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_EXISTED)));
         userAddressRepository.save(userAddress);
     }
+
+    public void delete(String id) {
+        UserAddress userAddress = userAddressRepository.findById(id).orElseThrow(
+                () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
+        );
+        if(userAddress.isDefaultAddress()){
+            throw new AppException(ErrorCode.DO_NOT_DELETE_USER_ADDRESS);
+        }
+       userAddressRepository.deleteById(id);
+    }
+
+    public void update(String id, UserAddressRequest userAddressRequest) {
+        UserAddress userAddress = userAddressRepository.findById(id).orElseThrow(
+                () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
+        );
+        userAddressMapper.toUserAddress(userAddress, userAddressRequest);
+        if(userAddressRequest.isDefaultAddress()){
+            List<UserAddress> userAddressList = userAddressRepository.findAllByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            for(UserAddress userAddress1 : userAddressList){
+                if(userAddress1.getId()==userAddress.getId()){
+                    continue;
+                }
+                userAddress1.setDefaultAddress(false);
+                userAddressRepository.save(userAddress1);
+            }
+        }
+
+        userAddressRepository.save(userAddress);
+    }
+
 
 }

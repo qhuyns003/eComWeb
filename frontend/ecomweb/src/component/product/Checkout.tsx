@@ -60,7 +60,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     getUserAddresses().then(addresses => {
       setUserAddresses(addresses);
-      const defaultAddr = addresses.find((addr: any) => addr.isDefault);
+      const defaultAddr = addresses.find((addr: any) => addr.defaultAddress);
       setSelectedAddress(defaultAddr || addresses[0] || null);
     });
   }, []);
@@ -460,7 +460,7 @@ const Checkout: React.FC = () => {
       fullAddress: `${newAddress.detailAddress}, ${newAddress.ward}, ${newAddress.district}, ${newAddress.province}`,
       latitude: null, // Có thể lấy từ API bản đồ nếu cần
       longitude: null,
-      isDefault: false
+      defaultAddress: false
     };
     await addUserAddress(addressData);
     // Sau khi lưu thành công, reload lại danh sách địa chỉ và chọn địa chỉ vừa thêm
@@ -536,7 +536,7 @@ const Checkout: React.FC = () => {
                     <span className="text-gray-900">{addr.phoneNumber}</span>
                     <span className="text-gray-700 text-sm break-words">{addr.fullAddress || `${addr.detailAddress}, ${addr.ward}, ${addr.district}, ${addr.province}`}</span>
                   </div>
-                  {(addr.isDefault === true ) && <span className="ml-2 px-2 py-1 bg-[#cc3333] text-white text-xs rounded self-start">Mặc định</span>}
+                  {(addr.defaultAddress === true ) && <span className="ml-2 px-2 py-1 bg-[#cc3333] text-white text-xs rounded self-start">Mặc định</span>}
                 </label>
               ))}
               <button

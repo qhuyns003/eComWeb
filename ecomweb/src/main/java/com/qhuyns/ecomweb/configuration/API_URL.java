@@ -24,7 +24,8 @@ public class API_URL {
             "/products/**",
             "/customer_reviews/**",
             "/orders/**",
-            "/users/**"
+            "/users/**",
+            "/user_address/**",
 
     };
 
@@ -49,6 +50,7 @@ public class API_URL {
             "/files/**",
             "/products/**",
             "/orders/**",
+            "/user_address/**",
 
     };
 }

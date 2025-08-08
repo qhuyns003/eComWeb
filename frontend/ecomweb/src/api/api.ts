@@ -1,3 +1,11 @@
+// Cập nhật địa chỉ user
+export const updateUserAddress = (id: string, addressData: any) => {
+  return axiosInstance.put(`/user_address/${id}`, addressData);
+};
+// Xóa địa chỉ user
+export const deleteUserAddress = (id: string) => {
+  return axiosInstance.delete(`/user_address/${id}`);
+};
 // Cập nhật thông tin user
 export const updateUser = (userData: any) => {
   return axiosInstance.put('/users/my-info', userData);

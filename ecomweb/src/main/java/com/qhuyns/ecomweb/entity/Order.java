@@ -52,9 +52,8 @@ public class Order {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderShopGroup> orderShopGroups= new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "user_address_id")
-    UserAddress userAddress;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    ShippingAddress shippingAddress;
 
     @Enumerated(EnumType.STRING)
     Payment payment;

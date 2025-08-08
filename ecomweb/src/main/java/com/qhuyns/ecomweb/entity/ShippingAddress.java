@@ -1,8 +1,5 @@
-package com.qhuyns.ecomweb.dto.response;
+package com.qhuyns.ecomweb.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.qhuyns.ecomweb.entity.Order;
-import com.qhuyns.ecomweb.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,13 +8,18 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserAddressResponse {
+public class ShippingAddress {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
     String receiverName;
     String phoneNumber;
     BigDecimal latitude;
@@ -29,9 +31,12 @@ public class UserAddressResponse {
     String district;
     Integer districtId;
     String province;
-    Integer provinceId;
-    // khi ap sang JSON sẽ tự đôgnj bỏ is -> thêm jsonProp để giữ is
-
+    String provinceId;
     boolean defaultAddress;
 
-}
+
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    Order order;
+
+} 

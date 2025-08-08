@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getUserAddresses, addUserAddress, getProvinces, getDistricts, getWards } from '../../api/api';
+import { toast } from 'react-toastify';
+import { getUserAddresses, addUserAddress, getProvinces, getDistricts, getWards, deleteUserAddress, updateUserAddress } from '../../api/api';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 // TODO: import updateUserAddress, deleteUserAddress from api if available
 
@@ -15,7 +16,7 @@ const UserAddressEdit: React.FC = () => {
     districtId: '',
     province: '',
     provinceId: '',
-    isDefault: false,
+    defaultAddress: false,
   });
   const [provinces, setProvinces] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
@@ -117,17 +118,18 @@ const UserAddressEdit: React.FC = () => {
         wardCode: form.wardCode,
         detailAddress: form.detailAddress,
         fullAddress: `${form.detailAddress}, ${form.ward}, ${form.district}, ${form.province}`,
-        isDefault: !!form.isDefault,
+        defaultAddress: !!form.defaultAddress,
         latitude: null,
         longitude: null
       };
       if (editMode && editId) {
-        // TODO: call updateUserAddress(editId, addressData)
-        // await updateUserAddress(editId, addressData);
+        await updateUserAddress(editId, addressData);
         setSuccess(true);
+        toast.success('Cập nhật địa chỉ thành công!');
       } else {
         await addUserAddress(addressData);
         setSuccess(true);
+        toast.success('Thêm địa chỉ thành công!');
       }
       setShowModal(false);
       setForm({
@@ -147,9 +149,11 @@ const UserAddressEdit: React.FC = () => {
     if (!window.confirm('Bạn có chắc muốn xóa địa chỉ này?')) return;
     setDeleteLoading(id);
     try {
-      // TODO: call deleteUserAddress(id)
-      // await deleteUserAddress(id);
+      await deleteUserAddress(id);
       setAddresses(addresses.filter(a => a.id !== id));
+      toast.success('Xóa địa chỉ thành công!');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Xóa địa chỉ thất bại');
     } finally {
       setDeleteLoading(null);
     }
@@ -170,7 +174,7 @@ const UserAddressEdit: React.FC = () => {
               <div className="font-semibold text-base text-gray-800 flex items-center gap-2">
                 <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-600 mr-2">{addr.receiverName}</span>
                 <span className="text-gray-500 text-xs">{addr.phoneNumber}</span>
-                {addr.isDefault && <span className="ml-2 text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full">Mặc định</span>}
+                {addr.defaultAddress && <span className="ml-2 text-green-600 text-xs font-bold bg-green-50 px-2 py-1 rounded-full">Mặc định</span>}
               </div>
               <div className="flex gap-2 opacity-80 group-hover:opacity-100">
                 <button onClick={() => handleOpenEditModal(addr)} title="Sửa" className="p-2 rounded-full hover:bg-blue-50 text-blue-600"><FaEdit /></button>
@@ -222,7 +226,7 @@ const UserAddressEdit: React.FC = () => {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" name="isDefault" checked={form.isDefault} onChange={handleChange} />
+                <input type="checkbox" name="defaultAddress" checked={form.defaultAddress} onChange={handleChange} />
                 <label className="text-sm">Đặt làm mặc định</label>
               </div>
               <div className="flex gap-3 mt-2">

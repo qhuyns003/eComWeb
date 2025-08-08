@@ -10,10 +10,7 @@ import com.qhuyns.ecomweb.dto.response.RoleResponse;
 import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
-import com.qhuyns.ecomweb.mapper.OrderItemMapper;
-import com.qhuyns.ecomweb.mapper.OrderMapper;
-import com.qhuyns.ecomweb.mapper.OrderShopGroupMapper;
-import com.qhuyns.ecomweb.mapper.RoleMapper;
+import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +39,7 @@ public class OrderService {
     UserRepository userRepository;
     ProductVariantRepository  productVariantRepository;
     ShopRepository  shopRepository;
+    ShippingAddressMapper  shippingAddressMapper;
     public OrderResponse create(OrderRequest orderRequest) {
         // kiem tra khong trung
       Order order = orderMapper.toOrder(orderRequest);
@@ -49,9 +47,13 @@ public class OrderService {
       order.setUser(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(
               ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
       ));
-      order.setUserAddress(userAddressRepository.findById(orderRequest.getUserAddressId()).orElseThrow(
-              () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
-      ));
+//      order.setUserAddress(userAddressRepository.findById(orderRequest.getUserAddressId()).orElseThrow(
+//              () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
+//      ));
+      ShippingAddress shippingAddress = shippingAddressMapper.toShippingAddress(
+                userAddressRepository.findById(orderRequest.getUserAddressId()).orElseThrow(()-> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)));
+      shippingAddress.setOrder(order);
+      order.setShippingAddress(shippingAddress);
       for(String couponId : orderRequest.getCouponIds()) {
           Coupon coupon = couponRepository.findById(couponId).orElseThrow(()-> new AppException(ErrorCode.COUPON_NOT_EXISTS));
           if(coupon.getUsed().compareTo(coupon.getQuantity())<0){
