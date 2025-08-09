@@ -1,5 +1,5 @@
 import HomePage from "./component/homepage/HomePage";
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useParams } from 'react-router-dom';
 import LoginForm from './component/login/LoginForm';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
@@ -21,6 +21,7 @@ import Cart from './component/product/Cart';
 import SearchResultPage from './component/homepage/SearchResultPage';
 import UserProfileEdit from './component/homepage/UserProfileEdit';
 import RegisterShopForm from './component/homepage/RegisterShopForm';
+import ShopInfoEdit from './component/homepage/ShopInfoEdit';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -90,6 +91,7 @@ function AppContent() {
         <Route path="/search" element={<SearchResultPage />} />
         <Route path="/profile" element={<UserProfileEdit />} />
         <Route path="/register-shop" element={<RegisterShopForm />} />
+        <Route path="/shop-info/:shopId" element={<ShopInfoEditWrapper />} />
       </Routes>
       
       <LogoutModal
@@ -103,6 +105,12 @@ function AppContent() {
       />
     </>
   );
+}
+
+function ShopInfoEditWrapper() {
+  const { shopId } = useParams();
+  if (!shopId) return <div>Không tìm thấy shopId</div>;
+  return <ShopInfoEdit shopId={shopId} />;
 }
 
 function App() {

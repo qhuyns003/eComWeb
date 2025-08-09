@@ -28,6 +28,10 @@ export const register = (userData: any) => {
   return axiosInstance.post('/users', userData);
 }; 
 
+export const registerShop = (shopData: any) => {
+  return axiosInstance.post('/shop', shopData);
+};
+
 export const getCategories = () => {
   return axiosInstance.get('/categories/');
 };
@@ -159,4 +163,8 @@ export const addToCart = (productVariantId: string, quantity: number) => {
 
 export const searchProduct = (params: { page: number; size: number; search?: string; status?: number; minPrice?: number; maxPrice?: number }) => {
   return axiosInstance.get('/products/searching', { params });
+};
+
+export const getShopInfoByUserId = () => {
+  return axiosInstance.get(`/shop`);
 };

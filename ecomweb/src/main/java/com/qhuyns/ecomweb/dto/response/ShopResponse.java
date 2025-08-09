@@ -1,6 +1,7 @@
 package com.qhuyns.ecomweb.dto.response;
 
 import com.qhuyns.ecomweb.entity.Product;
+import com.qhuyns.ecomweb.entity.ShopAddress;
 import com.qhuyns.ecomweb.entity.ShopReview;
 import com.qhuyns.ecomweb.entity.User;
 import jakarta.persistence.*;
@@ -24,5 +25,6 @@ public class ShopResponse {
     String address;
     String status;
     LocalDateTime createdAt;
+    ShopAddressResponse shopAddressResponse;
 
 }

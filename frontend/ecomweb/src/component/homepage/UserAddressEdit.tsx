@@ -135,7 +135,6 @@ const UserAddressEdit: React.FC = () => {
       setForm({
         receiverName: '', phoneNumber: '', detailAddress: '', ward: '', wardCode: '', district: '', districtId: '', province: '', provinceId: '', defaultAddress: false
       });
-      });
       setDistricts([]);
       setWards([]);
       getUserAddresses().then(setAddresses);

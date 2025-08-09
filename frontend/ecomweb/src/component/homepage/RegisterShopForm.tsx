@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaStore } from 'react-icons/fa';
-import { getProvinces, getDistricts, getWards } from '../../api/api';
+import { getProvinces, getDistricts, getWards, registerShop } from '../../api/api';
+import { toast } from 'react-toastify';
 
 interface RegisterShopFormProps {
   onSubmit?: (data: any) => void;
@@ -8,10 +10,11 @@ interface RegisterShopFormProps {
 }
 
 const RegisterShopForm: React.FC<RegisterShopFormProps> = ({ onSubmit, loading }) => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: '',
     description: '',
-    address: '',
+    detailAddress: '',
     province: '',
     provinceId: '',
     district: '',
@@ -60,14 +63,31 @@ const RegisterShopForm: React.FC<RegisterShopFormProps> = ({ onSubmit, loading }
     setForm(f => ({ ...f, ward: wardObj?.WardName || '', wardCode }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Gộp địa chỉ chi tiết
-    const fullAddress = `${form.address}, ${form.ward}, ${form.district}, ${form.province}`;
-    if (onSubmit) onSubmit({
-      ...form,
+    const fullAddress = `${form.detailAddress}, ${form.ward}, ${form.district}, ${form.province}`;
+    const shopData = {
+      name: form.name,
+      description: form.description,
       fullAddress,
-    });
+      province: form.province,
+      provinceId: form.provinceId,
+      district: form.district,
+      districtId: form.districtId,
+      ward: form.ward,
+      wardCode: form.wardCode,
+      detailAddress: form.detailAddress,
+    };
+    try {
+      if (onSubmit) onSubmit(shopData); // callback nếu cần
+      await registerShop(shopData);
+      toast.success('Đăng ký kênh bán thành công!');
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+    } catch (err: any) {
+      toast.error('Đăng ký kênh bán thất bại!');
+    }
   };
 
   return (
@@ -89,7 +109,7 @@ const RegisterShopForm: React.FC<RegisterShopFormProps> = ({ onSubmit, loading }
       </div>
       <div>
         <label className="block font-medium mb-1">Địa chỉ chi tiết <span className="text-red-500">*</span></label>
-        <input name="address" value={form.address} onChange={handleChange} required className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-shadow hover:shadow-md" placeholder="Số nhà, tên đường..." />
+        <input name="detailAddress" value={form.detailAddress} onChange={handleChange} required className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-shadow hover:shadow-md" placeholder="Số nhà, tên đường..." />
       </div>
       <div className="grid grid-cols-3 gap-4">
         <select name="provinceId" value={form.provinceId || ''} onChange={handleProvinceChange} className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-shadow hover:shadow-md">

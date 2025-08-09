@@ -8,7 +8,7 @@ import ShopActionButton from './ShopActionButton';
 import { useNavigate } from 'react-router-dom';
 
 // Giả sử có API updateUser, bạn cần implement ở api.ts
-import { updateUser } from '../../api/api';
+import { updateUser, getShopInfoByUserId } from '../../api/api';
 import UserAddressEdit from './UserAddressEdit';
 
 const UserProfileEdit: React.FC = () => {
@@ -113,7 +113,23 @@ const UserProfileEdit: React.FC = () => {
             <button type="button" onClick={handleOpenPwModal} className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold">Đổi mật khẩu</button>
             <ShopActionButton
               isSeller={isSeller}
-              onShopInfo={() => {/* TODO: show shop info modal or navigate */}}
+              onShopInfo={async () => {
+                if (user?.id) {
+                  try {
+                    const res = await getShopInfoByUserId();
+                    const shop = res.data?.data;
+                    if (shop && shop.id) {
+                      navigate(`/shop-info/${shop.id}`);
+                    } else {
+                      toast.error('Không tìm thấy thông tin shop!');
+                    }
+                  } catch (err) {
+                    toast.error('Không thể lấy thông tin shop!');
+                  }
+                } else {
+                  alert('Không tìm thấy user id!');
+                }
+              }}
               onRegisterShop={() => navigate('/register-shop')}
               className="px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold text-white text-base leading-tight"
             />

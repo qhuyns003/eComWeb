@@ -1,5 +1,6 @@
 package com.qhuyns.ecomweb.mapper;
 
+import com.qhuyns.ecomweb.dto.request.ShopCreateRequest;
 import com.qhuyns.ecomweb.dto.request.UserAddressRequest;
 import com.qhuyns.ecomweb.dto.response.ShopAddressResponse;
 import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
@@ -12,5 +13,6 @@ import org.mapstruct.Mapping;
 public interface ShopAddressMapper {
 
     ShopAddressResponse toShopAddressResponse(ShopAddress shopAddress);
+    ShopAddress toShopAddress(ShopCreateRequest shopCreateRequest);
 
 }

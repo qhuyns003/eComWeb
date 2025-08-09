@@ -28,7 +28,8 @@ public enum ErrorCode {
     SHOP_NOT_EXISTS(1019, "Không tồn tại shop này", HttpStatus.NOT_FOUND),
     DONNT_ENOUGH_PRODUCT(1020, "Hết hàng", HttpStatus.BAD_REQUEST),
     WRONG_PASSWORD(1020, "Sai mật khẩu", HttpStatus.BAD_REQUEST),
-    DO_NOT_DELETE_USER_ADDRESS(1021, "Không thể xóa địa chỉ mặc định", HttpStatus.BAD_REQUEST)
+    DO_NOT_DELETE_USER_ADDRESS(1021, "Không thể xóa địa chỉ mặc định", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_EXISTS(1022, "Không tồn tại role", HttpStatus.BAD_GATEWAY)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

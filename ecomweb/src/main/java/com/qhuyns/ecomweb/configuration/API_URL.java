@@ -14,7 +14,8 @@ public class API_URL {
             "/vnpay/**",
             "/payments/**",
             "/orders/**",
-            "/carts/**"
+            "/carts/**",
+            "/shop/**"
 
     };
 
@@ -26,6 +27,7 @@ public class API_URL {
             "/orders/**",
             "/users/**",
             "/user_address/**",
+            "/shop/**"
 
     };
 
@@ -43,6 +45,7 @@ public class API_URL {
             "/shop_address/**",
             "/vnpay/**",
             "/orders/**",
+            "/shop/**"
 
     };
     public static final String[] URL_ANONYMOUS_DELETE = {
@@ -51,6 +54,7 @@ public class API_URL {
             "/products/**",
             "/orders/**",
             "/user_address/**",
+            "/shop/**"
 
     };
 }
