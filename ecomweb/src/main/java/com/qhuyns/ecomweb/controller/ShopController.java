@@ -3,6 +3,7 @@ package com.qhuyns.ecomweb.controller;
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.request.ShopCreateRequest;
+import com.qhuyns.ecomweb.dto.request.ShopUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.ShopAddressResponse;
 import com.qhuyns.ecomweb.dto.response.ShopResponse;
 import com.qhuyns.ecomweb.service.ShopAddressService;
@@ -32,12 +33,22 @@ public class ShopController {
                 .build();
     }
 
+    @PutMapping("")
+    ApiResponse<?> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
+        shopService.update(shopUpdateRequest);
+        return ApiResponse.<String>builder()
+                .result("success")
+                .build();
+    }
+
     @GetMapping("")
     ApiResponse<ShopResponse> getInfo() {
         return ApiResponse.<ShopResponse>builder()
                 .result(shopService.getInfo())
                 .build();
     }
+
+
 
 
 

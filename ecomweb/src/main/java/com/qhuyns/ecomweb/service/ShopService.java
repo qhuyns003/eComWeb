@@ -2,6 +2,7 @@ package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.constant.PredefinedRole;
 import com.qhuyns.ecomweb.dto.request.ShopCreateRequest;
+import com.qhuyns.ecomweb.dto.request.ShopUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.ShopAddressResponse;
 import com.qhuyns.ecomweb.dto.response.ShopResponse;
 import com.qhuyns.ecomweb.entity.Role;
@@ -52,6 +53,17 @@ public class ShopService {
         roles.add(roleRepository.findById(PredefinedRole.SELLER_ROLE).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTS)));
         user.getRoles().clear();
         user.getRoles().addAll(roles);
+        shopRepository.save(shop);
+    }
+
+    public void update(ShopUpdateRequest shopUpdateRequest) {
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Shop shop = user.getShop();
+        shopMapper.toShop(shop,shopUpdateRequest);
+        ShopAddress shopAddress = shop.getShopAddress();
+        shopAddressMapper.toShopAddress(shopAddress,shopUpdateRequest);
+
         shopRepository.save(shop);
     }
 

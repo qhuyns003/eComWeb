@@ -108,6 +108,22 @@ const UserProfileEdit: React.FC = () => {
   return (
     <>
       <Header />
+      <div className="max-w-5xl mx-auto mt-8">
+        <div className="pl-2">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="flex items-center text-base text-gray-700 hover:text-[#cc3333] font-medium mb-4 transition-colors"
+            style={{ outline: 'none' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Quay lại
+          </button>
+        </div>
+        {/* ...existing code... */}
+      </div>
       <div className="max-w-5xl mx-auto mt-10 flex flex-col md:flex-row gap-8">
         {/* Left: User Info */}
         <div className="flex-1 min-w-[320px]">
