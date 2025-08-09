@@ -3,6 +3,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAppSelector } from '../../store/hooks';
 import { selectUser } from '../../store/features/userSlice';
+import { selectIsSeller } from '../../store/features/userSlice';
+import ShopActionButton from './ShopActionButton';
+import { useNavigate } from 'react-router-dom';
 
 // Giả sử có API updateUser, bạn cần implement ở api.ts
 import { updateUser } from '../../api/api';
@@ -10,6 +13,8 @@ import UserAddressEdit from './UserAddressEdit';
 
 const UserProfileEdit: React.FC = () => {
   const user = useAppSelector(selectUser);
+  const isSeller = useAppSelector(selectIsSeller);
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     fullName: user?.fullName || '',
     dob: user?.dob || '',
@@ -104,7 +109,15 @@ const UserProfileEdit: React.FC = () => {
       <div className="flex-1 min-w-[320px]">
         <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
           <h2 className="text-2xl font-bold text-[#cc3333] mb-2 tracking-tight">Thông tin cá nhân</h2>
-          <button type="button" onClick={handleOpenPwModal} className="self-start mb-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold">Đổi mật khẩu</button>
+          <div className="flex gap-2 mb-2">
+            <button type="button" onClick={handleOpenPwModal} className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold">Đổi mật khẩu</button>
+            <ShopActionButton
+              isSeller={isSeller}
+              onShopInfo={() => {/* TODO: show shop info modal or navigate */}}
+              onRegisterShop={() => navigate('/register-shop')}
+              className="px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold text-white text-base leading-tight"
+            />
+          </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block font-medium mb-1">Họ tên</label>

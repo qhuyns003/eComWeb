@@ -20,6 +20,7 @@ import PaymentSuccess from './component/payment/PaymentSuccess';
 import Cart from './component/product/Cart';
 import SearchResultPage from './component/homepage/SearchResultPage';
 import UserProfileEdit from './component/homepage/UserProfileEdit';
+import RegisterShopForm from './component/homepage/RegisterShopForm';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -88,6 +89,7 @@ function AppContent() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/search" element={<SearchResultPage />} />
         <Route path="/profile" element={<UserProfileEdit />} />
+        <Route path="/register-shop" element={<RegisterShopForm />} />
       </Routes>
       
       <LogoutModal
