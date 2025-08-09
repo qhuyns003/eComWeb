@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 // Giả sử có API updateUser, bạn cần implement ở api.ts
 import { updateUser, getShopInfoByUserId } from '../../api/api';
 import UserAddressEdit from './UserAddressEdit';
+import Header from '../layout/Header';
+import Footer from '../layout/Footer';
 
 const UserProfileEdit: React.FC = () => {
   const user = useAppSelector(selectUser);
@@ -104,102 +106,92 @@ const UserProfileEdit: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 flex flex-col md:flex-row gap-8">
-      {/* Left: User Info */}
-      <div className="flex-1 min-w-[320px]">
-        <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-          <h2 className="text-2xl font-bold text-[#cc3333] mb-2 tracking-tight">Thông tin cá nhân</h2>
-          <div className="flex gap-2 mb-2">
-            <button type="button" onClick={handleOpenPwModal} className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold">Đổi mật khẩu</button>
-            <ShopActionButton
-              isSeller={isSeller}
-              onShopInfo={async () => {
-                if (user?.id) {
-                  try {
-                    const res = await getShopInfoByUserId();
-                    const shop = res.data?.data;
-                    if (shop && shop.id) {
-                      navigate(`/shop-info/${shop.id}`);
-                    } else {
-                      toast.error('Không tìm thấy thông tin shop!');
-                    }
-                  } catch (err) {
-                    toast.error('Không thể lấy thông tin shop!');
-                  }
-                } else {
-                  alert('Không tìm thấy user id!');
-                }
-              }}
-              onRegisterShop={() => navigate('/register-shop')}
-              className="px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold text-white text-base leading-tight"
-            />
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block font-medium mb-1">Họ tên</label>
-              <input name="fullName" value={form.fullName} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
+    <>
+      <Header />
+      <div className="max-w-5xl mx-auto mt-10 flex flex-col md:flex-row gap-8">
+        {/* Left: User Info */}
+        <div className="flex-1 min-w-[320px]">
+          <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
+            <h2 className="text-2xl font-bold text-[#cc3333] mb-2 tracking-tight">Thông tin cá nhân</h2>
+            <div className="flex gap-2 mb-2">
+              <button type="button" onClick={handleOpenPwModal} className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold">Đổi mật khẩu</button>
+              <ShopActionButton
+                isSeller={isSeller}
+                onShopInfo={() => {
+                  navigate('/shop-info');
+                }}
+                onRegisterShop={() => navigate('/register-shop')}
+                className="px-5 py-2 rounded-full shadow hover:scale-105 transition-transform font-semibold text-white text-base leading-tight"
+              />
             </div>
-            <div>
-              <label className="block font-medium mb-1">Ngày sinh</label>
-              <input name="dob" type="date" value={form.dob} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">Email</label>
-              <input name="email" type="email" value={form.email} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">Số điện thoại</label>
-              <input name="phone" value={form.phone} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">Tên đăng nhập</label>
-              <input name="username" value={form.username} onChange={handleChange} className="border border-gray-200 bg-gray-100 rounded-lg px-3 py-2 w-full" disabled />
-            </div>
-            <button type="submit" className="bg-gradient-to-r from-[#cc3333] to-[#b82d2d] text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform w-full shadow" disabled={loading}>
-              {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
-            </button>
-            {/* Toast sẽ hiển thị qua react-toastify, không hiện inline */}
-          </form>
-        </div>
-      </div>
-      {/* Right: Address Edit */}
-      <div className="flex-1 min-w-[340px]">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <UserAddressEdit />
-        </div>
-      </div>
-      {/* Modal đổi mật khẩu */}
-      {showChangePw && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fadeIn">
-            <button onClick={handleClosePwModal} className="absolute top-3 right-3 text-gray-400 hover:text-black text-2xl font-bold">&times;</button>
-            <h4 className="text-xl font-bold mb-6 text-[#cc3333] tracking-tight">Đổi mật khẩu</h4>
-            <form onSubmit={handleSubmitPw} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block font-medium mb-1">Mật khẩu cũ</label>
-                <input name="oldPassword" type="password" value={pwForm.oldPassword} onChange={handlePwChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <label className="block font-medium mb-1">Họ tên</label>
+                <input name="fullName" value={form.fullName} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
               </div>
               <div>
-                <label className="block font-medium mb-1">Mật khẩu mới</label>
-                <input name="newPassword" type="password" value={pwForm.newPassword} onChange={handlePwChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <label className="block font-medium mb-1">Ngày sinh</label>
+                <input name="dob" type="date" value={form.dob} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
               </div>
               <div>
-                <label className="block font-medium mb-1">Nhập lại mật khẩu mới</label>
-                <input name="confirmPassword" type="password" value={pwForm.confirmPassword} onChange={handlePwChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <label className="block font-medium mb-1">Email</label>
+                <input name="email" type="email" value={form.email} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
               </div>
-              {pwError && <div className="text-red-600 mt-2">{pwError}</div>}
-              <div className="flex gap-3 mt-2">
-                <button type="submit" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform flex-1 shadow" disabled={pwLoading}>
-                  {pwLoading ? 'Đang lưu...' : 'Đổi mật khẩu'}
-                </button>
-                <button type="button" onClick={handleClosePwModal} className="bg-gray-100 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition flex-1 shadow">Hủy</button>
+              <div>
+                <label className="block font-medium mb-1">Số điện thoại</label>
+                <input name="phone" value={form.phone} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#cc3333]" />
               </div>
+              <div>
+                <label className="block font-medium mb-1">Tên đăng nhập</label>
+                <input name="username" value={form.username} onChange={handleChange} className="border border-gray-200 bg-gray-100 rounded-lg px-3 py-2 w-full" disabled />
+              </div>
+              <button type="submit" className="bg-gradient-to-r from-[#cc3333] to-[#b82d2d] text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform w-full shadow" disabled={loading}>
+                {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+              </button>
+              {/* Toast sẽ hiển thị qua react-toastify, không hiện inline */}
             </form>
           </div>
         </div>
-      )}
-      <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="colored" />
-    </div>
+        {/* Right: Address Edit */}
+        <div className="flex-1 min-w-[340px]">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <UserAddressEdit />
+          </div>
+        </div>
+        {/* Modal đổi mật khẩu */}
+        {showChangePw && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fadeIn">
+              <button onClick={handleClosePwModal} className="absolute top-3 right-3 text-gray-400 hover:text-black text-2xl font-bold">&times;</button>
+              <h4 className="text-xl font-bold mb-6 text-[#cc3333] tracking-tight">Đổi mật khẩu</h4>
+              <form onSubmit={handleSubmitPw} className="space-y-5">
+                <div>
+                  <label className="block font-medium mb-1">Mật khẩu cũ</label>
+                  <input name="oldPassword" type="password" value={pwForm.oldPassword} onChange={handlePwChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Mật khẩu mới</label>
+                  <input name="newPassword" type="password" value={pwForm.newPassword} onChange={handlePwChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Nhập lại mật khẩu mới</label>
+                  <input name="confirmPassword" type="password" value={pwForm.confirmPassword} onChange={handlePwChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                {pwError && <div className="text-red-600 mt-2">{pwError}</div>}
+                <div className="flex gap-3 mt-2">
+                  <button type="submit" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform flex-1 shadow" disabled={pwLoading}>
+                    {pwLoading ? 'Đang lưu...' : 'Đổi mật khẩu'}
+                  </button>
+                  <button type="button" onClick={handleClosePwModal} className="bg-gray-100 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition flex-1 shadow">Hủy</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+        <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="colored" />
+      </div>
+      <Footer />
+    </>
   );
 };
 

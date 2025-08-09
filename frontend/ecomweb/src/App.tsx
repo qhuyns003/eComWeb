@@ -91,7 +91,7 @@ function AppContent() {
         <Route path="/search" element={<SearchResultPage />} />
         <Route path="/profile" element={<UserProfileEdit />} />
         <Route path="/register-shop" element={<RegisterShopForm />} />
-        <Route path="/shop-info/:shopId" element={<ShopInfoEditWrapper />} />
+        <Route path="/shop-info" element={<ShopInfoEdit />} />
       </Routes>
       
       <LogoutModal
@@ -107,11 +107,7 @@ function AppContent() {
   );
 }
 
-function ShopInfoEditWrapper() {
-  const { shopId } = useParams();
-  if (!shopId) return <div>Không tìm thấy shopId</div>;
-  return <ShopInfoEdit shopId={shopId} />;
-}
+
 
 function App() {
   return (
