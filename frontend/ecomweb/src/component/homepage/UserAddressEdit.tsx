@@ -38,7 +38,7 @@ const UserAddressEdit: React.FC = () => {
     setEditMode(false);
     setEditId(null);
     setForm({
-      receiverName: '', phoneNumber: '', detailAddress: '', ward: '', wardCode: '', district: '', districtId: '', province: '', provinceId: '', isDefault: false
+      receiverName: '', phoneNumber: '', detailAddress: '', ward: '', wardCode: '', district: '', districtId: '', province: '', provinceId: '', defaultAddress: false
     });
     setDistricts([]);
     setWards([]);
@@ -133,7 +133,8 @@ const UserAddressEdit: React.FC = () => {
       }
       setShowModal(false);
       setForm({
-        receiverName: '', phoneNumber: '', detailAddress: '', ward: '', wardCode: '', district: '', districtId: '', province: '', provinceId: '', isDefault: false
+        receiverName: '', phoneNumber: '', detailAddress: '', ward: '', wardCode: '', district: '', districtId: '', province: '', provinceId: '', defaultAddress: false
+      });
       });
       setDistricts([]);
       setWards([]);
