@@ -28,3 +28,6 @@ vnpay:
 #  phai config trong quan tri https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login, phai dung ngrok
   ipnUrl: "https://572362ca02eb.ngrok-free.app/vnpay/IPN"
 #            "http://localhost:8080/vnpay/IPN"
+weaviate:
+  endpoint: "https://i1k90eipsxsivhzgzwjcia.c0.asia-southeast1.gcp.weaviate.cloud"
+  apikey: "UjNXY1VYRDZ3Z2V4MHhleF9kdDZYRkJDNlN1U2QwczFFOHVrdzd4OWV0UWQ5eU5xOTBiOHZIVHFWSjU4PV92MjAw"

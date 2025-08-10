@@ -3,12 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface OrderShopGroup {
   shop: any;
-  shippingMethods: any[];
-  selectedShipping: string;
-  voucher: string;
   products: any[];
-  shopDiscount: number;
-  shopVoucher: string;
 }
 
 export interface OrderState {
