@@ -29,14 +29,34 @@ const Header: React.FC = () => {
 
   return (
     <nav className="h-[70px] sticky top-0 w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-50 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all shadow">
+      {/* Logo text graffiti style */}
       <button
         type="button"
         className="bg-transparent border-none outline-none p-0 m-0"
         onClick={() => navigate('/')}
         aria-label="Go to homepage"
       >
-        <img className="h-9" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/dummyLogo/dummyLogoWhite.svg" alt="dummyLogoWhite" />
+        <span
+          style={{
+            fontFamily: 'Permanent Marker, cursive',
+            fontSize: '2rem',
+            color: '#fff',
+            letterSpacing: '2px',
+            textShadow: '2px 2px 0 #cc3333, 4px 4px 0 #b82d2d',
+            lineHeight: 1
+          }}
+        >
+          Easier
+        </span>
       </button>
+{/* // Thêm Google Fonts Permanent Marker vào head nếu chưa có
+if (typeof document !== 'undefined' && !document.getElementById('gf-permanent-marker')) {
+  const link = document.createElement('link');
+  link.id = 'gf-permanent-marker';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap';
+  document.head.appendChild(link);
+} */}
 
       <form
         className="flex items-center border pl-4 gap-2 bg-white border-gray-500/30 h-[46px] rounded-full overflow-hidden max-w-md w-full"
