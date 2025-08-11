@@ -258,7 +258,7 @@ public class ProductService {
             pa.setProduct(product);
         }
         // khi save , trước khi được persist các annotation gen data đi UUID hay CreateDate
-        // sẽ gắn dữ liệu vào entity nên bản hất save không cập nhật ngược dữ liệu lên enotty BE
+        // sẽ gắn dữ liệu vào entity nên bản chất save không cập nhật ngược dữ liệu lên enotty BE
         // nếu getList ra (TH lazy) thì sẽ cập nhật cả dữ liệu list (nếu có cascade không thì cũng không có ý nghĩa)
         productRepository.save(product);
      for(ProductVariantRequest pvr : productRequest.getProductVariants()){

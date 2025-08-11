@@ -28,6 +28,7 @@ public class WeaviateController {
     private static final String WEAVIATE_SCHEMA = "http://localhost:8082/v1/schema";
 
     // API tạo schema mới
+    // to do : them vao run application
     @PostMapping("/add-schema")
     public ResponseEntity<?> addSchema() {
         String schemaJson = """
@@ -111,4 +112,52 @@ public class WeaviateController {
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
 
+    @GetMapping("/all-products")
+    public ResponseEntity<?> getAllProducts() {
+        String graphql = "{ \"query\": \"{ Get { Product { productId _additional { id } } } }\" }";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(graphql, headers);
+        return restTemplate.postForEntity(WEAVIATE_GRAPHQL, entity, String.class);
+    }
+
+    // Xóa Product theo productId
+    @DeleteMapping("/delete-by-productId/{productId}")
+    public ResponseEntity<?> deleteByProductId(@PathVariable String productId) {
+    // 1. Truy vấn lấy tất cả objectId theo productId
+    String graphql = "{ \"query\": \"{ Get { Product(where: {path: [\\\"productId\\\"], operator: Equal, valueString: \\\"" + productId + "\\\"}) { _additional { id } } } }\" }";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<String> entity = new HttpEntity<>(graphql, headers);
+    ResponseEntity<String> response = restTemplate.postForEntity(WEAVIATE_GRAPHQL, entity, String.class);
+
+    // 2. Parse tất cả id từ response (dùng regex lấy UUID)
+    String body = response.getBody();
+    java.util.List<String> objectIds = new java.util.ArrayList<>();
+    java.util.regex.Pattern uuidPattern = java.util.regex.Pattern.compile("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}");
+    java.util.regex.Matcher matcher = uuidPattern.matcher(body);
+    while (matcher.find()) {
+      objectIds.add(matcher.group());
+    }
+    if (objectIds.isEmpty()) {
+      return ResponseEntity.badRequest().body("Không tìm thấy object với productId: " + productId);
+    }
+
+    // 3. Gọi DELETE cho từng object
+    int deleted = 0;
+    for (String objectId : objectIds) {
+      String deleteUrl = WEAVIATE_OBJECTS + "/Product/" + objectId;
+      try {
+        restTemplate.delete(deleteUrl);
+        deleted++;
+      } catch (Exception e) {
+        log.info(e.getMessage());
+        // Bỏ qua lỗi từng object
+      }
+    }
+    return ResponseEntity.ok("Đã xóa " + deleted + " Product với productId: " + productId);
+    }
+
 }
+
+
