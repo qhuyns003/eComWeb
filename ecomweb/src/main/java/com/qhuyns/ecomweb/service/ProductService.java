@@ -18,8 +18,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +52,7 @@ public class ProductService {
     FileService fileService;
     ProductVariantRepository productVariantRepository;
     ShopRepository shopRepository;
+    WeaviateService  weaviateService;
 
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
@@ -186,7 +192,8 @@ public class ProductService {
         return productResponse;
     };
 
-    public void update(String id, ProductRequest productRequest) {
+
+    public void update(String id, ProductRequest productRequest) throws IOException {
         Product product = productRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         productMapper.toProduct(product,productRequest);
         product.setCategory(categoryRepository.findById(productRequest.getCategory().getId()).orElseThrow(()-> new AppException(ErrorCode.CATEGORY_NOT_FOUND)));
@@ -232,10 +239,19 @@ public class ProductService {
             }
         }
         productRepository.save(product);
+        weaviateService.deleteByProductId(product.getId());
+        for(ProductImage image: product.getImages()){
+            URL url = new URL(ImagePrefix.IMAGE_PREFIX+image.getUrl());
+            InputStream is = url.openStream();
+            byte[] imageBytes = is.readAllBytes();
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+            is.close();
+            weaviateService.addProduct(product.getId(),base64Image);
+        }
         log.info("success");
     };
 
-    public void create( ProductRequest productRequest) {
+    public void create( ProductRequest productRequest) throws IOException {
         Product product = productMapper.toProduct(productRequest);
         product.setCategory(categoryRepository.findById(productRequest.getCategory().getId()).orElseThrow(()-> new AppException(ErrorCode.CATEGORY_NOT_FOUND)));
         product.getImages().addAll(productRequest.getImages().stream().map(img -> {
@@ -273,7 +289,15 @@ public class ProductService {
                 pv.setProduct(product);
                 product.getProductVariants().add(pv);
         }
-        productRepository.save(product);
+     productRepository.save(product);
+     for(ProductImage image: product.getImages()){
+         URL url = new URL(ImagePrefix.IMAGE_PREFIX+image.getUrl());
+         InputStream is = url.openStream();
+         byte[] imageBytes = is.readAllBytes();
+         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+         is.close();
+         weaviateService.addProduct(product.getId(),base64Image);
+     }
     };
 
     public void delete(List<String> ids) {
@@ -286,6 +310,7 @@ public class ProductService {
             for(ProductImage img : product.getImages()){
                 fileService.deleteImage(img.getUrl());
             }
+            weaviateService.deleteByProductId(id);
         }
         productRepository.deleteByIdIn(ids);
     };

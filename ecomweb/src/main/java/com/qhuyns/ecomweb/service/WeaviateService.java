@@ -41,9 +41,8 @@ public class WeaviateService {
     private static final String WEAVIATE_OBJECTS = "http://localhost:8082/v1/objects";
     private static final String WEAVIATE_SCHEMA = "http://localhost:8082/v1/schema";
 
-    public void addProduct(String productId, MultipartFile image)throws IOException {
+    public void addProduct(String productId, String base64Image)throws IOException {
 
-        String base64Image = Base64.getEncoder().encodeToString(image.getBytes());
 
         String json = "{"
                 + "\"class\": \"Product\","

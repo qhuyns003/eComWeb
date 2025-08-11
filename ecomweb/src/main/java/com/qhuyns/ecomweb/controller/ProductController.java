@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -92,7 +93,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     ApiResponse<String> update(@RequestBody ProductRequest productRequest,
-                                        @PathVariable("id") String prodId){
+                                        @PathVariable("id") String prodId) throws IOException {
         productService.update(prodId,productRequest);
         return new ApiResponse<>().<String>builder()
                 .result("Success")
@@ -100,7 +101,7 @@ public class ProductController {
     }
 
     @PostMapping("")
-    ApiResponse<String> create(@RequestBody ProductRequest productRequest){
+    ApiResponse<String> create(@RequestBody ProductRequest productRequest) throws IOException {
         productService.create(productRequest);
         return new ApiResponse<>().<String>builder()
                 .result("Success")
