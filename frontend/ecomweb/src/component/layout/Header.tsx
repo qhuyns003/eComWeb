@@ -1,4 +1,5 @@
 import React from "react";
+import { searchProductByImage } from '../../api/api';
 import UserMenu from "../homepage/UserMenu";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
@@ -10,6 +11,21 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const location = useLocation();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [loadingImageSearch, setLoadingImageSearch] = React.useState(false);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLoadingImageSearch(true);
+    try {
+      const res = await searchProductByImage(file, 0, 8);
+      navigate('/search', { state: { imageSearchResult: res.data.result } });
+    } catch (err) {
+      alert('Lỗi tìm kiếm bằng hình ảnh');
+    }
+    setLoadingImageSearch(false);
+  };
 
   return (
     <nav className="h-[70px] sticky top-0 w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-50 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all shadow">
@@ -41,6 +57,27 @@ const Header: React.FC = () => {
           value={searchValue}
           onChange={e => setSearchValue(e.target.value)}
         />
+        <input
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          ref={fileInputRef}
+          onChange={handleImageChange}
+        />
+        <button
+          type="button"
+          className="bg-[#cc3333] h-9 px-4 rounded-full text-white flex items-center justify-center hover:bg-[#b82d2d] transition mr-[5px]"
+          style={{ minWidth: 0 }}
+          onClick={() => fileInputRef.current?.click()}
+          title="Tìm kiếm bằng hình ảnh"
+          disabled={loadingImageSearch}
+        >
+          {loadingImageSearch ? (
+            <svg className="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-3h6l2 3h3a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          )}
+        </button>
         <button type="submit" className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white mr-[5px] hover:bg-[#b82d2d] transition">Search</button>
       </form>
       {location.pathname === '/' && (

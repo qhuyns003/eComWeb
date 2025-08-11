@@ -1,3 +1,12 @@
+export const searchProductByImage = (file: File, page = 0, size = 8) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('page', String(page));
+  formData.append('size', String(size));
+  return axiosInstance.post('/weaviate/search', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
 export const updateShop = (shopUpdateRequest: any) => {
   return axiosInstance.put('/shop', shopUpdateRequest);
 };

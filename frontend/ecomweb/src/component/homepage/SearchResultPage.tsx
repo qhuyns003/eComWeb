@@ -4,7 +4,7 @@ import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 import ProductCard from './ProductCard';
 import { searchProduct, getCategories, getProvinces } from '../../api/api';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -13,6 +13,7 @@ function useQuery() {
 const SearchResultPage: React.FC = () => {
   const query = useQuery();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -26,23 +27,24 @@ const SearchResultPage: React.FC = () => {
   const [minPriceFilter, setMinPriceFilter] = useState(query.get('minPrice') || "");
   const [maxPriceFilter, setMaxPriceFilter] = useState(query.get('maxPrice') || "");
   const [sortPrice, setSortPrice] = useState(query.get('sortPrice') || "");
-  // Lấy danh mục và tỉnh/thành khi mở modal filter
-  useEffect(() => {
-    if (showFilter) {
-      getCategories().then(res => setCategories(res.data.result || []));
-      getProvinces().then(res => setProvinces(res.data.data || []));
-    }
-  }, [showFilter]);
+
+  // Đặt các biến filter trước useEffect
   const size = Number(query.get('size')) || 8;
   const search = query.get('search') || '';
-  // const status = query.get('status') ? Number(query.get('status')) : 1;
   const minPrice = query.get('minPrice') ? Number(query.get('minPrice')) : undefined;
   const maxPrice = query.get('maxPrice') ? Number(query.get('maxPrice')) : undefined;
   const sortPriceParam = query.get('sortPrice') || undefined;
-
   const categoryId = query.get('categoryId') || undefined;
   const provinceId = query.get('provinceId') || undefined;
+
+  // Ưu tiên kết quả tìm kiếm bằng hình ảnh nếu có
   useEffect(() => {
+    if (location.state && location.state.imageSearchResult) {
+      setProducts(location.state.imageSearchResult.content || []);
+      setTotalPages(location.state.imageSearchResult.totalPages || 1);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const params: any = { page, size, search, minPrice, maxPrice };
     if (sortPriceParam) params.sortPrice = sortPriceParam;
@@ -54,8 +56,14 @@ const SearchResultPage: React.FC = () => {
         setTotalPages(res.data.result.totalPages || 1);
       })
       .finally(() => setLoading(false));
-  }, [page, size, search, minPrice, maxPrice, sortPriceParam, categoryId, provinceId]);
-
+  }, [page, size, search, minPrice, maxPrice, sortPriceParam, categoryId, provinceId, location.state]);
+  // Lấy danh mục và tỉnh/thành khi mở modal filter
+  useEffect(() => {
+    if (showFilter) {
+      getCategories().then(res => setCategories(res.data.result || []));
+      getProvinces().then(res => setProvinces(res.data.data || []));
+    }
+  }, [showFilter]);
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     query.set('page', String(newPage));
