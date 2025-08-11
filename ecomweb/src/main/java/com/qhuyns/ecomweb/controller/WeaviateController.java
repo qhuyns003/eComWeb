@@ -33,12 +33,12 @@ public class WeaviateController {
 
     WeaviateService  weaviateService;
 
-    @PostMapping("/search")
+    @PostMapping(path ="/search",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Page<ProductResponse>> search(
+            @RequestParam("image") MultipartFile image,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam MultipartFile image,
-            @RequestParam(defaultValue = "0.85") double certainty // mặc định 85% giống,
+            @RequestParam(defaultValue = "0.85",required = false) double certainty // mặc định 85% giống,
     ) throws IOException {
         return ApiResponse.<Page<ProductResponse>>builder()
                 .result(weaviateService.search(image,certainty,page,size))
