@@ -1,9 +1,13 @@
 package com.qhuyns.ecomweb.controller;
 
+import com.qhuyns.ecomweb.dto.request.ApiResponse;
+import com.qhuyns.ecomweb.dto.response.ProductResponse;
+import com.qhuyns.ecomweb.service.WeaviateService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,8 +31,23 @@ public class WeaviateController {
     private static final String WEAVIATE_OBJECTS = "http://localhost:8082/v1/objects";
     private static final String WEAVIATE_SCHEMA = "http://localhost:8082/v1/schema";
 
+    WeaviateService  weaviateService;
+
+    @PostMapping("/search")
+    public ApiResponse<Page<ProductResponse>> search(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam MultipartFile image,
+            @RequestParam(defaultValue = "0.85") double certainty // mặc định 85% giống,
+    ) throws IOException {
+        return ApiResponse.<Page<ProductResponse>>builder()
+                .result(weaviateService.search(image,certainty,page,size))
+                .build();
+    }
+
     // API tạo schema mới
     // to do : them vao run application
+    // postman test
     @PostMapping("/add-schema")
     public ResponseEntity<?> addSchema() {
         String schemaJson = """
@@ -66,6 +85,7 @@ public class WeaviateController {
     }
 
     // Thêm sản phẩm mới
+    // postman test
     @PostMapping("/add-product")
     public ResponseEntity<?> addProduct(
             @RequestParam String productId,
@@ -91,6 +111,7 @@ public class WeaviateController {
 
    
     // Tìm kiếm sản phẩm bằng ảnh với ngưỡng lọc
+    // postman test
     @PostMapping("/by-image")
     public ResponseEntity<?> searchByImage(
             @RequestParam MultipartFile image,
@@ -101,7 +122,7 @@ public class WeaviateController {
         // GraphQL query có thêm certainty
         String graphql = "{ \"query\": \"{ Get { Product(nearImage: {image: \\\"" + base64Image +
                 "\\\", certainty: " + certainty +
-                "}, limit: 5) { productId image _additional { certainty distance } } } }\" }";
+                "}, limit: 5) { productId _additional { certainty distance } } } }\" }";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -112,6 +133,7 @@ public class WeaviateController {
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
 
+    // postman test
     @GetMapping("/all-products")
     public ResponseEntity<?> getAllProducts() {
         String graphql = "{ \"query\": \"{ Get { Product { productId _additional { id } } } }\" }";
@@ -122,6 +144,7 @@ public class WeaviateController {
     }
 
     // Xóa Product theo productId
+    // postman test
     @DeleteMapping("/delete-by-productId/{productId}")
     public ResponseEntity<?> deleteByProductId(@PathVariable String productId) {
     // 1. Truy vấn lấy tất cả objectId theo productId

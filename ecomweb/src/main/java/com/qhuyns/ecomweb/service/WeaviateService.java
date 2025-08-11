@@ -1,16 +1,29 @@
 package com.qhuyns.ecomweb.service;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qhuyns.ecomweb.dto.request.RoleRequest;
+import com.qhuyns.ecomweb.dto.response.ProductImageResponse;
+import com.qhuyns.ecomweb.dto.response.ProductResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
+import com.qhuyns.ecomweb.entity.Product;
+import com.qhuyns.ecomweb.entity.ProductImage;
+import com.qhuyns.ecomweb.mapper.ProductImageMapper;
+import com.qhuyns.ecomweb.mapper.ProductMapper;
 import com.qhuyns.ecomweb.mapper.RoleMapper;
 import com.qhuyns.ecomweb.repository.PermissionRepository;
+import com.qhuyns.ecomweb.repository.ProductRepository;
 import com.qhuyns.ecomweb.repository.RoleRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -40,6 +53,10 @@ public class WeaviateService {
     private static final String WEAVIATE_GRAPHQL = "http://localhost:8082/v1/graphql";
     private static final String WEAVIATE_OBJECTS = "http://localhost:8082/v1/objects";
     private static final String WEAVIATE_SCHEMA = "http://localhost:8082/v1/schema";
+
+    ProductRepository productRepository;
+    ProductImageMapper productImageMapper;
+    ProductMapper productMapper;
 
     public void addProduct(String productId, String base64Image)throws IOException {
 
@@ -105,5 +122,61 @@ public class WeaviateService {
                 // Bỏ qua lỗi từng object
             }
         }
+    }
+
+    public Page<ProductResponse> search(MultipartFile image, double certainty, int page, int size) throws IOException {
+        String base64Image = Base64.getEncoder().encodeToString(image.getBytes());
+
+        // GraphQL query có thêm certainty
+        String graphql = "{ \"query\": \"{ Get { Product(nearImage: {image: \\\"" + base64Image +
+                "\\\", certainty: " + certainty +
+                "}, limit: 100) { productId _additional { certainty distance } } } }\" }";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<>(graphql, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(WEAVIATE_GRAPHQL, entity, String.class);
+
+        String body = response.getBody();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(body);
+        JsonNode products = root.path("data").path("Get").path("Product");
+        List<String> ids = new ArrayList<>();
+        for (JsonNode product : products) {
+            String id = product.path("productId").asText();
+            ids.add(id);
+        }
+
+        // Phân trang danh sách ids
+        int fromIndex = Math.min(page * size, ids.size());
+        int toIndex = Math.min(fromIndex + size, ids.size());
+        List<String> pagedIds = ids.subList(fromIndex, toIndex);
+
+        List<Product> productList = productRepository.findAllById(pagedIds);
+
+        Pageable pageable = PageRequest.of(page, size);
+        List<ProductResponse> productResponses = new ArrayList<>();
+        for (Product product : productList) {
+            ProductImageResponse productImageResponse = new ProductImageResponse();
+            for(ProductImage productImage: product.getImages()){
+                if(productImage.getIsMain()){
+                    productImageResponse =productImageMapper.toProductImageResponse(productImage);
+                    break;
+                }
+            }
+            ProductResponse productResponse = productMapper.toProductResponse(product);
+            productResponse.setImages(new ArrayList<>(List.of(productImageResponse)));
+            productResponses.add(productResponse);
+        }
+
+        Page<ProductResponse> productResponsePage = new PageImpl<>(
+                productResponses,
+                pageable,
+                ids.size()
+        );
+
+        return productResponsePage;
+
     }
 }
