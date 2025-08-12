@@ -1,6 +1,7 @@
 import React from "react";
 import { searchProductByImage } from '../../api/api';
 import UserMenu from "../homepage/UserMenu";
+import NotificationBell from "../common/NotificationBell";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
@@ -49,14 +50,7 @@ const Header: React.FC = () => {
           Easier
         </span>
       </button>
-{/* // Thêm Google Fonts Permanent Marker vào head nếu chưa có
-if (typeof document !== 'undefined' && !document.getElementById('gf-permanent-marker')) {
-  const link = document.createElement('link');
-  link.id = 'gf-permanent-marker';
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap';
-  document.head.appendChild(link);
-} */}
+
 
       <form
         className="flex items-center border pl-4 gap-2 bg-white border-gray-500/30 h-[46px] rounded-full overflow-hidden max-w-md w-full"
@@ -116,7 +110,8 @@ if (typeof document !== 'undefined' && !document.getElementById('gf-permanent-ma
             </button>
         </div>
       )}
-      <div className="flex gap-3">
+      <div className="flex gap-3 items-center">
+        {user && <NotificationBell />}
         {user ? (
           <UserMenu />
         ) : (
