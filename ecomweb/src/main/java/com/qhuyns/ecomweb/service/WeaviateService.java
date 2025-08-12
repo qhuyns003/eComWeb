@@ -9,6 +9,8 @@ import com.qhuyns.ecomweb.dto.response.ProductResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
 import com.qhuyns.ecomweb.entity.Product;
 import com.qhuyns.ecomweb.entity.ProductImage;
+import com.qhuyns.ecomweb.exception.AppException;
+import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.ProductImageMapper;
 import com.qhuyns.ecomweb.mapper.ProductMapper;
 import com.qhuyns.ecomweb.mapper.RoleMapper;
@@ -153,7 +155,13 @@ public class WeaviateService {
         int toIndex = Math.min(fromIndex + size, ids.size());
         List<String> pagedIds = ids.subList(fromIndex, toIndex);
 
-        List<Product> productList = productRepository.findAllById(pagedIds);
+        // danh sasch lay ra khong theo thu tu id
+//        List<Product> productList = productRepository.findAllById(pagedIds);
+        List<Product> productList = new ArrayList<>();
+        for (String id : pagedIds) {
+            productList.add(productRepository.findById(id)
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)));
+        }
 
         Pageable pageable = PageRequest.of(page, size);
         List<ProductResponse> productResponses = new ArrayList<>();

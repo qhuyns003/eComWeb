@@ -57,4 +57,15 @@ public class User {
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<UserAddress> userAddresses= new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<Notification> notificationsSent = new ArrayList<>();
+
+
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<NotificationRecipient> notificationRecipients = new ArrayList<>();
+
 }
