@@ -1,11 +1,12 @@
 // Notification API
+
 export async function fetchUserNotifications(userId: string) {
-  const res = await fetch(`/notifications/user/${userId}`);
-  return res.json();
+  const res = await axiosInstance.get(`/notifications/user/${userId}`);
+  return res.data;
 }
 
 export async function markNotificationAsRead(notificationRecipientId: string) {
-  return fetch(`/notifications/read/${notificationRecipientId}`, { method: "POST" });
+  return axiosInstance.post(`/notifications/read/${notificationRecipientId}`);
 }
 export const searchProductByImage = (file: File, page = 0, size = 8) => {
   const formData = new FormData();

@@ -56,9 +56,11 @@ public class NotificationService {
                     .build();
             notificationRecipientRepository.save(nr);
 
+            // Log username gửi WebSocket
+            log.info("Send WebSocket to user: {}", user.getUsername());
             // Gửi realtime qua WebSocket tới user
             messagingTemplate.convertAndSendToUser(
-                    user.getUsername(), // hoặc username
+                    user.getUsername(),
                     "/queue/notifications",
                     notificationMapper.toNotificationResponse(notification)
             );
