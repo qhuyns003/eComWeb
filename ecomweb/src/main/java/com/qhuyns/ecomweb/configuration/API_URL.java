@@ -33,6 +33,7 @@ public class API_URL {
             "/shop/**",
             "/weaviate/**",
             "/notifications/**",
+            "/ws/**"
 
     };
 
@@ -53,6 +54,7 @@ public class API_URL {
             "/shop/**",
             "/weaviate/**",
             "/notifications/**",
+            "/ws/**"
 
 
     };
@@ -65,6 +67,7 @@ public class API_URL {
             "/shop/**",
             "/weaviate/**",
             "/notifications/**",
+            "/ws/**"
 
     };
 }

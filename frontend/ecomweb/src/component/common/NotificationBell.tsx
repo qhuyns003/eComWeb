@@ -28,13 +28,13 @@ const NotificationBell: React.FC = () => {
         setNotifications(data);
         setUnreadCount(data.filter((n: Notification) => !n.seen).length);
       });
-    // Connect WebSocket
-    const socket = new SockJS("http://localhost:8080/ws");
     // Lấy token từ localStorage hoặc redux (tùy app của bạn)
     const token = localStorage.getItem("token");
+    // Truyền token qua query param khi tạo SockJS
+    const socket = new SockJS(`http://localhost:8080/ws${token ? `?token=${token}` : ''}`);
     const client = new Client({
       webSocketFactory: () => socket as any,
-      connectHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+      // Không cần connectHeaders cho handshake với SockJS, chỉ cần query param
       onConnect: () => {
         client.subscribe("/user/queue/notifications", (message) => {
           const notification: Notification = JSON.parse(message.body);
