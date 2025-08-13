@@ -55,7 +55,7 @@ public class UserAddressService {
                 userAddressRepository.save(userAddress1);
             }
         }
-        userAddress.setUser(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+        userAddress.setUser(userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
                 .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_EXISTED)));
         userAddressRepository.save(userAddress);
     }

@@ -37,7 +37,7 @@ public class NotificationService {
     NotificationMapper notificationMapper;
 
     public void sendNotificationToUsers(NotificationRequest notificationRequest) {
-        User sender = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+        User sender = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
                 .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
         List<User> recipients = userRepository.findAllById(notificationRequest.getRecipientId());
 

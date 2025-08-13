@@ -7,6 +7,7 @@ import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.entity.Role;
 import com.qhuyns.ecomweb.entity.User;
+import com.qhuyns.ecomweb.entity.VerificationToken;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.UserMapper;
@@ -15,7 +16,9 @@ import com.qhuyns.ecomweb.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,9 +26,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,17 +43,26 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
+    @NonFinal
+    @Value("${spring.mail.expiryTime}")
+    int expiryTime;
     public UserResponse createUser(UserCreationRequest request) {
         if(!request.getPassword().equals(request.getConfirmPassword())){
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
         }
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setActive(false);
 
         List<Role> roles = new ArrayList<>();
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
-
         user.setRoles(roles);
+        VerificationToken vt = VerificationToken.builder()
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusSeconds(expiryTime))
+                .token(UUID.randomUUID().toString())
+                .build();
+        user.getVerificationTokens().add(vt);
 
         try {
             user = userRepository.save(user);
@@ -63,7 +77,7 @@ public class UserService {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findByUsernameAndActive(name,true).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userMapper.toUserResponse(user);
     }
@@ -72,7 +86,7 @@ public class UserService {
 //    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse updateUser( UserUpdateRequest request) {
 
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);

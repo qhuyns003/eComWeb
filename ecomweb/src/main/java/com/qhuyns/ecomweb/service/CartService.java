@@ -33,7 +33,7 @@ public class CartService {
     ShopMapper shopMapper;
     ProductVariantRepository pvRepository;;
     public List<CartResponse> getAll() {
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(
+        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true).orElseThrow(
                 ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
         );
         List<Cart> carts = cartRepository.findByUserId(user.getId());
@@ -63,7 +63,7 @@ public class CartService {
     }
 
     public void addToCart(CartRequest cartRequest) {
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(
+        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true).orElseThrow(
                 ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
         );
         ProductVariant pv = pvRepository.findById(cartRequest.getProductVariantId()).orElseThrow(

@@ -12,6 +12,18 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: quanghuytq3011@gmail.com
+    password: xhcz ykyn ooea hhgd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    expiryTime: 3600 #second
 ghn:
   api-url: "https://dev-online-gateway.ghn.vn/shiip/public-api/"
   token: "f02c23e4-63c7-11f0-9b81-222185cb68c8"

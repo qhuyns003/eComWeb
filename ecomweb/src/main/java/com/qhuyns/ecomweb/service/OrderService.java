@@ -44,7 +44,7 @@ public class OrderService {
         // kiem tra khong trung
       Order order = orderMapper.toOrder(orderRequest);
       order.setStatus(OrderStatus.PENDING);
-      order.setUser(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(
+      order.setUser(userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true).orElseThrow(
               ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
       ));
 //      order.setUserAddress(userAddressRepository.findById(orderRequest.getUserAddressId()).orElseThrow(

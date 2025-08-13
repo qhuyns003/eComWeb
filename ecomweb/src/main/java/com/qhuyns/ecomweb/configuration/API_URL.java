@@ -18,7 +18,8 @@ public class API_URL {
             "/shop/**",
             "/weaviate/**",
             "/notifications/**",
-            "/ws/**"
+            "/ws/**",
+            "/apollo/**"
 
     };
 

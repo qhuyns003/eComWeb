@@ -29,6 +29,7 @@ public class User {
     String fullName;
     String email;
     String phone;
+    boolean active;
 
     @Builder.Default
     @ManyToMany(mappedBy = "users")
@@ -67,5 +68,9 @@ public class User {
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     List<NotificationRecipient> notificationRecipients = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VerificationToken> verificationTokens= new ArrayList<>();
 
 }

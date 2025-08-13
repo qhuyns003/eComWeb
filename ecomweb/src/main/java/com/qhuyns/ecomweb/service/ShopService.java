@@ -41,7 +41,7 @@ public class ShopService {
     RoleRepository roleRepository;
 
     public void create(ShopCreateRequest shopCreateRequest) {
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Shop shop = shopMapper.toShop(shopCreateRequest);
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
@@ -57,7 +57,7 @@ public class ShopService {
     }
 
     public void update(ShopUpdateRequest shopUpdateRequest) {
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Shop shop = user.getShop();
         shopMapper.toShop(shop,shopUpdateRequest);
