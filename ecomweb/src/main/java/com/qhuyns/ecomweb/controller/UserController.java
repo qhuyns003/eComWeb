@@ -30,6 +30,14 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/verification")
+    ApiResponse<?> activeUser(@RequestParam String username, @RequestParam String token) {
+        userService.activeUser(username, token);
+        return ApiResponse.builder()
+                .result("success")
+                .build();
+    }
+
 
 
 

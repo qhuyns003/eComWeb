@@ -29,6 +29,7 @@ const companyLogo = [
         name: "Facebook",
         image: "https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/companyLogo/facebook.svg",
     },
+    
 ];
 
 const CompanyMarquee: React.FC = () => (

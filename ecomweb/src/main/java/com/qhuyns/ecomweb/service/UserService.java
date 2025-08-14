@@ -42,6 +42,7 @@ public class UserService {
     RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    EmailService emailService;
 
     @NonFinal
     @Value("${spring.mail.expiryTime}")
@@ -69,8 +70,28 @@ public class UserService {
         } catch (DataIntegrityViolationException exception) {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
-
+        emailService.sendVerificationEmail(user.getEmail(), vt.getToken(),user.getUsername());
         return userMapper.toUserResponse(user);
+    }
+
+    public void activeUser(String username,String token) {
+        User user = userRepository.findByUsernameAndActive(username,false)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        List<VerificationToken> verificationTokens = user.getVerificationTokens();
+        for (VerificationToken verificationToken : verificationTokens) {
+            if (verificationToken.getToken().equals(token)) {
+                if(verificationToken.getExpiryDate().isAfter(LocalDateTime.now())) {
+                    user.setActive(true);
+                    userRepository.save(user);
+                    return;
+                }
+                else{
+                    throw new AppException(ErrorCode.VERIFICATION_TOKEN_IS_EXPRIRED);
+                }
+            }
+        }
+        throw new AppException(ErrorCode.VERIFICATION_TOKEN_IS_EXPRIRED);
+
     }
 
     public UserResponse getMyInfo() {

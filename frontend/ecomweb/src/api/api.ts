@@ -1,3 +1,7 @@
+// Xác thực tài khoản (verify email)
+export const verifyAccount = (token: string, username: string) => {
+  return axiosInstance.post('/users/verification', null, { params: { token, username } });
+};
 // Notification API
 
 export async function fetchUserNotifications(userId: string) {

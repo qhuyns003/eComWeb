@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 public class EmailService {
     JavaMailSender mailSender;
 
-    public void sendVerificationEmail(String to, String token) {
+    public void sendVerificationEmail(String to, String token,String username) {
         String subject = "Xác minh tài khoản";
-        String verificationUrl = "https://yourdomain.com/verify?token=" + token;
+        String verificationUrl = "http://localhost:5173/verify?token=" + token+"&username="+username;
         String content = "Nhấn vào link để xác minh tài khoản: " + verificationUrl;
 
         SimpleMailMessage message = new SimpleMailMessage();

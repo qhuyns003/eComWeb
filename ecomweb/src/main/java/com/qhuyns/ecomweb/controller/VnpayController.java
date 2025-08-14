@@ -38,7 +38,7 @@ public class VnpayController {
 
     @GetMapping("/payment-status")
     public ApiResponse<?> getPaymentStatus(@RequestParam("vnp_TxnRef") String orderId) {
-
+        // kiem tra don hang PAID chua
         return ApiResponse.builder()
                 .result("success")
                 .build();

@@ -19,7 +19,8 @@ public class API_URL {
             "/weaviate/**",
             "/notifications/**",
             "/ws/**",
-            "/apollo/**"
+            "/apollo/**",
+            "/users/**",
 
     };
 
@@ -40,7 +41,7 @@ public class API_URL {
 
     // Các API POST cho người dùng không đăng nhập (public)
     public static final String[] URL_ANONYMOUS_POST = {
-            "/users",
+
             "/auth/token",
             "/auth/introspect",
             "/auth/logout",
@@ -55,7 +56,8 @@ public class API_URL {
             "/shop/**",
             "/weaviate/**",
             "/notifications/**",
-            "/ws/**"
+            "/ws/**",
+            "/users/**",
 
 
     };
@@ -68,7 +70,8 @@ public class API_URL {
             "/shop/**",
             "/weaviate/**",
             "/notifications/**",
-            "/ws/**"
+            "/ws/**",
+            "/users/**",
 
     };
 }

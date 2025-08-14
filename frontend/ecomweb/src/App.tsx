@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import AppInitializer from './component/AppInitializer';
 import RegisterForm from './component/register/RegisterForm';
+import VerifyAccount from './component/register/VerifyAccount';
 import ProductDetail from './component/product/ProductDetail';
 import ShopAdmin from './component/admin/ShopAdmin';
 import LogoutModal from './component/common/LogoutModal';
@@ -92,6 +93,7 @@ function AppContent() {
         <Route path="/profile" element={<UserProfileEdit />} />
         <Route path="/register-shop" element={<RegisterShopForm />} />
         <Route path="/shop-info" element={<ShopInfoEdit />} />
+        <Route path="/verify" element={<VerifyAccount />} />
       </Routes>
       
       <LogoutModal
