@@ -21,6 +21,7 @@ public class API_URL {
             "/ws/**",
             "/apollo/**",
             "/users/**",
+            "/messages/**"
 
     };
 
@@ -35,7 +36,8 @@ public class API_URL {
             "/shop/**",
             "/weaviate/**",
             "/notifications/**",
-            "/ws/**"
+            "/ws/**",
+            "/messages/**"
 
     };
 
@@ -58,6 +60,7 @@ public class API_URL {
             "/notifications/**",
             "/ws/**",
             "/users/**",
+            "/messages/**"
 
 
     };
@@ -72,6 +75,7 @@ public class API_URL {
             "/notifications/**",
             "/ws/**",
             "/users/**",
+            "/messages/**"
 
     };
 }

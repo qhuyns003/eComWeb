@@ -24,6 +24,15 @@ spring:
           starttls:
             enable: true
     expiryTime: 3600 #second
+  cassandra:
+    contact-points: localhost
+    port: 9042
+    keyspace-name: ecomweb
+    username: cassandra
+    password: cassandra
+    schema-action: none
+    local-datacenter: datacenter1
+
 ghn:
   api-url: "https://dev-online-gateway.ghn.vn/shiip/public-api/"
   token: "f02c23e4-63c7-11f0-9b81-222185cb68c8"
