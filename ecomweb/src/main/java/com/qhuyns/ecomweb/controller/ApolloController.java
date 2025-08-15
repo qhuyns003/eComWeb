@@ -26,7 +26,7 @@ public class ApolloController {
     ApolloService apolloService;
 
     @GetMapping("/")
-    ApiResponse<?> getCategories() throws IOException {
+    ApiResponse<?> getCategories() throws IOException, InterruptedException {
         apolloService.get();
         return ApiResponse.builder()
                 .result("success")

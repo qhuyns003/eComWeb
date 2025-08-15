@@ -47,7 +47,7 @@ public class UserService {
     @NonFinal
     @Value("${spring.mail.expiryTime}")
     int expiryTime;
-    public UserResponse createUser(UserCreationRequest request) {
+    public UserResponse createUser(UserCreationRequest request) throws Exception {
         if(!request.getPassword().equals(request.getConfirmPassword())){
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
         }
