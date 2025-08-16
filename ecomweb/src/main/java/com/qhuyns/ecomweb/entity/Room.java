@@ -1,11 +1,12 @@
 package com.qhuyns.ecomweb.entity;
 
 //import jakarta.persistence.*;
-import com.qhuyns.ecomweb.entity.key.MessagePrimaryKey;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,13 +14,10 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-// Message.java
-// table nay cua cassandra kp cua jkt
-@Table("message")
-public class Message {
+@Table("room")
+public class Room {
     @PrimaryKey
-    private MessagePrimaryKey key;
-    private String sender;
-    private String content;
-    private String type;
+    private String roomId;
+    private String name;
+    private LocalDateTime createdAt;
 }

@@ -1,6 +1,5 @@
-package com.qhuyns.ecomweb.entity;
+package com.qhuyns.ecomweb.entity.key;
 
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
@@ -9,8 +8,6 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -20,13 +17,11 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @PrimaryKeyClass
-public class MessagePrimaryKey implements Serializable {
-    @PrimaryKeyColumn(name = "room_id", type = PrimaryKeyType.PARTITIONED)
+public class UserRoomKey implements Serializable {
+    @PrimaryKeyColumn(name = "user_id", type = PrimaryKeyType.PARTITIONED)
+    private String userId;
+    @PrimaryKeyColumn(name = "last_message_at", type = PrimaryKeyType.CLUSTERED, ordinal = 0)
+    private LocalDateTime lastMessageAt;
+    @PrimaryKeyColumn(name = "room_id", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
     private String roomId;
-
-    @PrimaryKeyColumn(name = "sent_at", type = PrimaryKeyType.CLUSTERED, ordinal = 0)
-    private LocalDateTime sentAt;
-
-    @PrimaryKeyColumn(name = "message_id", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
-    private UUID messageId;
 }
