@@ -27,12 +27,12 @@ import java.util.UUID;
 public class UserRoomController {
     UserRoomService  userRoomService;
 
-    @PostMapping("")
-    public ApiResponse<?> create() {
-       return ApiResponse.builder()
-               .result("success")
-               .build();
-    }
+//    @PostMapping("")
+//    public ApiResponse<?> create() {
+//       return ApiResponse.builder()
+//               .result("success")
+//               .build();
+//    }
 
     @PutMapping("/{roomId}")
     public ApiResponse<?> update(@PathVariable String roomId) {

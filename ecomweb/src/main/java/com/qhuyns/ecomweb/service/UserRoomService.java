@@ -5,6 +5,7 @@ import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
 import com.qhuyns.ecomweb.entity.Message;
 import com.qhuyns.ecomweb.entity.User;
 import com.qhuyns.ecomweb.entity.UserRoom;
+import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
@@ -34,10 +35,22 @@ public class UserRoomService {
     UserRepository userRepository;
     UserRoomMapper userRoomMapper;
     UserRoomKeyMapper userRoomKeyMapper;
+
     public void updateLastTime(String roomId) {
         UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyRoomId(SecurityContextHolder.getContext().getAuthentication().getName(), roomId);
         userRoom.getKey().setLastMessageAt(LocalDateTime.now());
         userRoomRepository.save(userRoom);
+    }
+
+    public void create(String userId,String roomId) {
+        userRoomRepository.save(UserRoom.builder()
+                        .joinedAt(LocalDateTime.now())
+                        .key(UserRoomKey.builder()
+                                .userId(userId)
+                                .roomId(roomId)
+                                .lastMessageAt(LocalDateTime.now())
+                                .build())
+                .build());
     }
 
     public List<UserRoomResponse> getRoomByUserId() {

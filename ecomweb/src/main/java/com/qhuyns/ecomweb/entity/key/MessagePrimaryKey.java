@@ -23,6 +23,7 @@ public class MessagePrimaryKey implements Serializable {
    // dung cho entity co data lon va truy xuat nhanh, it quan he
     // xay dung bang theo truy van chu khong phai theo entity -> 1 entity co the nhieu bang va phai cap nhat nhieu
     // co the chuyen sang scylladb de dang chi can doi config connection
+    // >7 querry thi xem xet chuyen entity sang sql
     @PrimaryKeyColumn(name = "room_id", type = PrimaryKeyType.PARTITIONED)
     private String roomId;
 
