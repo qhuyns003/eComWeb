@@ -36,11 +36,11 @@ public class UserRoomService {
     UserRoomMapper userRoomMapper;
     UserRoomKeyMapper userRoomKeyMapper;
 
-    public void updateLastTime(String roomId) {
-        UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyRoomId(SecurityContextHolder.getContext().getAuthentication().getName(), roomId);
-        userRoom.getKey().setLastMessageAt(LocalDateTime.now());
-        userRoomRepository.save(userRoom);
-    }
+//    public void updateLastTime(String roomId) {
+//        UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyRoomId(SecurityContextHolder.getContext().getAuthentication().getName(), roomId);
+//        userRoom.getKey().setLastMessageAt(LocalDateTime.now());
+//        userRoomRepository.save(userRoom);
+//    }
 
     public void create(String userId,String roomId) {
         userRoomRepository.save(UserRoom.builder()

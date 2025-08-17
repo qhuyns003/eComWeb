@@ -2,11 +2,16 @@ package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.constant.ImagePrefix;
 import com.qhuyns.ecomweb.dto.request.CartRequest;
+import com.qhuyns.ecomweb.dto.request.MessageRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
+import com.qhuyns.ecomweb.dto.response.MessageResponse;
 import com.qhuyns.ecomweb.entity.*;
+import com.qhuyns.ecomweb.entity.key.MessagePrimaryKey;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.mapper.MessageMapper;
+import com.qhuyns.ecomweb.mapper.MessagePrimaryKeyMapper;
 import com.qhuyns.ecomweb.mapper.ShopMapper;
 import com.qhuyns.ecomweb.repository.*;
 import lombok.AccessLevel;
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,18 +37,37 @@ public class MessageService {
     UserRoomRepository userRoomRepository;
     RoomMemberRepository roomMemberRepository;
     PrivateChatService privateChatService;
+    MessageMapper messageMapper;
+    MessagePrimaryKeyMapper messagePrimaryKeyMapper;
 
-    public Message saveMessage(Message message) {
+    public void saveMessage(MessageRequest messageRequest) {
+        Message message = Message.builder()
+                .content(messageRequest.getContent())
+                .type(messageRequest.getType())
+                .sender(messageRequest.getSender())
+                .key(MessagePrimaryKey.builder()
+                        .messageId(UUID.randomUUID().toString())
+                        .sentAt(LocalDateTime.now())
+                        .roomId(messageRequest.getRoomId())
+                        .build())
+                .build();
         List<RoomMember> roomMembers = roomMemberRepository.findByKeyRoomId(message.getKey().getRoomId());
         for(RoomMember roomMember : roomMembers){
             UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyRoomId(roomMember.getKey().getUserId(), roomMember.getKey().getRoomId());
             userRoom.getKey().setLastMessageAt(LocalDateTime.now());
             userRoomRepository.save(userRoom);
         }
-        return messageRepository.save(message);
     }
 
-    public List<Message> getMessagesByRoomId(String roomId) {
-        return messageRepository.findByKeyRoomIdOrderByKeySentAtAsc(roomId);
+    public List<MessageResponse> getMessagesByRoomId(String roomId) {
+        List<Message> message = messageRepository.findByKeyRoomIdOrderByKeySentAtAsc(roomId);
+        List<MessageResponse> messageResponses = message.stream().map(m -> {
+            MessageResponse messageResponse = messageMapper.toMessageResponse(m);
+            messageResponse.setKey(messagePrimaryKeyMapper.toMessagePrimaryKeyResponse(m.getKey()));
+            return messageResponse;
+
+        }).collect(Collectors.toList());
+
+        return messageResponses;
     }
 }

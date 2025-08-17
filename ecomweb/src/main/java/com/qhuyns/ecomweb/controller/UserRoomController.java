@@ -34,13 +34,13 @@ public class UserRoomController {
 //               .build();
 //    }
 
-    @PutMapping("/{roomId}")
-    public ApiResponse<?> update(@PathVariable String roomId) {
-        userRoomService.updateLastTime(roomId);
-        return ApiResponse.builder()
-                .result("success")
-                .build();
-    }
+//    @PutMapping("/{roomId}")
+//    public ApiResponse<?> update(@PathVariable String roomId) {
+//        userRoomService.updateLastTime(roomId);
+//        return ApiResponse.builder()
+//                .result("success")
+//                .build();
+//    }
 
 
     @GetMapping("")

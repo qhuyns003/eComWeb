@@ -30,6 +30,7 @@ public class MessagePrimaryKey implements Serializable {
     @PrimaryKeyColumn(name = "sent_at", type = PrimaryKeyType.CLUSTERED, ordinal = 0)
     private LocalDateTime sentAt;
 
+    // k ap dung generate UUID dc cho casandra
     @PrimaryKeyColumn(name = "message_id", type = PrimaryKeyType.CLUSTERED, ordinal = 1)
-    private UUID messageId;
+    private String messageId;
 }

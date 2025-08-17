@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,19 +37,21 @@ public class RoomService {
     UserRoomService userRoomService;
     RoomMemberService roomMemberService;
     public void create(CreateRoomRequest createRoomRequest,Room room) {
+
+        List<String> members = new ArrayList<>(createRoomRequest.getMembers());
        if(room == null){
            room = Room.builder()
                    .name(createRoomRequest.getName())
                    .createdAt(LocalDateTime.now())
                    .roomId(UUID.randomUUID().toString())
                    .build();
-           roomRepository.save(room);
+           User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
+                   .orElseThrow(()->new  AppException(ErrorCode.USER_NOT_EXISTED));
+           members.add(user.getId());
        };
-        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-                        .orElseThrow(()->new  AppException(ErrorCode.USER_NOT_EXISTED));
-        userRoomService.create(user.getId(),room.getRoomId());
-        roomMemberService.create(user.getId(),room.getRoomId());
-        for(String userId : createRoomRequest.getMembers()) {
+        roomRepository.save(room);
+
+        for(String userId : members) {
             userRoomService.create(userId,room.getRoomId());
             roomMemberService.create(userId,room.getRoomId());
         };

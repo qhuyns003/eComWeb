@@ -3,7 +3,9 @@ package com.qhuyns.ecomweb.controller;
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.request.CartRequest;
+import com.qhuyns.ecomweb.dto.request.MessageRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
+import com.qhuyns.ecomweb.dto.response.MessageResponse;
 import com.qhuyns.ecomweb.entity.Message;
 import com.qhuyns.ecomweb.service.CartService;
 import com.qhuyns.ecomweb.service.MessageService;
@@ -28,19 +30,17 @@ public class MessageController {
     MessageService messageService;
 
     @PostMapping
-    public ResponseEntity<Message> sendMessage(@RequestBody Message message) {
-        // Gán UUID và thời gian gửi nếu cần
-        if (message.getKey().getMessageId() == null) {
-            message.getKey().setMessageId(UUID.randomUUID());
-        }
-        if (message.getKey().getSentAt() == null) {
-            message.getKey().setSentAt(LocalDateTime.now());
-        }
-        return ResponseEntity.ok(messageService.saveMessage(message));
+    public ApiResponse<?> sendMessage(@RequestBody MessageRequest  messageRequest) {
+        messageService.saveMessage(messageRequest);
+        return ApiResponse.builder()
+                .result("success")
+                .build();
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<List<Message>> getMessages(@PathVariable String roomId) {
-        return ResponseEntity.ok(messageService.getMessagesByRoomId(roomId));
+    public ApiResponse<List<MessageResponse>> getMessages(@PathVariable String roomId) {
+        return  ApiResponse.<List<MessageResponse>>builder()
+                .result(messageService.getMessagesByRoomId(roomId))
+                .build();
     }
 }

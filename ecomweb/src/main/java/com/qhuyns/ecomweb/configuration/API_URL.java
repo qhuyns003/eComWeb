@@ -21,7 +21,10 @@ public class API_URL {
             "/ws/**",
             "/apollo/**",
             "/users/**",
-            "/messages/**"
+            "/messages/**",
+            "/private_chats/**",
+            "/rooms/**",
+            "/user_rooms/**",
 
     };
 
@@ -37,7 +40,10 @@ public class API_URL {
             "/weaviate/**",
             "/notifications/**",
             "/ws/**",
-            "/messages/**"
+            "/messages/**",
+            "/private_chats/**",
+            "/rooms/**",
+            "/user_rooms/**",
 
     };
 
@@ -60,7 +66,10 @@ public class API_URL {
             "/notifications/**",
             "/ws/**",
             "/users/**",
-            "/messages/**"
+            "/messages/**",
+            "/private_chats/**",
+            "/rooms/**",
+            "/user_rooms/**",
 
 
     };
@@ -75,7 +84,10 @@ public class API_URL {
             "/notifications/**",
             "/ws/**",
             "/users/**",
-            "/messages/**"
+            "/messages/**",
+            "/private_chats/**",
+            "/rooms/**",
+            "/user_rooms/**",
 
     };
 }

@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class PrivateChatService {
     PrivateChatRepository privateChatRepository;
     RoomService roomService;
+    UserRepository userRepository;
     public String getRoomId(String user1,String user2) {
         PrivateChat pc = privateChatRepository.findByKeyUser1AndKeyUser2(user1,user2);
         if (pc != null) {
@@ -44,7 +45,8 @@ public class PrivateChatService {
     }
 
     public String create(String user2) {
-        String user1 = SecurityContextHolder.getContext().getAuthentication().getName();
+        String user1 = (userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED))).getId();
         if(user1.compareToIgnoreCase(user2) >0){
             String tmp =user1;
             user1 =user2;

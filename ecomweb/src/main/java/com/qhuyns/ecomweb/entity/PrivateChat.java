@@ -4,6 +4,7 @@ package com.qhuyns.ecomweb.entity;
 import com.qhuyns.ecomweb.entity.key.PrivateChatKey;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
@@ -19,5 +20,6 @@ import java.time.LocalDateTime;
 public class PrivateChat {
     @PrimaryKey
     PrivateChatKey key;
+    @Column("room_id")
     String roomId;
 }
