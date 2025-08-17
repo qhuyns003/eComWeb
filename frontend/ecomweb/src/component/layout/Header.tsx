@@ -3,7 +3,9 @@ import { searchProductByImage } from '../../api/api';
 import UserMenu from "../homepage/UserMenu";
 import NotificationBell from "../common/NotificationBell";
 import ChatBox from "../chat/ChatBox";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import SockJS from "sockjs-client/dist/sockjs";
+import { Client } from "@stomp/stompjs";
 import { fetchUserRooms } from "../../api/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
@@ -17,8 +19,12 @@ const Header: React.FC = () => {
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
+  // Kết nối WebSocket để cập nhật danh sách phòng chat realtime
+  const stompClient = useRef<Client | null>(null);
+
   useEffect(() => {
     if (!user) return;
+    // Lấy danh sách phòng lần đầu
     fetchUserRooms()
       .then(res => {
         if (Array.isArray(res.data?.result)) {
@@ -33,6 +39,38 @@ const Header: React.FC = () => {
         }
       })
       .catch(() => setChatRooms([]));
+
+    // Kết nối WebSocket
+    const token = localStorage.getItem("token");
+    const socket = new SockJS(`http://localhost:8080/ws${token ? `?token=${token}` : ''}`);
+    const client = new Client({
+      webSocketFactory: () => socket as any,
+      onConnect: () => {
+        // Lắng nghe sự kiện tạo phòng chat mới cho user (Spring sẽ gửi về /user/queue/chat-rooms)
+        client.subscribe("/user/queue/chat-rooms", (message) => {
+          // message.body là roomId mới
+          fetchUserRooms()
+            .then(res => {
+              if (Array.isArray(res.data?.result)) {
+                setChatRooms(res.data.result.map((item: any) => ({
+                  roomId: item.key?.roomId,
+                  lastMessageAt: item.key?.lastMessageAt,
+                  name: item.room?.name,
+                  ...item
+                })));
+              } else {
+                setChatRooms([]);
+              }
+            })
+            .catch(() => setChatRooms([]));
+        });
+      },
+    });
+    client.activate();
+    stompClient.current = client;
+    return () => {
+      client.deactivate();
+    };
   }, [user]);
   const navigate = useNavigate();
   const location = useLocation();
