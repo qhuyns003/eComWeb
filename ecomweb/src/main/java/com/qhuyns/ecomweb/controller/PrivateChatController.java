@@ -33,6 +33,14 @@ public class PrivateChatController {
                 .build();
     }
 
+    @PostMapping()
+    public ApiResponse<?> createAndGetRoomId(@RequestParam String user2) {
+        return ApiResponse.builder()
+                .result(privateChatService.create(user2))
+                .build();
+    }
+
+
 
 
 }

@@ -43,7 +43,7 @@ public class PrivateChatService {
         return null;
     }
 
-    public void create(String user2) {
+    public String create(String user2) {
         String user1 = SecurityContextHolder.getContext().getAuthentication().getName();
         if(user1.compareToIgnoreCase(user2) >0){
             String tmp =user1;
@@ -66,6 +66,7 @@ public class PrivateChatService {
                                 .build())
                         .roomId(room.getRoomId())
                 .build());
+        return room.getRoomId();
     }
 
 

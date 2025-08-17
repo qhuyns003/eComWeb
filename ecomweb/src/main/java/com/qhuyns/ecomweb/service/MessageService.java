@@ -30,6 +30,7 @@ public class MessageService {
     MessageRepository messageRepository;
     UserRoomRepository userRoomRepository;
     RoomMemberRepository roomMemberRepository;
+    PrivateChatService privateChatService;
 
     public Message saveMessage(Message message) {
         List<RoomMember> roomMembers = roomMemberRepository.findByKeyRoomId(message.getKey().getRoomId());
