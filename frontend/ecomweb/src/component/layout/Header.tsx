@@ -2,6 +2,9 @@ import React from "react";
 import { searchProductByImage } from '../../api/api';
 import UserMenu from "../homepage/UserMenu";
 import NotificationBell from "../common/NotificationBell";
+import ChatBox from "../chat/ChatBox";
+import { useEffect, useState } from "react";
+import { fetchUserRooms } from "../../api/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
@@ -9,8 +12,29 @@ import { selectUser } from "../../store/features/userSlice";
 const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
-  const navigate = useNavigate();
   const user = useAppSelector(selectUser);
+  const [showChatDropdown, setShowChatDropdown] = useState(false);
+  const [chatRooms, setChatRooms] = useState<any[]>([]);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchUserRooms()
+      .then(res => {
+        if (Array.isArray(res.data?.result)) {
+          setChatRooms(res.data.result.map((item: any) => ({
+            roomId: item.key?.roomId,
+            lastMessageAt: item.key?.lastMessageAt,
+            name: item.room?.name,
+            ...item
+          })));
+        } else {
+          setChatRooms([]);
+        }
+      })
+      .catch(() => setChatRooms([]));
+  }, [user]);
+  const navigate = useNavigate();
   const location = useLocation();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [loadingImageSearch, setLoadingImageSearch] = React.useState(false);
@@ -112,6 +136,45 @@ const Header: React.FC = () => {
       )}
       <div className="flex gap-3 items-center">
         {user && <NotificationBell />}
+        {/* Nút chat */}
+        {user && (
+          <div className="relative">
+            <button
+              className="relative focus:outline-none"
+              aria-label="Nhắn tin"
+              onClick={() => setShowChatDropdown(v => !v)}
+            >
+              {/* Icon chat */}
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l.8-4A8.96 8.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </button>
+            {showChatDropdown && (
+              <div className="absolute right-0 mt-2 w-80 bg-white border rounded-lg shadow-lg z-50">
+                <div className="p-4 border-b font-bold">Phòng chat</div>
+                <ul className="max-h-96 overflow-y-auto">
+                  {chatRooms.length === 0 ? (
+                    <li className="p-4 text-gray-500 text-center">Không có phòng chat</li>
+                  ) : (
+                    chatRooms.map((room) => (
+                      <li
+                        key={room.roomId}
+                        className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedRoomId(room.roomId);
+                          setShowChatDropdown(false);
+                        }}
+                      >
+                        <div className="font-semibold">{room.name || room.roomId}</div>
+                        <div className="text-xs text-gray-400">{room.lastMessageAt ? new Date(room.lastMessageAt).toLocaleString() : ''}</div>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
         {user ? (
           <UserMenu />
         ) : (
@@ -131,6 +194,11 @@ const Header: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* ChatBox nhỏ góc dưới bên phải */}
+      {selectedRoomId && (
+        <ChatBox roomId={selectedRoomId} onClose={() => setSelectedRoomId(null)} />
+      )}
 
       <button
         aria-label="menu-btn"

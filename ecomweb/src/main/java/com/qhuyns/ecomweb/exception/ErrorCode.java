@@ -32,6 +32,7 @@ public enum ErrorCode {
     ROLE_NOT_EXISTS(1022, "Không tồn tại role", HttpStatus.BAD_GATEWAY),
     NOTIFICATION_RECIPIENT_NOT_EXISTS(1023, "Không tồn tại ", HttpStatus.BAD_GATEWAY),
     VERIFICATION_TOKEN_IS_EXPRIRED(1024, "Quá hạn token", HttpStatus.BAD_GATEWAY),
+    ROOM_NOT_FOUND(1024, "Phong chat khong ton tai", HttpStatus.BAD_GATEWAY)
 
     ;
 

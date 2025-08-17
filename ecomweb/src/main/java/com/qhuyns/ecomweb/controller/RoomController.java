@@ -29,6 +29,13 @@ public class RoomController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<?> getById(@PathVariable String id) {
+        return ApiResponse.builder()
+                .result(roomService.findById(id))
+                .build();
+    }
+
 
 
 

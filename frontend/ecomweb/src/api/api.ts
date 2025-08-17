@@ -1,3 +1,14 @@
+import axiosInstance from './axiosInstance';
+
+// Lấy danh sách phòng chat của user
+export const fetchUserRooms = () => {
+  return axiosInstance.get('/user_rooms');
+};
+
+// Lấy chi tiết phòng theo roomId
+export const fetchRoomById = (roomId: string) => {
+  return axiosInstance.get(`/rooms/${roomId}`);
+};
 // Xác thực tài khoản (verify email)
 export const verifyAccount = (token: string, username: string) => {
   return axiosInstance.post('/users/verification', null, { params: { token, username } });
@@ -36,7 +47,7 @@ export const deleteUserAddress = (id: string) => {
 export const updateUser = (userData: any) => {
   return axiosInstance.put('/users/my-info', userData);
 };
-import axiosInstance from './axiosInstance';
+
 
 export const login = (username: string, password: string) => {
   return axiosInstance.post('/auth/token', { username, password });

@@ -14,10 +14,12 @@ import com.qhuyns.ecomweb.mapper.MessageMapper;
 import com.qhuyns.ecomweb.mapper.MessagePrimaryKeyMapper;
 import com.qhuyns.ecomweb.mapper.ShopMapper;
 import com.qhuyns.ecomweb.repository.*;
+import com.qhuyns.ecomweb.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,8 @@ public class MessageService {
     PrivateChatService privateChatService;
     MessageMapper messageMapper;
     MessagePrimaryKeyMapper messagePrimaryKeyMapper;
+    SimpMessagingTemplate  messagingTemplate;
+    UserRepository  userRepository;
 
     public void saveMessage(MessageRequest messageRequest) {
         Message message = Message.builder()
@@ -56,6 +60,17 @@ public class MessageService {
             UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyRoomId(roomMember.getKey().getUserId(), roomMember.getKey().getRoomId());
             userRoom.getKey().setLastMessageAt(LocalDateTime.now());
             userRoomRepository.save(userRoom);
+        }
+
+        MessageResponse messageResponse = messageMapper.toMessageResponse(message);
+        messageResponse.setKey(messagePrimaryKeyMapper.toMessagePrimaryKeyResponse(message.getKey()));
+        // gui tin nhan moi
+        messagingTemplate.convertAndSend("/topic/room." + messageRequest.getRoomId(),messageResponse);
+        // cap nhat dsach room cua user khi co tb moi
+        for (RoomMember roomMember : roomMembers) {
+            User user = userRepository.findById(roomMember.getKey().getUserId())
+                    .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-rooms", messageRequest.getRoomId());
         }
     }
 

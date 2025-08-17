@@ -8,4 +8,5 @@ import org.springframework.data.cassandra.repository.CassandraRepository;
 import java.util.List;
 
 public interface RoomRepository extends CassandraRepository<Room, String> {
+    Room findByRoomId(String roomId);
 }

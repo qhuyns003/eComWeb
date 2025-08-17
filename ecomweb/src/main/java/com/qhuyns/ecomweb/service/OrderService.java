@@ -12,6 +12,7 @@ import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.*;
+import com.qhuyns.ecomweb.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
