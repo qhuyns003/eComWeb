@@ -52,25 +52,35 @@ public class MessageService {
                 .key(MessagePrimaryKey.builder()
                         .messageId(UUID.randomUUID().toString())
                         .sentAt(LocalDateTime.now())
-                        .roomId(messageRequest.getRoomId())
+                        .roomId(messageRequest.getKey().getRoomId())
                         .build())
                 .build();
+        messageRepository.save(message);
         List<RoomMember> roomMembers = roomMemberRepository.findByKeyRoomId(message.getKey().getRoomId());
         for(RoomMember roomMember : roomMembers){
-            UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyRoomId(roomMember.getKey().getUserId(), roomMember.getKey().getRoomId());
-            userRoom.getKey().setLastMessageAt(LocalDateTime.now());
-            userRoomRepository.save(userRoom);
+            List<UserRoom> userRooms = userRoomRepository.findByKeyUserId(roomMember.getKey().getUserId());
+            for(UserRoom userRoom : userRooms){
+                if(messageRequest.getKey().getRoomId().equals(userRoom.getKey().getRoomId())){
+                    userRoomRepository.delete(userRoom);
+                    // thay tgian la khoa chinh nen phai xoa ban ghi cu
+                    // nen thiet ke thoi gian kp khoa chinh, con viec sap xep nen de java lam
+                    userRoom.getKey().setLastMessageAt(LocalDateTime.now());
+                    userRoomRepository.save(userRoom);
+                }
+            }
+
+
         }
 
         MessageResponse messageResponse = messageMapper.toMessageResponse(message);
         messageResponse.setKey(messagePrimaryKeyMapper.toMessagePrimaryKeyResponse(message.getKey()));
         // gui tin nhan moi
-        messagingTemplate.convertAndSend("/topic/room." + messageRequest.getRoomId(),messageResponse);
+        messagingTemplate.convertAndSend("/topic/room." + messageRequest.getKey().getRoomId(),messageResponse);
         // cap nhat dsach room cua user khi co tb moi
         for (RoomMember roomMember : roomMembers) {
             User user = userRepository.findById(roomMember.getKey().getUserId())
                     .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
-            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-rooms", messageRequest.getRoomId());
+            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-rooms", messageRequest.getKey().getRoomId());
         }
     }
 

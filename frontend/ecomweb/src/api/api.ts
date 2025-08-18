@@ -1,3 +1,12 @@
+// Lấy danh sách tin nhắn của 1 phòng
+export const fetchMessagesByRoomId = (roomId: string) => {
+  return axiosInstance.get(`/messages/${roomId}`);
+};
+
+// Gửi tin nhắn
+export const sendMessage = (message: any) => {
+  return axiosInstance.post('/messages', message);
+};
 import axiosInstance from './axiosInstance';
 
 // Lấy danh sách phòng chat của user

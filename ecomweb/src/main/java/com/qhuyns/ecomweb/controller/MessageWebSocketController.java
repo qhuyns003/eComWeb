@@ -16,7 +16,7 @@ import org.springframework.stereotype.Controller;
 public class MessageWebSocketController {
     MessageService messageService;
 
-    // FE gửi tin nhắn qua WebSocket tới /app/chat.sendMessage
+    // FE gửi tin nhắn qua WebSocket tới /ws-app/chat.sendMessage
     // tối ưu hơn rest vì nhanh hơn, k cần thời gian phản hồi
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(MessageRequest messageRequest) {

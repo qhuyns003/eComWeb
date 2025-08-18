@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useUserRooms } from "../../hooks/useUserRooms";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
+import { fetchMessagesByRoomId, sendMessage } from "../../api/api";
 
 interface Message {
-  id: string;
+  key: {
+    messageId: string;
+    roomId: string;
+    sentAt: string;
+  };
   sender: string;
   content: string;
-  sentAt: string;
+  type: string;
 }
 
 interface ChatBoxProps {
@@ -23,10 +27,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ roomId, onClose }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Fetch messages history (replace with your API)
-    fetch(`/api/messages/${roomId}`)
-      .then(res => res.json())
-      .then(data => setMessages(data.result || []));
+    // Fetch messages history qua REST API
+    fetchMessagesByRoomId(roomId)
+      .then(res => setMessages(res.data.result || []));
 
     // Subscribe WebSocket
     const token = localStorage.getItem("token");
@@ -34,9 +37,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ roomId, onClose }) => {
     const client = new Client({
       webSocketFactory: () => socket as any,
       onConnect: () => {
-        client.subscribe(`/topic/room.${roomId}`, (message) => {
-          const msg: Message = JSON.parse(message.body);
-          setMessages(prev => [...prev, msg]);
+        client.subscribe(`/topic/room.${roomId}`, () => {
+          // Khi có tin nhắn mới, gọi lại API để lấy toàn bộ danh sách tin nhắn mới nhất
+          fetchMessagesByRoomId(roomId)
+            .then(res => setMessages(res.data.result || []));
         });
       },
     });
@@ -53,12 +57,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ roomId, onClose }) => {
 
   const handleSend = () => {
     if (!input.trim() || !stompClient.current) return;
-    const msg = { roomId, content: input };
-    stompClient.current.publish({
-      destination: "/app/chat.sendMessage",
-      body: JSON.stringify(msg),
-    });
-    setInput("");
+    const userId = localStorage.getItem("userId") || "user";
+    const msg = {
+      key: { roomId },
+      sender: userId,
+      content: input,
+      type: "text"
+    };
+  // Gửi qua WebSocket
+  // stompClient.current.publish({
+  //   destination: "/ws-app/chat.sendMessage",
+  //   body: JSON.stringify(msg),
+  // });
+  // Gửi qua REST API (chỉ dùng REST để debug backend)
+  sendMessage(msg);
+  setInput("");
   };
 
   return (
@@ -68,12 +81,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ roomId, onClose }) => {
         <button onClick={onClose} className="text-white hover:text-red-400">×</button>
       </div>
       
-  <div className="flex-1 overflow-y-auto p-2" style={{ maxHeight: 320 }}>
+      <div className="flex-1 overflow-y-auto p-2" style={{ maxHeight: 320 }}>
         {messages.map((m) => (
-          <div key={m.id} className="mb-2">
+          <div key={m.key?.messageId || m.key?.sentAt || Math.random()} className="mb-2">
             <span className="font-semibold text-blue-700">{m.sender}: </span>
             <span>{m.content}</span>
-            <div className="text-xs text-gray-400">{new Date(m.sentAt).toLocaleTimeString()}</div>
+            <div className="text-xs text-gray-400">{m.key?.sentAt ? new Date(m.key.sentAt).toLocaleTimeString() : ''}</div>
           </div>
         ))}
         <div ref={messagesEndRef} />

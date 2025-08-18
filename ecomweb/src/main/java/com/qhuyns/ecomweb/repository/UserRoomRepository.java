@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface UserRoomRepository extends CassandraRepository<UserRoom, UserRoomKey> {
     List<UserRoom> findByKeyUserIdOrderByKeyLastMessageAtDesc(String keyUserId);
-    UserRoom findByKeyUserIdAndKeyRoomId(String  keyUserId, String keyRoomId);
+    List<UserRoom> findByKeyUserId(String  keyUserId);
 }
