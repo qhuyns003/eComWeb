@@ -52,7 +52,7 @@ const banners = [
     alt: "Banner 4"
   },
   {
-    img: "https://scontent.fhan5-6.fna.fbcdn.net/v/t39.30808-6/524072111_1171438378351301_4635849076760195533_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=0LyDDw1KukQQ7kNvwGherlF&_nc_oc=AdkFJBR4eYjoBd_isYkFB380viFA-SSvGhnZMBibtVKTwCoWa3K7rAo9lRfhfwBoEso&_nc_zt=23&_nc_ht=scontent.fhan5-6.fna&_nc_gid=1nlp-aaoiq9aI4kCN9YJ4g&oh=00_AfWxaJHYiHghItohYxbOgEjCJxUnK6hwbl9QZ72sjAQ2lQ&oe=689FD019",
+    img: "https://scontent.fhan5-6.fna.fbcdn.net/v/t39.30808-6/508692111_1156566123176558_6880270108761767108_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=8ouhAuveWL4Q7kNvwEY8o5M&_nc_oc=AdmmT8LhyzcwGWKBTm5xhEZ1ce1RLFlRpj8Wh-PV6DUMHEnE6ylem_g71GO5_o86Hpw&_nc_zt=23&_nc_ht=scontent.fhan5-6.fna&_nc_gid=_C_OhD8BNq360199eoelkg&oh=00_AfX0JCGDl06G4Plq1ST7BEt0k4GpCZnCO3JTDsF1ru-O0w&oe=68A87890",
     alt: "Banner 1"
   },
   {

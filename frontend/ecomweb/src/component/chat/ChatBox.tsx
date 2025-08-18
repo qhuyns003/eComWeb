@@ -16,9 +16,7 @@ interface ChatBoxProps {
 }
 
 const ChatBox: React.FC<ChatBoxProps> = ({ roomId, onClose }) => {
-  // Demo: Lấy token từ localStorage, thực tế nên lấy từ redux hoặc context
-  const token = localStorage.getItem("token") || "";
-  const { rooms, loading, error } = useUserRooms();
+  // ...existing code...
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const stompClient = useRef<Client | null>(null);
@@ -64,25 +62,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ roomId, onClose }) => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 bg-white border rounded-lg shadow-lg z-50 flex flex-col">
+  <div className="fixed bottom-4 right-4 w-80 bg-white border rounded-lg shadow-lg z-50 flex flex-col" style={{ height: 400 }}>
       <div className="flex items-center justify-between p-2 border-b bg-blue-600 text-white rounded-t-lg">
         <span>Chat Room {roomId}</span>
         <button onClick={onClose} className="text-white hover:text-red-400">×</button>
       </div>
-      {/* Demo: Hiển thị danh sách phòng chat của user */}
-      <div className="p-2 border-b bg-gray-50 text-xs text-gray-700">
-        <b>Danh sách phòng:</b>
-        {loading && <div>Đang tải...</div>}
-        {error && <div className="text-red-500">{error}</div>}
-        <ul>
-          {rooms.map((r: any) => (
-            <li key={r.key.roomId}>
-              {r.room?.roomId} {r.room?.name ? `- ${r.room.name}` : ''}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="flex-1 overflow-y-auto p-2" style={{ maxHeight: 300 }}>
+      
+  <div className="flex-1 overflow-y-auto p-2" style={{ maxHeight: 320 }}>
         {messages.map((m) => (
           <div key={m.id} className="mb-2">
             <span className="font-semibold text-blue-700">{m.sender}: </span>

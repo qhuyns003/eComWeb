@@ -6,7 +6,7 @@ import ChatBox from "../chat/ChatBox";
 import { useEffect, useState, useRef } from "react";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
-import { fetchUserRooms } from "../../api/api";
+import { fetchUserRooms, fetchRoomById } from "../../api/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
@@ -22,23 +22,36 @@ const Header: React.FC = () => {
   // Kết nối WebSocket để cập nhật danh sách phòng chat realtime
   const stompClient = useRef<Client | null>(null);
 
+  // Hàm lấy danh sách phòng chat kèm chi tiết tên phòng
+  const fetchRoomsWithDetail = async () => {
+    try {
+      const res = await fetchUserRooms();
+      const result = res.data?.result;
+      if (!result) {
+        setChatRooms([]);
+        return;
+      }
+      const roomDetails = await Promise.all(
+        result.map(async (item: any) => {
+          const roomId = item.key.roomId;
+          const detail = await fetchRoomById(roomId);
+          return {
+            ...item,
+            roomId,
+            lastMessageAt: item.key?.lastMessageAt,
+            name: detail.data?.result?.name,
+          };
+        })
+      );
+      setChatRooms(roomDetails);
+    } catch {
+      setChatRooms([]);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
-    // Lấy danh sách phòng lần đầu
-    fetchUserRooms()
-      .then(res => {
-        if (Array.isArray(res.data?.result)) {
-          setChatRooms(res.data.result.map((item: any) => ({
-            roomId: item.key?.roomId,
-            lastMessageAt: item.key?.lastMessageAt,
-            name: item.room?.name,
-            ...item
-          })));
-        } else {
-          setChatRooms([]);
-        }
-      })
-      .catch(() => setChatRooms([]));
+    fetchRoomsWithDetail();
 
     // Kết nối WebSocket
     const token = localStorage.getItem("token");
@@ -46,23 +59,9 @@ const Header: React.FC = () => {
     const client = new Client({
       webSocketFactory: () => socket as any,
       onConnect: () => {
-        // Lắng nghe sự kiện tạo phòng chat mới cho user (Spring sẽ gửi về /user/queue/chat-rooms)
         client.subscribe("/user/queue/chat-rooms", (message) => {
           // message.body là roomId mới
-          fetchUserRooms()
-            .then(res => {
-              if (Array.isArray(res.data?.result)) {
-                setChatRooms(res.data.result.map((item: any) => ({
-                  roomId: item.key?.roomId,
-                  lastMessageAt: item.key?.lastMessageAt,
-                  name: item.room?.name,
-                  ...item
-                })));
-              } else {
-                setChatRooms([]);
-              }
-            })
-            .catch(() => setChatRooms([]));
+          fetchRoomsWithDetail();
         });
       },
     });
@@ -203,7 +202,7 @@ const Header: React.FC = () => {
                           setShowChatDropdown(false);
                         }}
                       >
-                        <div className="font-semibold">{room.name || room.roomId}</div>
+                        <div className="font-semibold">{room.name ? room.name : 'Phòng chat'}</div>
                         <div className="text-xs text-gray-400">{room.lastMessageAt ? new Date(room.lastMessageAt).toLocaleString() : ''}</div>
                       </li>
                     ))
