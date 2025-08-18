@@ -45,10 +45,14 @@ public class MessageService {
     UserRepository  userRepository;
 
     public void saveMessage(MessageRequest messageRequest) {
+        String sendername = userRepository.findByIdAndActive(messageRequest.getSender(),true)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED))
+                .getFullName();
         Message message = Message.builder()
                 .content(messageRequest.getContent())
                 .type(messageRequest.getType())
                 .sender(messageRequest.getSender())
+                .sendername(sendername)
                 .key(MessagePrimaryKey.builder()
                         .messageId(UUID.randomUUID().toString())
                         .sentAt(LocalDateTime.now())

@@ -23,7 +23,7 @@ public class RoomController {
 
     @PostMapping()
     public ApiResponse<?> create(@RequestBody CreateRoomRequest createRoomRequest) {
-        roomService.create(createRoomRequest,null);
+        roomService.create(createRoomRequest);
         return ApiResponse.builder()
                 .result("success")
                 .build();

@@ -49,10 +49,12 @@ public class ShopService {
         shop.setShopAddress(shopAddress);
         shop.setUser(user);
         user.setShop(shop);
+        user.setFullName(shopCreateRequest.getName());
         List<Role> roles = new ArrayList<>();
         roles.add(roleRepository.findById(PredefinedRole.SELLER_ROLE).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTS)));
         user.getRoles().clear();
         user.getRoles().addAll(roles);
+        userRepository.save(user);
         shopRepository.save(shop);
     }
 

@@ -22,4 +22,5 @@ public class Message {
     private String sender;
     private String content;
     private String type;
+    String sendername;
 }

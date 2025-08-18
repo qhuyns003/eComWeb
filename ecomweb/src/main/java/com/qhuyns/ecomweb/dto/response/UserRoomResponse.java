@@ -14,5 +14,6 @@ import java.time.LocalDateTime;
 public class UserRoomResponse {
     private UserRoomKeyResponse key;
     private LocalDateTime joinedAt;
+    String roomName;
 
 }

@@ -42,29 +42,29 @@ public class RoomService {
     RoomMemberService roomMemberService;
     SimpMessagingTemplate messagingTemplate;
     RoomMapper roomMapper;
-    public void create(CreateRoomRequest createRoomRequest,Room room) {
+    public void create(CreateRoomRequest createRoomRequest) {
 
         List<String> members = new ArrayList<>(createRoomRequest.getMembers());
-       if(room == null){
-           room = Room.builder()
+
+        Room   room = Room.builder()
                    .name(createRoomRequest.getName())
                    .createdAt(LocalDateTime.now())
                    .roomId(UUID.randomUUID().toString())
                    .build();
-           User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
+        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
                    .orElseThrow(()->new  AppException(ErrorCode.USER_NOT_EXISTED));
-           members.add(user.getId());
-       };
+        members.add(user.getId());
+
         roomRepository.save(room);
 
         for(String userId : members) {
-            userRoomService.create(userId,room.getRoomId());
+            userRoomService.create(userId,room.getRoomId(),null);
             roomMemberService.create(userId,room.getRoomId());
         };
         for (String userId: members) {
-            User user = userRepository.findById(userId)
+            User user2 = userRepository.findById(userId)
                     .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
-            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-rooms", room.getRoomId());
+            messagingTemplate.convertAndSendToUser(user2.getUsername(), "/queue/chat-rooms", room.getRoomId());
         }
 
     }

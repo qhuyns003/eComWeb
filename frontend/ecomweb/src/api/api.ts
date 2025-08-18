@@ -10,8 +10,15 @@ export const sendMessage = (message: any) => {
 import axiosInstance from './axiosInstance';
 
 // Lấy danh sách phòng chat của user
+// Lấy danh sách phòng chat của user, trả về kèm roomName nếu có
 export const fetchUserRooms = () => {
   return axiosInstance.get('/user_rooms');
+};
+
+// Lấy tên phòng theo roomId (chỉ gọi khi user_room không có roomName)
+export const getRoomNameByRoomId = async (roomId: string) => {
+  const res = await axiosInstance.get(`/rooms/${roomId}`);
+  return res.data?.result?.roomName || '';
 };
 
 // Lấy chi tiết phòng theo roomId

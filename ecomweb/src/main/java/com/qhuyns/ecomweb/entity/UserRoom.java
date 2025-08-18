@@ -24,4 +24,7 @@ public class UserRoom {
     // khong tu doi camelCase sang snakeCase nhu jpa
     @Column("joined_at")
     private LocalDateTime joinedAt;
+
+    @Column("room_name")
+    String roomName;
 }

@@ -31,16 +31,27 @@ const Header: React.FC = () => {
         setChatRooms([]);
         return;
       }
+      // Ưu tiên lấy roomName từ user_rooms, chỉ fallback sang fetchRoomById nếu thiếu
       const roomDetails = await Promise.all(
         result.map(async (item: any) => {
           const roomId = item.key.roomId;
-          const detail = await fetchRoomById(roomId);
-          return {
-            ...item,
-            roomId,
-            lastMessageAt: item.key?.lastMessageAt,
-            name: detail.data?.result?.name,
-          };
+          const name = item.roomName || item.room_name;
+          if (name) {
+            return {
+              ...item,
+              roomId,
+              lastMessageAt: item.key?.lastMessageAt,
+              name,
+            };
+          } else {
+            const detail = await fetchRoomById(roomId);
+            return {
+              ...item,
+              roomId,
+              lastMessageAt: item.key?.lastMessageAt,
+              name: detail.data?.result?.name,
+            };
+          }
         })
       );
       setChatRooms(roomDetails);
@@ -202,7 +213,7 @@ const Header: React.FC = () => {
                           setShowChatDropdown(false);
                         }}
                       >
-                        <div className="font-semibold">{room.name ? room.name : 'Phòng chat'}</div>
+                        <div className="font-semibold">{room.name || room.roomName || room.room_name || 'Phòng chat'}</div>
                         <div className="text-xs text-gray-400">{room.lastMessageAt ? new Date(room.lastMessageAt).toLocaleString() : ''}</div>
                       </li>
                     ))
@@ -234,7 +245,11 @@ const Header: React.FC = () => {
 
       {/* ChatBox nhỏ góc dưới bên phải */}
       {selectedRoomId && (
-        <ChatBox roomId={selectedRoomId} onClose={() => setSelectedRoomId(null)} />
+        <ChatBox 
+          roomId={selectedRoomId} 
+          roomName={chatRooms.find(room => room.roomId === selectedRoomId)?.name || ''} 
+          onClose={() => setSelectedRoomId(null)} 
+        />
       )}
 
       <button
@@ -265,4 +280,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header; 
+export default Header;

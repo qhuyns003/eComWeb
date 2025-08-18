@@ -13,16 +13,19 @@ import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomMapper;
 import com.qhuyns.ecomweb.repository.PrivateChatRepository;
+import com.qhuyns.ecomweb.repository.RoomRepository;
 import com.qhuyns.ecomweb.repository.UserRepository;
 import com.qhuyns.ecomweb.repository.UserRoomRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,9 +36,13 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
 public class PrivateChatService {
+    RoomRepository  roomRepository;
     PrivateChatRepository privateChatRepository;
     RoomService roomService;
     UserRepository userRepository;
+    UserRoomService userRoomService;
+    RoomMemberService roomMemberService;
+    SimpMessagingTemplate messagingTemplate;
     public String getRoomId(String user1,String user2) {
         PrivateChat pc = privateChatRepository.findByKeyUser1AndKeyUser2(user1,user2);
         if (pc != null) {
@@ -44,27 +51,36 @@ public class PrivateChatService {
         return null;
     }
 
-    public String create(String user2) {
-        String user1 = (userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED))).getId();
-        if(user1.compareToIgnoreCase(user2) >0){
-            String tmp =user1;
-            user1 =user2;
-            user2 =tmp;
+    public String create(String userId2) {
+        User user1 = (userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED)));
+        String userId1 = user1.getId();
+        User user2 = (userRepository.findByIdAndActive(userId2,true)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED)));
+        if(userId1.compareToIgnoreCase(userId2) >0){
+            String tmp =userId1;
+            userId1 =userId2;
+            userId2 =tmp;
         }
-        CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
-                .members(List.of(user1,user2))
-                .build();
         Room room = Room.builder()
-                .name(createRoomRequest.getName())
                 .createdAt(LocalDateTime.now())
                 .roomId(UUID.randomUUID().toString())
                 .build();
-        roomService.create(createRoomRequest,room);
+        roomRepository.save(room);
+
+        userRoomService.create(userId1,room.getRoomId(),user2.getFullName());
+        roomMemberService.create(userId1,room.getRoomId());
+        userRoomService.create(userId2,room.getRoomId(),user1.getFullName());
+        roomMemberService.create(userId2,room.getRoomId());
+
+        messagingTemplate.convertAndSendToUser(user1.getUsername(), "/queue/chat-rooms", room.getRoomId());
+        messagingTemplate.convertAndSendToUser(user2.getUsername(), "/queue/chat-rooms", room.getRoomId());
+
+
         privateChatRepository.save(PrivateChat.builder()
                         .key(PrivateChatKey.builder()
-                                .user1(user1)
-                                .user2(user2)
+                                .user1(userId1)
+                                .user2(userId2)
                                 .build())
                         .roomId(room.getRoomId())
                 .build());

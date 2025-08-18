@@ -42,9 +42,10 @@ public class UserRoomService {
 //        userRoomRepository.save(userRoom);
 //    }
 
-    public void create(String userId,String roomId) {
+    public void create(String userId,String roomId,String privateRoomName) {
         userRoomRepository.save(UserRoom.builder()
                         .joinedAt(LocalDateTime.now())
+                        .roomName(privateRoomName)
                         .key(UserRoomKey.builder()
                                 .userId(userId)
                                 .roomId(roomId)
