@@ -75,7 +75,8 @@ public class PrivateChatService {
 
         messagingTemplate.convertAndSendToUser(user1.getUsername(), "/queue/chat-rooms", room.getRoomId());
         messagingTemplate.convertAndSendToUser(user2.getUsername(), "/queue/chat-rooms", room.getRoomId());
-
+        messagingTemplate.convertAndSendToUser(user1.getUsername(), "/queue/chat-notification", "");
+        messagingTemplate.convertAndSendToUser(user2.getUsername(), "/queue/chat-notification", "");
 
         privateChatRepository.save(PrivateChat.builder()
                         .key(PrivateChatKey.builder()

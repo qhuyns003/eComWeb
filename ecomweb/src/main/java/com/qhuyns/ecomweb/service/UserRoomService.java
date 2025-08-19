@@ -46,12 +46,14 @@ public class UserRoomService {
         userRoomRepository.save(UserRoom.builder()
                         .joinedAt(LocalDateTime.now())
                         .roomName(privateRoomName)
+                        .seen(false)
                         .key(UserRoomKey.builder()
                                 .userId(userId)
                                 .roomId(roomId)
                                 .lastMessageAt(LocalDateTime.now())
                                 .build())
                 .build());
+
     }
 
     public List<UserRoomResponse> getRoomByUserId() {

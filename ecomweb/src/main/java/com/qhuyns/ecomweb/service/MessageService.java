@@ -3,6 +3,7 @@ package com.qhuyns.ecomweb.service;
 import com.qhuyns.ecomweb.constant.ImagePrefix;
 import com.qhuyns.ecomweb.dto.request.CartRequest;
 import com.qhuyns.ecomweb.dto.request.MessageRequest;
+import com.qhuyns.ecomweb.dto.request.UserRoomKeyRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
 import com.qhuyns.ecomweb.dto.response.MessageResponse;
 import com.qhuyns.ecomweb.entity.*;
@@ -69,6 +70,7 @@ public class MessageService {
                     // thay tgian la khoa chinh nen phai xoa ban ghi cu
                     // nen thiet ke thoi gian kp khoa chinh, con viec sap xep nen de java lam
                     userRoom.getKey().setLastMessageAt(LocalDateTime.now());
+                    userRoom.setSeen(false);
                     userRoomRepository.save(userRoom);
                 }
             }
@@ -85,6 +87,8 @@ public class MessageService {
             User user = userRepository.findById(roomMember.getKey().getUserId())
                     .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
             messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-rooms", messageRequest.getKey().getRoomId());
+            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-notification", messageRequest.getKey().getRoomId());
+
         }
     }
 
@@ -98,5 +102,12 @@ public class MessageService {
         }).collect(Collectors.toList());
 
         return messageResponses;
+    }
+
+    public void markRead(UserRoomKeyRequest userRoomKeyRequest){
+        UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyLastMessageAtAndKeyRoomId(userRoomKeyRequest.getUserId(),userRoomKeyRequest.getLastMessageAt(),userRoomKeyRequest.getRoomId());
+        userRoom.setSeen(true);
+        messagingTemplate.convertAndSendToUser(SecurityContextHolder.getContext().getAuthentication().getName()
+                , "/queue/chat-notification", "");
     }
 }

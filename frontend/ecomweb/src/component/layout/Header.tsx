@@ -19,6 +19,8 @@ const Header: React.FC = () => {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  // Số phòng chat có tin nhắn chưa đọc
+  const unreadChatRooms = chatRooms.filter(room => room.seen === false).length;
 
   // Kết nối WebSocket để cập nhật danh sách phòng chat realtime
   const stompClient = useRef<Client | null>(null);
@@ -71,8 +73,12 @@ const Header: React.FC = () => {
     const client = new Client({
       webSocketFactory: () => socket as any,
       onConnect: () => {
+        // Lắng nghe cập nhật danh sách phòng chat
         client.subscribe("/user/queue/chat-rooms", (message) => {
-          // message.body là roomId mới
+          fetchRoomsWithDetail();
+        });
+        // Lắng nghe thông báo chat-notification (cập nhật trạng thái đã đọc)
+        client.subscribe("/user/queue/chat-notification", (message) => {
           fetchRoomsWithDetail();
         });
       },
@@ -210,6 +216,11 @@ const Header: React.FC = () => {
               <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l.8-4A8.96 8.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
+              {unreadChatRooms > 0 && (
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                  {unreadChatRooms}
+                </span>
+              )}
             </button>
             {showChatDropdown && (
               <div className="absolute right-0 mt-2 w-80 bg-white border rounded-lg shadow-lg z-50">
@@ -225,9 +236,25 @@ const Header: React.FC = () => {
                         onClick={() => {
                           setSelectedRoomId(room.roomId);
                           setShowChatDropdown(false);
+                          // Gửi socket xác nhận đã đọc nếu phòng này chưa đọc
+                          if (room.seen === false && stompClient.current && stompClient.current.connected) {
+                            stompClient.current.publish({
+                              destination: "/ws-app/chat/mark-read",
+                              body: JSON.stringify({
+                                userId: user.id,
+                                roomId: room.roomId,
+                                lastMessageAt: room.lastMessageAt
+                              })
+                            });
+                          }
                         }}
                       >
-                        <div className="font-semibold">{room.name || room.roomName || room.room_name || 'Phòng chat'}</div>
+                        <div className="font-semibold flex items-center">
+                          {room.name || room.roomName || room.room_name || 'Phòng chat'}
+                          {!room.seen && (
+                            <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
+                          )}
+                        </div>
                         <div className="text-xs text-gray-400">{room.lastMessageAt ? new Date(room.lastMessageAt).toLocaleString() : ''}</div>
                       </li>
                     ))

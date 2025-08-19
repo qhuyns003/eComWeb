@@ -16,4 +16,6 @@ public class UserRoomResponse {
     private LocalDateTime joinedAt;
     String roomName;
 
+    boolean seen;
+
 }

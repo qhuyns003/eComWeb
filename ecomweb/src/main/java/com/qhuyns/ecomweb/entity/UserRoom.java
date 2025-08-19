@@ -27,4 +27,6 @@ public class UserRoom {
 
     @Column("room_name")
     String roomName;
+
+    boolean seen;
 }
