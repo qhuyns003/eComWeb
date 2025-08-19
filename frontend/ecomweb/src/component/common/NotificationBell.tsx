@@ -13,10 +13,9 @@ interface Notification {
   seen: boolean;
 }
 
-const NotificationBell: React.FC = () => {
+const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> = ({ showDropdown, onToggle }) => {
   const user = useAppSelector(selectUser);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const stompClient = useRef<Client | null>(null);
 
@@ -60,7 +59,7 @@ const NotificationBell: React.FC = () => {
     <div className="relative">
       <button
         className="relative focus:outline-none"
-        onClick={() => setShowDropdown(v => !v)}
+        onClick={onToggle}
         aria-label="Thông báo"
       >
         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -16,6 +16,7 @@ const Header: React.FC = () => {
   const [searchValue, setSearchValue] = React.useState("");
   const user = useAppSelector(selectUser);
   const [showChatDropdown, setShowChatDropdown] = useState(false);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
@@ -183,14 +184,27 @@ const Header: React.FC = () => {
         </div>
       )}
       <div className="flex gap-3 items-center">
-        {user && <NotificationBell />}
+        {user && (
+          <NotificationBell
+            showDropdown={showNotificationDropdown}
+            onToggle={() => {
+              setShowNotificationDropdown(v => {
+                if (!v) setShowChatDropdown(false);
+                return !v;
+              });
+            }}
+          />
+        )}
         {/* Nút chat */}
         {user && (
           <div className="relative">
             <button
               className="relative focus:outline-none"
               aria-label="Nhắn tin"
-              onClick={() => setShowChatDropdown(v => !v)}
+              onClick={() => setShowChatDropdown(v => {
+                if (!v) setShowNotificationDropdown(false);
+                return !v;
+              })}
             >
               {/* Icon chat */}
               <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
