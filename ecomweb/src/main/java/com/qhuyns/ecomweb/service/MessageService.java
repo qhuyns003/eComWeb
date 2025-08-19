@@ -24,6 +24,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,10 +105,11 @@ public class MessageService {
         return messageResponses;
     }
 
-    public void markRead(UserRoomKeyRequest userRoomKeyRequest){
+    public void markRead(UserRoomKeyRequest userRoomKeyRequest, Principal principal){
         UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyLastMessageAtAndKeyRoomId(userRoomKeyRequest.getUserId(),userRoomKeyRequest.getLastMessageAt(),userRoomKeyRequest.getRoomId());
         userRoom.setSeen(true);
-        messagingTemplate.convertAndSendToUser(SecurityContextHolder.getContext().getAuthentication().getName()
+        userRoomRepository.save(userRoom);
+        messagingTemplate.convertAndSendToUser(principal.getName()
                 , "/queue/chat-notification", "");
     }
 }

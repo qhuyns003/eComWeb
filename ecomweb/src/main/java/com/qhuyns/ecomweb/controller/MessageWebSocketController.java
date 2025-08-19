@@ -12,6 +12,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.security.Principal;
+
 // chi dung cntroller
 @Controller
 @RequiredArgsConstructor
@@ -29,9 +31,10 @@ public class MessageWebSocketController {
         // Không cần return, BE sẽ broadcast lại qua SimpMessagingTemplate trong service
     }
 
+    // do khong trai qua filter nen token k duoc decode va luu vao secu -> dung thang principle cua ws ta da config
     @MessageMapping("/chat/mark-read")
-    public void markRead(@Payload UserRoomKeyRequest  userRoomKeyRequest) {
-        messageService.markRead(userRoomKeyRequest);
+    public void markRead(@Payload UserRoomKeyRequest  userRoomKeyRequest, Principal principal) {
+        messageService.markRead(userRoomKeyRequest,principal);
 
     }
 
