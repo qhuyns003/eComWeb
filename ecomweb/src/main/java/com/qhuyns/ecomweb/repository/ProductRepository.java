@@ -59,6 +59,19 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 """)
     List<Object[]> findNewestProducts(Pageable pageable);
 
+    @Query("""
+    SELECT p, COUNT(oi), COALESCE(ROUND(AVG(cr.rating), 1), 0)
+    FROM Product p
+    LEFT JOIN p.productVariants v
+    LEFT JOIN v.orderItems oi
+    LEFT JOIN oi.customerReview cr
+    LEFT JOIN p.shop s
+    WHERE s.id = :shopId 
+    GROUP BY p
+    ORDER BY p.createdAt DESC
+""")
+    List<Object[]> findByShopIdAndNewest(Pageable pageable,@Param("shopId") String shopId);
+
     // fetch de lay ca danh sach quan he
     @Query("""
     SELECT p

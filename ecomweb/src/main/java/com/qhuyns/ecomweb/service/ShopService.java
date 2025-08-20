@@ -76,5 +76,14 @@ public class ShopService {
        return shopResponse;
     }
 
+    public ShopResponse getInfoById(String id) {
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SHOP_NOT_EXISTS));
+        ShopResponse shopResponse = shopMapper.toShopResponse(shop);
+        shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
+        return shopResponse;
+    }
+
+
+
 
 }

@@ -1,5 +1,5 @@
 import HomePage from "./component/homepage/HomePage";
-import { Routes, Route, useParams } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import LoginForm from './component/login/LoginForm';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
@@ -11,9 +11,10 @@ import ShopAdmin from './component/admin/ShopAdmin';
 import LogoutModal from './component/common/LogoutModal';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
+
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ShopInfoEdit from './component/homepage/ShopInfoEdit';
 import Checkout from './component/product/Checkout';
 import { useAppDispatch } from './store/hooks';
 import { clearUser } from './store/features/userSlice';
@@ -22,7 +23,10 @@ import Cart from './component/product/Cart';
 import SearchResultPage from './component/homepage/SearchResultPage';
 import UserProfileEdit from './component/homepage/UserProfileEdit';
 import RegisterShopForm from './component/homepage/RegisterShopForm';
-import ShopInfoEdit from './component/homepage/ShopInfoEdit';
+
+
+
+import ShopDetail from './component/shop/ShopDetail';
 
 function AppContent() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -94,6 +98,7 @@ function AppContent() {
         <Route path="/register-shop" element={<RegisterShopForm />} />
         <Route path="/shop-info" element={<ShopInfoEdit />} />
         <Route path="/verify" element={<VerifyAccount />} />
+        <Route path="/shop/:id" element={<ShopDetail />} />
       </Routes>
       
       <LogoutModal

@@ -1,3 +1,15 @@
+// Tạo private chat với user2 (shop owner)
+export const createPrivateChat = (shopId: string) => {
+  return axiosInstance.post(`/private_chats?shopId=${shopId}`);
+};
+// Lấy danh sách sản phẩm theo shopId
+export const getProductsByShopId = (shopId: string) => {
+  return axiosInstance.get(`/products/shop/${shopId}`);
+};
+// Lấy thông tin shop theo id
+export const getShopById = (shopId: string) => {
+  return axiosInstance.get(`/shop/${shopId}`);
+};
 // Lấy danh sách tin nhắn của 1 phòng
 export const fetchMessagesByRoomId = (roomId: string) => {
   return axiosInstance.get(`/messages/${roomId}`);

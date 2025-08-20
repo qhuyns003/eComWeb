@@ -116,6 +116,13 @@ public class ProductController {
                 .build();
     }
 
+    @GetMapping("/shop/{id}")
+    ApiResponse<List<ProductOverviewResponse>> getByShopId(@PathVariable("id") String id){
+        return ApiResponse.<List<ProductOverviewResponse>>builder()
+                .result(productService.findByShopId(8,id))
+                .build();
+    }
+
 
 
 }

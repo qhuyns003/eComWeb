@@ -48,6 +48,15 @@ public class ShopController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    ApiResponse<ShopResponse> getInfoById(@PathVariable String id) {
+        return ApiResponse.<ShopResponse>builder()
+                .result(shopService.getInfoById(id))
+                .build();
+    }
+
+
+
 
 
 

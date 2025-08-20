@@ -34,9 +34,9 @@ public class PrivateChatController {
     }
 
     @PostMapping()
-    public ApiResponse<?> createAndGetRoomId(@RequestParam String user2) {
+    public ApiResponse<?> createAndGetRoomId(@RequestParam String shopId) {
         return ApiResponse.builder()
-                .result(privateChatService.create(user2))
+                .result(privateChatService.create(shopId))
                 .build();
     }
 

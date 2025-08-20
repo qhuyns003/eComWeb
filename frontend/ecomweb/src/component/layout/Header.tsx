@@ -229,9 +229,9 @@ const Header: React.FC = () => {
                   {chatRooms.length === 0 ? (
                     <li className="p-4 text-gray-500 text-center">Không có phòng chat</li>
                   ) : (
-                    chatRooms.map((room) => (
+                    chatRooms.map((room, idx) => (
                       <li
-                        key={room.roomId}
+                        key={room.roomId + '-' + idx}
                         className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-100"
                         onClick={() => {
                           setSelectedRoomId(room.roomId);

@@ -12,10 +12,7 @@ import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomMapper;
-import com.qhuyns.ecomweb.repository.PrivateChatRepository;
-import com.qhuyns.ecomweb.repository.RoomRepository;
-import com.qhuyns.ecomweb.repository.UserRepository;
-import com.qhuyns.ecomweb.repository.UserRoomRepository;
+import com.qhuyns.ecomweb.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,6 +40,7 @@ public class PrivateChatService {
     UserRoomService userRoomService;
     RoomMemberService roomMemberService;
     SimpMessagingTemplate messagingTemplate;
+    ShopRepository shopRepository;
     public String getRoomId(String user1,String user2) {
         PrivateChat pc = privateChatRepository.findByKeyUser1AndKeyUser2(user1,user2);
         if (pc != null) {
@@ -51,12 +49,15 @@ public class PrivateChatService {
         return null;
     }
 
-    public String create(String userId2) {
+    public String create(String shopId) {
+
         User user1 = (userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
                 .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED)));
         String userId1 = user1.getId();
-        User user2 = (userRepository.findByIdAndActive(userId2,true)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED)));
+        User user2 = shopRepository.findById(shopId).orElseThrow(
+                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
+        ).getUser();
+        String userId2 = user2.getId();
         if(userId1.compareToIgnoreCase(userId2) >0){
             String tmp =userId1;
             userId1 =userId2;

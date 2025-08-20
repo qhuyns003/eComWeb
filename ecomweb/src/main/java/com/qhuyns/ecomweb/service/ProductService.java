@@ -315,6 +315,23 @@ public class ProductService {
         productRepository.deleteByIdIn(ids);
     };
 
+    public List<ProductOverviewResponse> findByShopId(int limit,String id) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Object[]> results = productRepository.findByShopIdAndNewest(pageable,id);
+        List<ProductOverviewResponse> productOverviewResponses = new ArrayList<>();
+        for (Object[] rs : results) {
+            Product product = (Product) rs[0]; // có thể ép xuống lớp con vì vốn dĩ rs[0] là 1 íntance của Product (có các attribute của nó)
+            Double rating = (Double)rs[2];
+            BigDecimal count = (BigDecimal.valueOf((long)rs[1])) ;
+            ProductOverviewResponse productOverviewResponse = productMapper.toProductOverviewResponse(product);
+            productOverviewResponse.setImages(productImageService.getAllByProductId(product.getId()));
+            productOverviewResponse.setRating(rating != null ? rating : 0.0);
+            productOverviewResponse.setNumberOfOrder(count != null ? count : BigDecimal.valueOf(0));
+            productOverviewResponses.add(productOverviewResponse);
+        }
+        return productOverviewResponses;
+    }
+
 
 
 
