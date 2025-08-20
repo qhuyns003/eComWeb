@@ -16,6 +16,9 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
+// entity duoc config database co composite indexing voi 2 truong username, active -> tao voi cac truong truy van nhieu, nen tao toi da 3 index
+// giup truy van nhanh hon voi username, username+active
+// tuy nhien thao tac update insert se cham hon do phai tao ra 2 bang phu va cap nhat 2 bang 1 luc
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
