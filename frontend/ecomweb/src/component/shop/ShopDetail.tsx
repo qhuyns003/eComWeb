@@ -6,7 +6,7 @@ import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import defaultAvatar from "../../assets/default-avatar-icon-of-social-media-user-vector.jpg";
 import { useParams } from "react-router-dom";
-import { getShopById, getProductsByShopId, sendMessage, createPrivateChat } from "../../api/api";
+import { getShopById, getProductsByShopId, sendMessage, createPrivateChat, checkPrivateChat } from "../../api/api";
 import ProductCard from "../homepage/ProductCard";
 import ChatBox from "../chat/ChatBox";
 
@@ -78,7 +78,23 @@ const ShopDetail: React.FC = () => {
           </div>
           <button
             className="mb-6 bg-[#cc3333] text-white px-6 py-2 rounded-full hover:bg-pink-500 transition font-semibold"
-            onClick={() => setShowContactModal(true)}
+            onClick={async () => {
+              if (!currentUser?.id || !shop.shopId) return;
+              
+              
+              try {
+                const res = await checkPrivateChat(currentUser.id, shop.shopId);
+                const roomId = res?.data?.result?.roomId || res?.data?.result || res?.data?.roomId;
+                if (roomId) {
+                  setChatRoomId(roomId);
+                  setShowChatBox(true);
+                } else {
+                  setShowContactModal(true);
+                }
+              } catch (e) {
+                setShowContactModal(true);
+              }
+            }}
           >
             Liên hệ với shop
           </button>

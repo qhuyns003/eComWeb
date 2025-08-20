@@ -1,3 +1,7 @@
+// Kiểm tra phòng chat riêng giữa 2 user (user1 < user2)
+export const checkPrivateChat = (user1: string, shopId: string) => {
+  return axiosInstance.get(`/private_chats/shop`, { params: { user1, shopId } });
+};
 // Tạo private chat với user2 (shop owner)
 export const createPrivateChat = (shopId: string) => {
   return axiosInstance.post(`/private_chats?shopId=${shopId}`);

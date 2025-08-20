@@ -83,6 +83,12 @@ public class ShopService {
         return shopResponse;
     }
 
+    public String getUserIdByShopId(String shopId){
+        return shopRepository.findById(shopId).orElseThrow(
+                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
+        ).getUser().getId();
+    }
+
 
 
 
