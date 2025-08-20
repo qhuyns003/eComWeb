@@ -289,8 +289,13 @@ const ProductDetail: React.FC = () => {
                             </div>
                             <p className="text-gray-500 mb-2">{product.description || "Chưa có mô tả cho sản phẩm này."}</p>
                             <div className="mb-2">
-                                <span className="font-semibold">Cửa hàng: </span>
-                                <span>{product.shop?.name}</span>
+                                                                <span className="font-semibold">Cửa hàng: </span>
+                                                                <span
+                                                                    className="text-[#cc3333] font-semibold cursor-pointer hover:underline"
+                                                                    onClick={() => navigate(`/shop/${product.shop?.id}`)}
+                                                                >
+                                                                    {product.shop?.name}
+                                                                </span>
                             </div>
                             {/* Hiển thị các option thuộc tính để chọn */}
                             {(!product.productAttributes || product.productAttributes.length === 0) && (

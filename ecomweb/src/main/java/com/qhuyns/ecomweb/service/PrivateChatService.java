@@ -69,9 +69,9 @@ public class PrivateChatService {
                 .build();
         roomRepository.save(room);
 
-        userRoomService.create(userId1,room.getRoomId(),user2.getFullName());
+        userRoomService.create(user1.getId(),room.getRoomId(),user2.getFullName());
         roomMemberService.create(userId1,room.getRoomId());
-        userRoomService.create(userId2,room.getRoomId(),user1.getFullName());
+        userRoomService.create(user2.getId(),room.getRoomId(),user1.getFullName());
         roomMemberService.create(userId2,room.getRoomId());
 
         messagingTemplate.convertAndSendToUser(user1.getUsername(), "/queue/chat-rooms", room.getRoomId());
