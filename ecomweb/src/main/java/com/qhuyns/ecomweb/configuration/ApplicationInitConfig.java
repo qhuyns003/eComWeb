@@ -25,6 +25,7 @@ import java.util.HashSet;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+// add VM option trong edit configuration de chay elastic phan tich api
 public class ApplicationInitConfig {
 
     PasswordEncoder passwordEncoder;
