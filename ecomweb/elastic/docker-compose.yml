@@ -1,0 +1,46 @@
+version: "8.15.3"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - ELASTIC_PASSWORD=changeme   # user elastic mặc định
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.3
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_SERVICEACCOUNT_TOKEN=AAEAAWVsYXN0aWMva2liYW5hL2tpYmFuYS10b2tlbjp6ZnY0N2t4b1JoeV9LTnAyNG9FOG1n
+    ports:
+      - "5601:5601"
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:8.15.3
+    container_name: apm-server
+    depends_on:
+      - elasticsearch
+      - kibana
+    environment:
+      - apm-server.host=0.0.0.0:8200
+      - output.elasticsearch.hosts=http://elasticsearch:9200
+      - output.elasticsearch.username=elastic
+      - output.elasticsearch.password=changeme
+      - setup.kibana.host=http://kibana:5601
+      - logging.level=info
+    ports:
+      - "8200:8200"
+
+volumes:
+  es-data:
+    driver: local
