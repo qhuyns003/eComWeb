@@ -8,6 +8,8 @@ import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.*;
+import com.qhuyns.ecomweb.util.RedisCacheHelper;
+import com.qhuyns.ecomweb.util.RedisKey;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -53,6 +55,7 @@ public class ProductService {
     ProductVariantRepository productVariantRepository;
     ShopRepository shopRepository;
     WeaviateService  weaviateService;
+    RedisCacheHelper cacheHelper;
 
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
@@ -71,10 +74,17 @@ public class ProductService {
         return productOverviewResponses;
     }
 
-    public List<ProductOverviewResponse> findNewestProducts(int limit) {
+    public List<ProductOverviewResponse> findNewestProducts(int limit) throws Exception {
+
+        // Kiểm tra cache
+//        List<ProductOverviewResponse> cachedProducts = cacheHelper.getFromCache(RedisKey.TOP_NEWEST_PROD.getKey(), List.class);
+//        if (cachedProducts != null) {
+//            return cachedProducts;
+//        }
+
+        List<ProductOverviewResponse> productOverviewResponses = new ArrayList<>();
         Pageable pageable = PageRequest.of(0, limit);
         List<Object[]> results = productRepository.findNewestProducts(PageRequest.of(0, limit));
-        List<ProductOverviewResponse> productOverviewResponses = new ArrayList<>();
         for (Object[] rs : results) {
             Product product = (Product) rs[0]; // có thể ép xuống lớp con vì vốn dĩ rs[0] là 1 íntance của Product (có các attribute của nó)
             Double rating = (Double)rs[2];
@@ -85,6 +95,8 @@ public class ProductService {
             productOverviewResponse.setNumberOfOrder(count != null ? count : BigDecimal.valueOf(0));
             productOverviewResponses.add(productOverviewResponse);
         }
+
+//        cacheHelper.saveToCache(RedisKey.TOP_NEWEST_PROD.getKey(), productOverviewResponses, RedisKey.TOP_NEWEST_PROD.getTtl());
         return productOverviewResponses;
     }
 

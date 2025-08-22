@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     @GetMapping("/newest")
-    ApiResponse<List<ProductOverviewResponse>> findNewestProducts(  @RequestParam("limit") int limit) {
+    ApiResponse<List<ProductOverviewResponse>> findNewestProducts(  @RequestParam(name = "limit", defaultValue = "8") int limit) throws Exception {
         return ApiResponse.<List<ProductOverviewResponse>>builder()
                 .result(productService.findNewestProducts(limit))
                 .build();

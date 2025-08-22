@@ -1,16 +1,18 @@
 package com.qhuyns.ecomweb.configuration;
 
-import redis.clients.jedis.Jedis;
-
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+@Configuration
 public class RedisConfig {
-    private static Jedis jedis;
 
-    static {
-        jedis = new Jedis("localhost", 6379); 
-        jedis.connect();
-    }
-
-    public static Jedis getRedisClient() {
-        return jedis;
+    @Bean
+    public JedisPool jedisPool() {
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setJmxEnabled(false); // tắt JMX
+        return new JedisPool(poolConfig, "localhost", 6379);
     }
 }
+
+
