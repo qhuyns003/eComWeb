@@ -49,3 +49,7 @@ vnpay:
 #  phai config trong quan tri https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login, phai dung ngrok
   ipnUrl: "https://572362ca02eb.ngrok-free.app/vnpay/IPN"
 #            "http://localhost:8080/vnpay/IPN"
+elastic.apm:
+  server_urls: "http://127.0.0.1:8200"
+  service_name: "ecomweb-backend"
+
