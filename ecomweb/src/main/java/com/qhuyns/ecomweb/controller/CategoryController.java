@@ -25,7 +25,7 @@ public class CategoryController {
     CategoryService categoryService;
 
     @GetMapping("/")
-    ApiResponse<List<CategoryResponse>> getCategories() {
+    ApiResponse<List<CategoryResponse>> getCategories() throws Exception {
         return ApiResponse.<List<CategoryResponse>>builder()
                 .result(categoryService.getAll())
                 .build();

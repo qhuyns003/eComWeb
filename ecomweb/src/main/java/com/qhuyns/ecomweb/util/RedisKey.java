@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 @RequiredArgsConstructor
 public enum RedisKey {
-    TOP_NEWEST_PROD("topNewestProduct",3600)
+    TOP_NEWEST_PROD("topNewestProduct",3600),
+    TOP_SELLING_PROD("topSellingProduct",3600),
+    GET_ALL_CATEGORY("getAllCategory",3600)
     ;
 
     private final String key;

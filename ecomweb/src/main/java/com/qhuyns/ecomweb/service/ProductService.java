@@ -57,7 +57,13 @@ public class ProductService {
     WeaviateService  weaviateService;
     RedisCacheHelper cacheHelper;
 
-    public List<ProductOverviewResponse> findTopSellingProducts(int limit) {
+    public List<ProductOverviewResponse> findTopSellingProducts(int limit) throws Exception {
+        // Kiểm tra cache
+        List<ProductOverviewResponse> cachedProducts = cacheHelper.getFromCache(RedisKey.TOP_SELLING_PROD.getKey(),  List.class);
+        if (cachedProducts != null) {
+            return cachedProducts;
+        }
+
         Pageable pageable = PageRequest.of(0, limit);
         List<Object[]> results = productRepository.findTopSellingProducts(PageRequest.of(0, limit));
         List<ProductOverviewResponse> productOverviewResponses = new ArrayList<>();
@@ -71,16 +77,19 @@ public class ProductService {
             productOverviewResponse.setNumberOfOrder(count != null ? count : BigDecimal.valueOf(0));
             productOverviewResponses.add(productOverviewResponse);
         }
+
+        cacheHelper.saveToCache(RedisKey.TOP_SELLING_PROD.getKey(), productOverviewResponses, RedisKey.TOP_SELLING_PROD.getTtl());
+
         return productOverviewResponses;
     }
 
     public List<ProductOverviewResponse> findNewestProducts(int limit) throws Exception {
 
         // Kiểm tra cache
-//        List<ProductOverviewResponse> cachedProducts = cacheHelper.getFromCache(RedisKey.TOP_NEWEST_PROD.getKey(), List.class);
-//        if (cachedProducts != null) {
-//            return cachedProducts;
-//        }
+        List<ProductOverviewResponse> cachedProducts = cacheHelper.getFromCache(RedisKey.TOP_NEWEST_PROD.getKey(), List.class);
+        if (cachedProducts != null) {
+            return cachedProducts;
+        }
 
         List<ProductOverviewResponse> productOverviewResponses = new ArrayList<>();
         Pageable pageable = PageRequest.of(0, limit);
@@ -96,7 +105,7 @@ public class ProductService {
             productOverviewResponses.add(productOverviewResponse);
         }
 
-//        cacheHelper.saveToCache(RedisKey.TOP_NEWEST_PROD.getKey(), productOverviewResponses, RedisKey.TOP_NEWEST_PROD.getTtl());
+        cacheHelper.saveToCache(RedisKey.TOP_NEWEST_PROD.getKey(), productOverviewResponses, RedisKey.TOP_NEWEST_PROD.getTtl());
         return productOverviewResponses;
     }
 

@@ -32,7 +32,7 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping("/top-selling")
-    ApiResponse<List<ProductOverviewResponse>> findTopSellingProducts(  @RequestParam("limit") int limit) {
+    ApiResponse<List<ProductOverviewResponse>> findTopSellingProducts(  @RequestParam(name ="limit", defaultValue = "8") int limit) throws Exception {
         return ApiResponse.<List<ProductOverviewResponse>>builder()
                 .result(productService.findTopSellingProducts(limit))
                 .build();
