@@ -336,7 +336,13 @@ public class ProductService {
         productRepository.deleteByIdIn(ids);
     };
 
-    public List<ProductOverviewResponse> findByShopId(int limit,String id) {
+    public List<ProductOverviewResponse> findByShopId(int limit,String id) throws Exception {
+        // Kiểm tra cache
+        List<ProductOverviewResponse> cachedProducts = cacheHelper.getFromCache(RedisKey.NEWEST_PROD_OF_SHOP.getKey()+id,  List.class);
+        if (cachedProducts != null) {
+            return cachedProducts;
+        }
+
         Pageable pageable = PageRequest.of(0, limit);
         List<Object[]> results = productRepository.findByShopIdAndNewest(pageable,id);
         List<ProductOverviewResponse> productOverviewResponses = new ArrayList<>();
@@ -350,6 +356,11 @@ public class ProductService {
             productOverviewResponse.setNumberOfOrder(count != null ? count : BigDecimal.valueOf(0));
             productOverviewResponses.add(productOverviewResponse);
         }
+
+        cacheHelper.saveToCache(RedisKey.NEWEST_PROD_OF_SHOP.getKey()+id
+                , productOverviewResponses
+                , RedisKey.NEWEST_PROD_OF_SHOP.getTtl());
+
         return productOverviewResponses;
     }
 

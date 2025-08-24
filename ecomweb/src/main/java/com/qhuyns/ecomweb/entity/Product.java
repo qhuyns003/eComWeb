@@ -21,6 +21,7 @@ import java.util.List;
 // khong dung data do toString se khien cho code bi lap vo han do manytoone va onetomany duoc in ra
 // log ra cung thay lap vo han nhung khong sao vi obj se tham chieu lan nhau -> khong anh huong hieu nang
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;

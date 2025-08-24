@@ -67,6 +67,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     LEFT JOIN oi.customerReview cr
     LEFT JOIN p.shop s
     WHERE s.id = :shopId 
+    AND p.status = '1'
     GROUP BY p
     ORDER BY p.createdAt DESC
 """)

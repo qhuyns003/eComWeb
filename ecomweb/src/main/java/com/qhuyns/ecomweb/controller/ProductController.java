@@ -117,7 +117,7 @@ public class ProductController {
     }
 
     @GetMapping("/shop/{id}")
-    ApiResponse<List<ProductOverviewResponse>> getByShopId(@PathVariable("id") String id){
+    ApiResponse<List<ProductOverviewResponse>> getByShopId(@PathVariable("id") String id) throws Exception {
         return ApiResponse.<List<ProductOverviewResponse>>builder()
                 .result(productService.findByShopId(8,id))
                 .build();
