@@ -75,7 +75,7 @@ public class ProductController {
             @RequestParam("page") int page,
             @RequestParam("size") int size,
             @RequestParam(value = "search", required = false,defaultValue = "") String search,
-            @RequestParam(value = "status",required = false,defaultValue = "1") int status,
+            @RequestParam(value = "status",required = false,defaultValue = "1") String status,
             @ModelAttribute ProductFilterRequest productFilterRequest) {
 
         return ApiResponse.<Page<ProductResponse>>builder()

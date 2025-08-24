@@ -10,6 +10,7 @@ import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.*;
 import com.qhuyns.ecomweb.util.RedisCacheHelper;
 import com.qhuyns.ecomweb.util.RedisKey;
+import com.sun.jna.platform.win32.Sspi;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +26,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -168,7 +171,7 @@ public class ProductService {
         return productResponsePage;
     }
 
-    public Page<ProductResponse> searchProduct(int page, int size,String search, int status,ProductFilterRequest productFilterRequest) {
+    public Page<ProductResponse> searchProduct(int page, int size,String search, String status,ProductFilterRequest productFilterRequest) {
         Sort sort = Sort.unsorted();
         if ("asc".equalsIgnoreCase(productFilterRequest.getSortPrice())) {
             sort = Sort.by("price").ascending();
@@ -179,12 +182,22 @@ public class ProductService {
         Page<Object[]> results = productRepository.searchProduct(search,status,pageable,productFilterRequest);
         List<ProductResponse> productResponses = new ArrayList<>();
         for(Object[] rs : results.getContent()) {
-            Product product = (Product) rs[0];
-            ProductImage productImage = (ProductImage)rs[1];
-            ProductResponse productResponse = productMapper.toProductResponse(product);
 
-            productResponse.setImages(new ArrayList<>(List.of(productImageMapper.toProductImageResponse(productImage))));
+            ProductResponse productResponse = ProductResponse.builder()
+                    .id((String)rs[0])
+                    .name((String)rs[1])
+                    .description((String)rs[2])
+                    .price((BigDecimal)rs[3])
+                    .status((String)rs[4])
+                    .createdAt(((Timestamp) rs[5]).toLocalDateTime())
+                    .images(List.of(ProductImageResponse.builder()
+                            .id((String)rs[6])
+                            .url((String)rs[7])
+                            .isMain((Boolean)rs[8])
+                            .build()))
+                    .build();
             productResponses.add(productResponse);
+
         }
         Page<ProductResponse> productResponsePage = new PageImpl<>(
                 productResponses,
