@@ -1,0 +1,24 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/users/**
+
+        - id: order-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/orders/**
+          filters:
+            - JwtAuthenticationFilter
+security:
+  jwt:
+    secret: your_jwt_secret_key
