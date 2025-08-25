@@ -1,0 +1,13 @@
+version: "3.8"
+#server:
+#  port: 8081
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # cổng cho ứng dụng Spring Boot
+      - "15672:15672" # cổng UI web quản lý RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest

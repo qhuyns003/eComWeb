@@ -1,0 +1,17 @@
+spring:
+  cassandra:
+    contact-points: localhost
+    port: 9042
+    keyspace-name: notification_service
+    local-datacenter: datacenter1   # Tên DC trong cluster Cassandra
+    schema-action: none
+    request:
+      timeout: 10s
+    username: cassandra
+    password: cassandra
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
