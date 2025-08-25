@@ -1,36 +1,42 @@
 package com.ecomweb.gateway.configuration;
 
-
 import com.ecomweb.gateway.dto.response.ApiResponse;
 import com.ecomweb.gateway.exception.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
+@Component
+public class JwtAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
-    public void commence(
-            HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, ServletException {
+    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
         ErrorCode errorCode = ErrorCode.UNAUTHENTICATED;
-
-        response.setStatus(errorCode.getStatusCode().value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] bytes;
+        try {
+            bytes = objectMapper.writeValueAsBytes(apiResponse);
+        } catch (JsonProcessingException e) {
+            return Mono.error(e);
+        }
 
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
-        response.flushBuffer();
+        var response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        return response.writeWith(Mono.just(response.bufferFactory().wrap(bytes)));
     }
 }
