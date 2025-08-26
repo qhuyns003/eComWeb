@@ -12,10 +12,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -27,12 +30,25 @@ public class NotificationService {
     NotificationRepository notificationRepository;
     NotificationMapper  notificationMapper;
     NotificationKeyMapper  notificationKeyMapper;
+    SimpMessagingTemplate messagingTemplate;
     // Tạo thông báo mới
     public void createNotification(NotificationRequest notificationRequest) {
-        Notification notification = notificationMapper.toNotification(notificationRequest);
-        notification.setKey(notificationKeyMapper.toNotificationKey(notificationRequest.getKey()));
-        notification.setStatus(NotificationStatus.UNREAD.name());
-        notificationRepository.save(notification);
+        for (String userId : notificationRequest.getRecipientId()) {
+            Notification notification = notificationMapper.toNotification(notificationRequest);
+            notification.getKey().setNotificationId(UUID.randomUUID().toString());
+            notification.getKey().setCreatedAt(LocalDateTime.now());
+            notification.getKey().setUserId(userId);
+            notification.setStatus(NotificationStatus.UNREAD.name());
+            notificationRepository.save(notification);
+
+
+            messagingTemplate.convertAndSendToUser(
+                    ,
+                    "/queue/notifications",
+                    notificationMapper.toNotificationResponse(notification)
+            );
+        }
+
     }
 
     // Lấy tất cả thông báo của một user

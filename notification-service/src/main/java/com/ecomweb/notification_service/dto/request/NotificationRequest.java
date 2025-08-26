@@ -15,9 +15,10 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NotificationRequest {
-    NotificationKeyRequest key;
+
     private String type;
     private String title;
     private String message;
     private String status;
+    List<String> recipientId;
 }

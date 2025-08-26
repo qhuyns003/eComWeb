@@ -22,7 +22,7 @@ public class NotificationController {
     NotificationService notificationService;
 
 
-    @PostMapping
+    @PostMapping("/")
     public ApiResponse<?> createNotification(@RequestBody NotificationRequest notificationRequest) {
         notificationService.createNotification(notificationRequest);
         return ApiResponse.builder()

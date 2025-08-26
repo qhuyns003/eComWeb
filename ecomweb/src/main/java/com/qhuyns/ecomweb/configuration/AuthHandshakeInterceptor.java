@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class AuthHandshakeInterceptor implements HandshakeInterceptor {
 
+    // k can xac thuc token vi da lam o security roi
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {

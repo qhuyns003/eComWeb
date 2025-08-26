@@ -13,7 +13,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table("notifications")
+@Table("notification")
 public class Notification {
     @PrimaryKey
     private NotificationKey key;
