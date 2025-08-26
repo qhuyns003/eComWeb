@@ -1,8 +1,12 @@
 package com.ecomweb.notification_service.service;
 
+import com.ecomweb.notification_service.dto.request.IntrospectRequest;
 import com.ecomweb.notification_service.dto.request.NotificationKeyRequest;
 import com.ecomweb.notification_service.dto.request.NotificationRequest;
+import com.ecomweb.notification_service.dto.response.ApiResponse;
+import com.ecomweb.notification_service.dto.response.IntrospectResponse;
 import com.ecomweb.notification_service.dto.response.NotificationResponse;
+import com.ecomweb.notification_service.dto.response.UserResponse;
 import com.ecomweb.notification_service.entity.Notification;
 import com.ecomweb.notification_service.entity.NotificationStatus;
 import com.ecomweb.notification_service.mapper.NotificationKeyMapper;
@@ -12,9 +16,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +39,8 @@ public class NotificationService {
     NotificationMapper  notificationMapper;
     NotificationKeyMapper  notificationKeyMapper;
     SimpMessagingTemplate messagingTemplate;
+    @Qualifier("mainService")
+    WebClient webClient;
     // Tạo thông báo mới
     public void createNotification(NotificationRequest notificationRequest) {
         for (String userId : notificationRequest.getRecipientId()) {
@@ -40,10 +50,15 @@ public class NotificationService {
             notification.getKey().setUserId(userId);
             notification.setStatus(NotificationStatus.UNREAD.name());
             notificationRepository.save(notification);
+            String username = webClient.get()
+                    .uri("/"+userId)
+                    .retrieve()// gui rq
+                    .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
+                            .block().getResult().getUsername();
 
 
             messagingTemplate.convertAndSendToUser(
-                    ,
+                    username,
                     "/queue/notifications",
                     notificationMapper.toNotificationResponse(notification)
             );
@@ -67,5 +82,18 @@ public class NotificationService {
                 .findByKeyUserIdAndKeyCreatedAtAndKeyNotificationId(notificationKeyRequest.getUserId(),notificationKeyRequest.getCreatedAt(),notificationKeyRequest.getNotificationId());
         notification.setStatus(NotificationStatus.READ.name());
         notificationRepository.save(notification);
+
+        String username = webClient.get()
+                .uri("/"+notificationKeyRequest.getUserId())
+                .retrieve()// gui rq
+                .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
+                .block().getResult().getUsername();
+
+
+        messagingTemplate.convertAndSendToUser(
+                username,
+                "/queue/notifications",
+                notificationMapper.toNotificationResponse(notification)
+        );
     }
 }

@@ -46,7 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // dang ki endpoint ws de ket noi
-    registry.addEndpoint("/ws")
+    registry.addEndpoint("/ws-notification")
         .setAllowedOriginPatterns("*")
             // giai ma token va gan username, principle luu vao 1 map la bien tam de truyen cho buoc sau
         .addInterceptors(new AuthHandshakeInterceptor())

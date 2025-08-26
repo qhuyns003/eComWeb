@@ -9,20 +9,23 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+// dat trung ten voi rést ksao vi no da co prefix e dua den api socket
 @RequestMapping("/notifications")
-public class NotificationController {
+public class NotificationSocketController {
     NotificationService notificationService;
 
 
-    @PostMapping("/send")
+    @MessageMapping("/send")
     public ApiResponse<?> createNotification(@RequestBody NotificationRequest notificationRequest) {
         notificationService.createNotification(notificationRequest);
         return ApiResponse.builder()
@@ -30,16 +33,8 @@ public class NotificationController {
                 .build();
     }
 
-    @GetMapping("/{userId}")
-    public ApiResponse<List<NotificationResponse>> getNotificationsByUser(@PathVariable String userId) {
-        return ApiResponse.<List<NotificationResponse>>builder()
-                .result(notificationService.getNotificationsByUser(userId))
-                .build();
-    }
 
-
-
-    @PostMapping("/read")
+    @MessageMapping("/read")
     public ApiResponse<?> markNotificationAsRead(@RequestBody NotificationKeyRequest notificationKeyRequest) {
         notificationService.markNotificationAsRead(notificationKeyRequest);
         return ApiResponse.builder()
