@@ -24,7 +24,8 @@ import java.util.List;
 public class NotificationSocketController {
     NotificationService notificationService;
 
-
+// dung message broken cho cac api k can nhan ket qua tra ve, chap nhan tre
+    // rest cho api can kq tra ve va nhanh chong
     @MessageMapping("/send")
     public ApiResponse<?> createNotification(@RequestBody NotificationRequest notificationRequest) {
         notificationService.createNotification(notificationRequest);
