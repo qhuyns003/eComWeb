@@ -8,15 +8,15 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: user-service
+        - id: main-service
+          uri: http://localhost:8080
+          predicates:
+            - Path=/**
+#match  path cu the hon neu path gan giong nhau
+        - id: notification-service
           uri: http://localhost:8081
           predicates:
-            - Path=/users/**
-
-        - id: order-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/orders/**
+            - Path=/notification/**
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 3600 # in second

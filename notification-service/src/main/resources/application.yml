@@ -15,3 +15,9 @@ spring:
     port: 5672
     username: guest
     password: guest
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # in seconds
+server:
+  port: 8081
