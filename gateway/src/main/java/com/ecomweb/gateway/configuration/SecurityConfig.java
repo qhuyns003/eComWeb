@@ -30,6 +30,7 @@ public class SecurityConfig {
     }
 
     // webflux yeu cau config tra ra mono haic flux , k duco tra ra object blocking truc tiep
+    // filter danh cho http request (rest)
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
