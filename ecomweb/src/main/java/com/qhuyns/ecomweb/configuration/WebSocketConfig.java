@@ -10,6 +10,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 // websocket giup client thay du lieu realtime ngay khong can reload nhu http
+// ws thuần chỉ là giao thức kết nối bắt tay giữa client và server
+// còn stomp là giao thức chạy trên socket mới làm việc trao đổi dữ liệu, quy ước giữa client và service cụ thể
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 //    /topic/: gửi cho nhiều người
