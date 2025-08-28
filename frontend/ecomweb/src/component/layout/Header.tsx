@@ -239,7 +239,7 @@ const Header: React.FC = () => {
                           // Gửi socket xác nhận đã đọc nếu phòng này chưa đọc
                           if (room.seen === false && stompClient.current && stompClient.current.connected) {
                             stompClient.current.publish({
-                              destination: "/ws-app/chat/mark-read",
+                              destination: "/ws-app/messages/mark-read",
                               body: JSON.stringify({
                                 userId: user.id,
                                 roomId: room.roomId,

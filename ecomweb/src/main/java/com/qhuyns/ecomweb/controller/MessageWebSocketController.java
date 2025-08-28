@@ -11,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
 
@@ -25,14 +26,14 @@ public class MessageWebSocketController {
 
     // FE gửi tin nhắn qua WebSocket tới /ws-app/chat.sendMessage
     // tối ưu hơn rest vì nhanh hơn, k cần thời gian phản hồi
-    @MessageMapping("/chat.sendMessage")
+    @MessageMapping("/messages/chat.sendMessage")
     public void sendMessage(@Payload MessageRequest messageRequest) {
         messageService.saveMessage(messageRequest);
         // Không cần return, BE sẽ broadcast lại qua SimpMessagingTemplate trong service
     }
 
     // do khong trai qua filter nen token k duoc decode va luu vao secu -> dung thang principle cua ws ta da config
-    @MessageMapping("/chat/mark-read")
+    @MessageMapping("/messages/mark-read")
     public void markRead(@Payload UserRoomKeyRequest  userRoomKeyRequest, Principal principal) {
         messageService.markRead(userRoomKeyRequest,principal);
 

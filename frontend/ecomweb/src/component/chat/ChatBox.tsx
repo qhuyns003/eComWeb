@@ -72,7 +72,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ roomId, roomName, onClose }) => {
       content: input,
       type: "text"
     };
-    sendMessage(msg);
+    stompClient.current.publish({
+      destination: "/ws-app/messages/chat.sendMessage",
+      body: JSON.stringify(msg)
+    });
     setInput("");
   };
 
