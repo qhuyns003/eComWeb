@@ -82,6 +82,7 @@ public class MessageService {
         MessageResponse messageResponse = messageMapper.toMessageResponse(message);
         messageResponse.setKey(messagePrimaryKeyMapper.toMessagePrimaryKeyResponse(message.getKey()));
         // gui tin nhan moi
+        // co the gui broadcast haoc private queue voi tung user (dk la phai subribe user)
         messagingTemplate.convertAndSend("/topic/room." + messageRequest.getKey().getRoomId(),messageResponse);
         // cap nhat dsach room cua user khi co tb moi
         for (RoomMember roomMember : roomMembers) {

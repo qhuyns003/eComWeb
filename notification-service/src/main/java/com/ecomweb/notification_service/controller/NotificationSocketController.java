@@ -20,7 +20,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 // dat trung ten voi rést ksao vi no da co prefix e dua den api socket
-@RequestMapping("/notifications")
+// tuy nhien api socket k dung rqmapping
 public class NotificationSocketController {
     NotificationService notificationService;
 
