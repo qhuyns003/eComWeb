@@ -60,7 +60,9 @@ public class NotificationService {
             messagingTemplate.convertAndSendToUser(
                     username,
                     "/queue/notifications",
-                    notificationMapper.toNotificationResponse(notification)
+                    ApiResponse.builder()
+                            .result(notificationMapper.toNotificationResponse(notification))
+                            .build()
             );
         }
 

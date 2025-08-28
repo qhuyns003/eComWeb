@@ -48,7 +48,7 @@ export const verifyAccount = (token: string, username: string) => {
 // Notification API
 
 export async function fetchUserNotifications(userId: string) {
-  const res = await axiosInstance.get(`/notifications/user/${userId}`);
+  const res = await axiosInstance.get(`/notifications/${userId}`);
   return res.data;
 }
 

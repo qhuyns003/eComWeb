@@ -5,17 +5,24 @@ import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
 import { fetchUserNotifications, markNotificationAsRead } from "../../api/api";
 
-interface Notification {
-  id: string;
-  title: string;
-  content: string;
+interface NotificationKeyResponse {
+  userId: string;
   createdAt: string;
-  seen: boolean;
+  notificationId: string;
+}
+
+interface NotificationResponse {
+  key: NotificationKeyResponse;
+  type: string;
+  title: string;
+  message: string;
+  status: string;
+  seen?: boolean; // nếu có
 }
 
 const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> = ({ showDropdown, onToggle }) => {
   const user = useAppSelector(selectUser);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const stompClient = useRef<Client | null>(null);
 
@@ -24,19 +31,27 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
     // Fetch notifications on mount
     fetchUserNotifications(user.id)
       .then(data => {
-        setNotifications(data);
-        setUnreadCount(data.filter((n: Notification) => !n.seen).length);
+        // Nếu backend trả về { result: [...] }
+        const notiList = data?.result || [];
+        setNotifications(notiList);
+        setUnreadCount(notiList.filter((n: NotificationResponse) => !n.seen).length);
       });
     // Lấy token từ localStorage hoặc redux (tùy app của bạn)
     const token = localStorage.getItem("token");
     // Truyền token qua query param khi tạo SockJS
-    const socket = new SockJS(`http://localhost:8080/ws${token ? `?token=${token}` : ''}`);
+    const socket = new SockJS(`http://localhost:8082/ws${token ? `?token=${token}` : ''}`);
     const client = new Client({
       webSocketFactory: () => socket as any,
-      // Không cần connectHeaders cho handshake với SockJS, chỉ cần query param
       onConnect: () => {
         client.subscribe("/user/queue/notifications", (message) => {
-          const notification: Notification = JSON.parse(message.body);
+          // Nếu backend trả về { result: {...} }
+          let notification: NotificationResponse;
+          try {
+            const body = JSON.parse(message.body);
+            notification = body?.result || body;
+          } catch {
+            notification = message.body as any;
+          }
           setNotifications(prev => [notification, ...prev]);
           setUnreadCount(prev => prev + 1);
         });
@@ -49,10 +64,10 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
     };
   }, [user]);
 
-  const handleReadNotification = (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, seen: true } : n));
+  const handleReadNotification = (notificationId: string) => {
+    setNotifications(prev => prev.map(n => n.key.notificationId === notificationId ? { ...n, seen: true } : n));
     setUnreadCount(prev => prev - 1);
-  markNotificationAsRead(id);
+    markNotificationAsRead(notificationId);
   };
 
   return (
@@ -80,13 +95,14 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
             ) : (
               notifications.map((n) => (
                 <li
-                  key={n.id}
+                  key={n.key.notificationId}
                   className={`p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-100 ${!n.seen ? 'bg-blue-50' : ''}`}
-                  onClick={() => handleReadNotification(n.id)}
+                  onClick={() => handleReadNotification(n.key.notificationId)}
                 >
                   <div className="font-semibold">{n.title}</div>
-                  <div className="text-sm text-gray-600">{n.content}</div>
-                  <div className="text-xs text-gray-400">{new Date(n.createdAt).toLocaleString()}</div>
+                  <div className="text-sm text-gray-600">{n.message}</div>
+                  <div className="text-xs text-gray-400">{n.key.createdAt ? new Date(n.key.createdAt).toLocaleString() : ''}</div>
+                  <div className="text-xs text-gray-400 italic">{n.type} - {n.status}</div>
                 </li>
               ))
             )}
