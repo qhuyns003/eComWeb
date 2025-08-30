@@ -40,10 +40,19 @@ public class SecurityConfig {
 
     // webflux yeu cau config tra ra mono haic flux , k duco tra ra object blocking truc tiep
     // filter danh cho http request (rest)
+    // socket ban chat dung http de ket noi truoc xong moi upgrade len socket sau
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+    // bat cors o gateway, tat o service doi voi cac restapi thuong
+    // cac api handshake, bypass cors ở filter để thuc hien set cors o websocket tại service -> bắt buộc set cors tại websocketconfig k sẽ bị 403
+    // truoc khi thuc hien cors, tat ca api deu gui 1 prefight request (OPTIONS METHOD) de kiem tra truoc
+    // preflight duoc config de test phía nhận vào (gateway ở microservice) nếu header đc set ngay thì nó sẽ return luôn k forrward tiếp xuống service
+    // api preflight giong het api rest chi khac method
+    // neu return null cho 1 api tai filter thi no duoc phep forward xuong service tiep
+    // preflight cung se bi forward xuong service thưc hiện tất cả nghiệp vụ , nhân response body, header xong mới về
+    // mônlith có để set có cors filter và websocketcorf do mvc có thể nhận diện được handsake socket và bỏ qua cors tại filter, chỉ dùng tại socketconffig (webflux gateway k làm đc), mặt khác nó sẽ ghi đè nếu trùng header vì thuộc cùng 1 server
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             String path = request.getRequest().getURI().getPath();
