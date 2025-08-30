@@ -49,7 +49,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // dang ki endpoint ws de ket noi
     registry.addEndpoint("/ws")
-        .setAllowedOriginPatterns("*")
+            .setAllowedOriginPatterns("*")
             // giai ma token va gan username, principle luu vao 1 map la bien tam de truyen cho buoc sau
         .addInterceptors(new AuthHandshakeInterceptor())
             // custom de lay ra Priciple da tao o buoc truoc de tao ws session

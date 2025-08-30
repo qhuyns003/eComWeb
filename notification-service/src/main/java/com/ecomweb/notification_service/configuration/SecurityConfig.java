@@ -34,16 +34,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .cors(cors -> cors
-                        .configurationSource(request -> {
-                            CorsConfiguration config = new CorsConfiguration();
-                            config.addAllowedOrigin("http://localhost:5173");
-                            config.addAllowedMethod("*");
-                            config.addAllowedHeader("*");
-                            config.setAllowCredentials(true); // nếu origin là * thì xóa dòng này
-                            return config;
-                        })
-                )
+//                .cors(cors -> cors
+//                        .configurationSource(request -> {
+//                            CorsConfiguration config = new CorsConfiguration();
+//                            config.addAllowedOrigin("http://localhost:5173");
+//                            config.addAllowedMethod("*");
+//                            config.addAllowedHeader("*");
+//                            config.setAllowCredentials(true); // nếu origin là * thì xóa dòng này
+//                            return config;
+//                        })
+//                )
                 // luôn decode kiểm tra token trước khi permit
                 // ứng với mỗi request, sẽ có context khác nhau tùy vào token gửi theo
                 .authorizeHttpRequests(request -> request // nếu không yêu cầu token mà vẫn nhét token vào sẽ bị unauthorize
