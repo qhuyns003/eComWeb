@@ -16,7 +16,8 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @Table("notification")
 public class Notification {
     @PrimaryKey
-    private NotificationKey key;
+    @Builder.Default
+    private NotificationKey key = new NotificationKey();
 
     private String type;
     private String title;

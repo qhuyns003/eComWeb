@@ -12,15 +12,7 @@ spring:
         #        doi thanh ws chu kp http de service biet day la api socket
         #        sau khi ket noi thanh cong thi cac request sau khi qua k qua gateway n-ua
         #        ban chat ban dau ws gui 1 http rq de yeu cau ket noi, tai day se tan dung duoc http security
-        - id: notification-ws
-          uri: http://localhost:8082
-          predicates:
-            - Path=/notifications/ws-notification/**
 
-        - id: main-ws
-          uri: http://localhost:8081
-          predicates:
-            - Path=/ws/**
 
 
         - id: notification-service

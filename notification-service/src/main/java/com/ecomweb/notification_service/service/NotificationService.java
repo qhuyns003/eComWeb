@@ -18,8 +18,11 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,6 +31,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.datastax.dse.driver.internal.core.graph.SearchPredicate.token;
 
 @Transactional
 @Service
@@ -50,18 +55,25 @@ public class NotificationService {
             notification.getKey().setUserId(userId);
             notification.setStatus(NotificationStatus.UNREAD.name());
             notificationRepository.save(notification);
+
+            JwtAuthenticationToken authentication =
+                    (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+            String token = authentication.getToken().getTokenValue();
+
             String username = webClient.get()
-                    .uri("/"+userId)
+                    .uri("/users/"+userId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                     .retrieve()// gui rq
                     .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
                             .block().getResult().getUsername();
-
-
+            NotificationResponse notificationResponse = notificationMapper.toNotificationResponse(notification);
+            notificationResponse.setKey(notificationKeyMapper.toNotificationKeyResponse(notification.getKey()));
             messagingTemplate.convertAndSendToUser(
                     username,
                     "/queue/notifications",
                     ApiResponse.builder()
-                            .result(notificationMapper.toNotificationResponse(notification))
+                            .result(notificationResponse)
                             .build()
             );
         }
@@ -85,13 +97,19 @@ public class NotificationService {
         notification.setStatus(NotificationStatus.READ.name());
         notificationRepository.save(notification);
 
+        JwtAuthenticationToken authentication =
+                (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        String token = authentication.getToken().getTokenValue();
+
         String username = webClient.get()
-                .uri("/"+notificationKeyRequest.getUserId())
+                .uri("/users/"+notificationKeyRequest.getUserId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " +token )
                 .retrieve()// gui rq
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
                 .block().getResult().getUsername();
 
-
+        log.info(username+"HEREEEEEEEEE");
         messagingTemplate.convertAndSendToUser(
                 username,
                 "/queue/notifications",

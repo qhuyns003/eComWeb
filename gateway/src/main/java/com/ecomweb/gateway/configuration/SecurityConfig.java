@@ -61,6 +61,9 @@ public class SecurityConfig {
                             if (path.startsWith("/ws")) {
                                 return null;
                             }
+                            if (path.startsWith("/notifications/ws-notification")) {
+                                return null;
+                            }
                             CorsConfiguration config = new CorsConfiguration();
                             config.addAllowedOrigin("http://localhost:5173");
                             config.addAllowedMethod("*");
@@ -84,6 +87,7 @@ public class SecurityConfig {
                         )
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
+
                 .build();
     }
 

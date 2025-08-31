@@ -39,7 +39,7 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
     // Lấy token từ localStorage hoặc redux (tùy app của bạn)
     const token = localStorage.getItem("token");
     // Truyền token qua query param khi tạo SockJS
-    const socket = new SockJS(`http://localhost:8082/notifications/ws-notification${token ? `?token=${token}` : ''}`);
+    const socket = new SockJS(`http://localhost:8080/notifications/ws-notification${token ? `?token=${token}` : ''}`);
     const client = new Client({
       webSocketFactory: () => socket as any,
       onConnect: () => {
@@ -52,6 +52,7 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
           } catch {
             notification = message.body as any;
           }
+          console.log('WebSocket notification received:', notification);
           setNotifications(prev => [notification, ...prev]);
           setUnreadCount(prev => prev + 1);
         });

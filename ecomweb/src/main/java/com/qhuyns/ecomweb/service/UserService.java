@@ -141,7 +141,7 @@ public class UserService {
         return userRepository.findAll().stream().map(userMapper::toUserResponse).collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse getUser(String id) {
         return userMapper.toUserResponse(
                 userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
