@@ -53,6 +53,7 @@ public class SecurityConfig {
     // neu return null cho 1 api tai filter thi no duoc phep forward xuong service tiep
     // preflight cung se bi forward xuong service thưc hiện tất cả nghiệp vụ , nhân response body, header xong mới về
     // mônlith có để set có cors filter và websocketcorf do mvc có thể nhận diện được handsake socket và bỏ qua cors tại filter, chỉ dùng tại socketconffig (webflux gateway k làm đc), mặt khác nó sẽ ghi đè nếu trùng header vì thuộc cùng 1 server
+    // method option la de no k map voi controller nao -> response header nhanh
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             String path = request.getRequest().getURI().getPath();
