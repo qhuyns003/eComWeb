@@ -310,6 +310,11 @@ public class ProductService {
         // khi save , trước khi được persist các annotation gen data đi UUID hay CreateDate
         // sẽ gắn dữ liệu vào entity nên bản chất save không cập nhật ngược dữ liệu lên enotty BE
         // nếu getList ra (TH lazy) thì sẽ cập nhật cả dữ liệu list (nếu có cascade không thì cũng không có ý nghĩa)
+        // goi getList bao gio thi moi truy van luc do de lay du lieu
+        // ben one persist truoc moi co khoa ngoai de persist ben many
+        // owner la ben giu khoa ngoai (many)- ben k co mappedby
+        // orphanRemoval thuc hien cuoi cung
+        // khi tao moi A ma muon dung lai B co san ->  phai luu B trong A o dang tham chieu (lay ra bang find tu db) chu k duoc mapper sang enitty moi bang builder hay mapstruct
         productRepository.save(product);
      for(ProductVariantRequest pvr : productRequest.getProductVariants()){
                 ProductVariant pv = new ProductVariant();

@@ -52,7 +52,6 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
           } catch {
             notification = message.body as any;
           }
-          console.log('WebSocket notification received:', notification);
           setNotifications(prev => [notification, ...prev]);
           setUnreadCount(prev => prev + 1);
         });
