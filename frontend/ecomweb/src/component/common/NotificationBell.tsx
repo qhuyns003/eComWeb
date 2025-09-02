@@ -1,3 +1,4 @@
+// ...existing code...
 import React, { useEffect, useState, useRef } from "react";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
@@ -25,6 +26,7 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
   const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const stompClient = useRef<Client | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -64,10 +66,17 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
     };
   }, [user]);
 
-  const handleReadNotification = (notificationId: string) => {
+  const handleOpenNotification = (notificationId: string) => {
+    setOpenId(notificationId);
+    // Gọi socket cập nhật đã đọc
+    if (stompClient.current) {
+      stompClient.current.publish({
+        destination: "/ws-app/read",
+        body: JSON.stringify({ notificationId }),
+      });
+    }
     setNotifications(prev => prev.map(n => n.key.notificationId === notificationId ? { ...n, seen: true } : n));
     setUnreadCount(prev => prev - 1);
-    markNotificationAsRead(notificationId);
   };
 
   return (
@@ -97,12 +106,16 @@ const NotificationBell: React.FC<{showDropdown: boolean, onToggle: () => void}> 
                 <li
                   key={n.key.notificationId}
                   className={`p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-100 ${!n.seen ? 'bg-blue-50' : ''}`}
-                  onClick={() => handleReadNotification(n.key.notificationId)}
+                  onClick={() => handleOpenNotification(n.key.notificationId)}
                 >
                   <div className="font-semibold">{n.title}</div>
-                  <div className="text-sm text-gray-600">{n.message}</div>
-                  <div className="text-xs text-gray-400">{n.key.createdAt ? new Date(n.key.createdAt).toLocaleString() : ''}</div>
-                  <div className="text-xs text-gray-400 italic">{n.type} - {n.status}</div>
+                  {openId === n.key.notificationId && (
+                    <>
+                      <div className="text-sm text-gray-600">{n.message}</div>
+                      <div className="text-xs text-gray-400">{n.key.createdAt ? new Date(n.key.createdAt).toLocaleString() : ''}</div>
+                      <div className="text-xs text-gray-400 italic">{n.type} - {n.status}</div>
+                    </>
+                  )}
                 </li>
               ))
             )}

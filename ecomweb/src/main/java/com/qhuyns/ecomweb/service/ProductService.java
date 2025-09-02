@@ -315,6 +315,8 @@ public class ProductService {
         // owner la ben giu khoa ngoai (many)- ben k co mappedby
         // orphanRemoval thuc hien cuoi cung
         // khi tao moi A ma muon dung lai B co san ->  phai luu B trong A o dang tham chieu (lay ra bang find tu db) chu k duoc mapper sang enitty moi bang builder hay mapstruct
+        // khi co id trung thi se luon la merge khi save ke ca lay tham chieu hay tao moi
+        // tuy nhien, neu A persist thì cung se ep B persist theo se gay ra loi vi neu B co id san roi thi phai la merge -> B phai lay tham chieu se k bi loi
         productRepository.save(product);
      for(ProductVariantRequest pvr : productRequest.getProductVariants()){
                 ProductVariant pv = new ProductVariant();
