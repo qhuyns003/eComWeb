@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -44,7 +41,8 @@ public class CustomJwtDecoder implements ReactiveJwtDecoder {
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<IntrospectResponse>>() {}) // parse json ra object
                 .flatMap(response -> {  // xu li kq
                     if (!response.getResult().isValid()) {
-                        return Mono.error(new JwtException("Token invalid"));
+                        // su dung badjwtexception bat loi chuan hon jwtexception vi jwtexc qua rong
+                        return Mono.error(new BadJwtException("Token invalid"));
                     }
                     if (nimbusJwtDecoder == null) {
                         SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");

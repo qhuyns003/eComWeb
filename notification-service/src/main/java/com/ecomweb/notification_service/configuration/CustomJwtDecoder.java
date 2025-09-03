@@ -51,7 +51,7 @@ public class CustomJwtDecoder implements JwtDecoder {
                        .bodyToMono(new ParameterizedTypeReference<ApiResponse<IntrospectResponse>>() {}) // parse json ra object
                        .flatMap(response -> {  // xu li kq
                            if (!response.getResult().isValid()) {
-                               return Mono.error(new JwtException("Token invalid"));
+                               return Mono.error(new BadJwtException("Token invalid"));
                            }
                            if (nimbusJwtDecoder == null) {
                                SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");

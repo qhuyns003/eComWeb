@@ -9,9 +9,12 @@ import com.ecomweb.notification_service.dto.response.NotificationResponse;
 import com.ecomweb.notification_service.dto.response.UserResponse;
 import com.ecomweb.notification_service.entity.Notification;
 import com.ecomweb.notification_service.entity.NotificationStatus;
+import com.ecomweb.notification_service.exception.AppException;
+import com.ecomweb.notification_service.exception.ErrorCode;
 import com.ecomweb.notification_service.mapper.NotificationKeyMapper;
 import com.ecomweb.notification_service.mapper.NotificationMapper;
 import com.ecomweb.notification_service.repository.NotificationRepository;
+import com.ecomweb.notification_service.util.AuthUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -97,14 +100,11 @@ public class NotificationService {
         notification.setStatus(NotificationStatus.READ.name());
         notificationRepository.save(notification);
 
-        JwtAuthenticationToken authentication =
-                (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
-        String token = authentication.getToken().getTokenValue();
+        String token = AuthUtil.getToken();
 
         String username = webClient.get()
                 .uri("/users/"+notificationKeyRequest.getUserId())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " +token )
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token )
                 .retrieve()// gui rq
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
                 .block().getResult().getUsername();

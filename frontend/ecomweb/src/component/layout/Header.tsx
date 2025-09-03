@@ -17,6 +17,7 @@ const Header: React.FC = () => {
   const user = useAppSelector(selectUser);
   const [showChatDropdown, setShowChatDropdown] = useState(false);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [notificationUnreadCount, setNotificationUnreadCount] = useState(0);
   const [chatRooms, setChatRooms] = useState<any[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   // Số phòng chat có tin nhắn chưa đọc
@@ -199,6 +200,8 @@ const Header: React.FC = () => {
                 return !v;
               });
             }}
+            unreadCount={notificationUnreadCount}
+            setUnreadCount={setNotificationUnreadCount}
           />
         )}
         {/* Nút chat */}
