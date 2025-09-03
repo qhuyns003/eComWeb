@@ -34,8 +34,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static com.datastax.dse.driver.internal.core.graph.SearchPredicate.token;
+// truong hop B response loi cho A thi A phai format lai 
+//} catch (WebClientResponseException ex) {
+//    return ResponseEntity
+//            .status(ex.getRawStatusCode())
+//            .body(ex.getResponseBodyAsString()); // forward lỗi gốc
+//}
 
 @Transactional
 @Service
@@ -85,6 +89,7 @@ public class NotificationService {
 
     // Lấy tất cả thông báo của một user
     public List<NotificationResponse> getNotificationsByUser(String userId) {
+
         return notificationRepository.findByKeyUserIdOrderByKeyCreatedAtDesc(userId)
                 .stream().map((notification) -> {
                     NotificationResponse notificationResponse = notificationMapper.toNotificationResponse(notification);
@@ -109,7 +114,6 @@ public class NotificationService {
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
                 .block().getResult().getUsername();
 
-        log.info(username+"HEREEEEEEEEE");
         messagingTemplate.convertAndSendToUser(
                 username,
                 "/queue/notifications",
