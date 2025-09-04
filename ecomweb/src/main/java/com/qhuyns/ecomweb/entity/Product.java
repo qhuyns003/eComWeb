@@ -57,6 +57,7 @@ public class Product {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductImage> images = new ArrayList<>();
 
+    // phai new list de tranh truong hop khi getList cua 1 object se bi null
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductVariant> productVariants= new ArrayList<>();;

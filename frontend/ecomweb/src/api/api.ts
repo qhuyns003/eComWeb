@@ -1,3 +1,12 @@
+// Gửi thông báo hệ thống
+export const sendNotification = (payload: {
+  recipientId: string[],
+  type: string,
+  title: string,
+  message: string
+}) => {
+  return axiosInstance.post('/notifications/send', payload);
+};
 // Kiểm tra phòng chat riêng giữa 2 user (user1 < user2)
 export const checkPrivateChat = (user1: string, shopId: string) => {
   return axiosInstance.get(`/private_chats/shop`, { params: { user1, shopId } });
