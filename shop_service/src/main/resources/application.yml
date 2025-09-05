@@ -2,16 +2,6 @@ spring:
   mongodb:
     uri: mongodb://localhost:27017/ecommerce
     database: ecommerce
-  cassandra:
-    contact-points: localhost
-    port: 9042
-    keyspace-name: notification_service
-    local-datacenter: datacenter1   # T�n DC trong cluster Cassandra
-    schema-action: none
-    request:
-      timeout: 10s
-    username: cassandra
-    password: cassandra
 
   rabbitmq:
     host: localhost
@@ -23,6 +13,6 @@ jwt:
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
 server:
-  port: 8082
+  port: 8084
   servlet:
-    context-path: /notifications
+    context-path: /shop
