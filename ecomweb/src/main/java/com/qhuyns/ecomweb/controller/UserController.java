@@ -1,9 +1,7 @@
 package com.qhuyns.ecomweb.controller;
 
 
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.UserCreationRequest;
-import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
+import com.qhuyns.ecomweb.dto.request.*;
 import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.service.UserService;
 import jakarta.validation.Valid;
@@ -22,6 +20,14 @@ import java.util.List;
 @Slf4j
 public class UserController {
     UserService userService;
+
+    @PutMapping("/toSeller")
+    ApiResponse<?> upgradeToSeller(@RequestBody UpgradeSellerRequest request) throws Exception {
+        userService.upgradeSellerRequest(request);
+        return ApiResponse.builder()
+                .result("Upgrade user infor to seller successful")
+                .build();
+    }
 
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) throws Exception {

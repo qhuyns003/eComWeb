@@ -34,12 +34,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-// truong hop B response loi cho A thi A phai format lai 
-//} catch (WebClientResponseException ex) {
-//    return ResponseEntity
-//            .status(ex.getRawStatusCode())
-//            .body(ex.getResponseBodyAsString()); // forward lỗi gốc
-//}
+
 
 @Transactional
 @Service

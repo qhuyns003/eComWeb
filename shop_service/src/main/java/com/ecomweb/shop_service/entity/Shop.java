@@ -48,6 +48,6 @@ public class Shop {
     @Builder.Default
     List<String> couponIds = new ArrayList<>();
 
-    @DBRef(lazy = true)
+//    @DBRef(lazy = true) k tham chieu, embedd luon
     ShopAddress shopAddress;
 }

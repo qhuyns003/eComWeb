@@ -1,19 +1,23 @@
 package com.ecomweb.shop_service.dto.response;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NotificationKeyResponse {
-    private String userId;
-    private LocalDateTime createdAt;
-    private String notificationId;
+public class ShopResponse {
+
+    String id;
+    String name;
+    String description;
+    String address;
+    String status;
+    LocalDateTime createdAt;
+    ShopAddressResponse shopAddressResponse;
+
 }

@@ -1,7 +1,7 @@
 spring:
   mongodb:
-    uri: mongodb://localhost:27017/ecommerce
-    database: ecommerce
+    uri: mongodb://localhost:27017/shop_service
+    database: shop_service
 
   rabbitmq:
     host: localhost

@@ -3,9 +3,7 @@ package com.ecomweb.shop_service.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,11 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NotificationRequest {
+public class ShopRequest {
+    String id;
+    String name;
+    String description;
+    String address;
+    String status;
+    LocalDateTime createdAt;
 
-    private String type;
-    private String title;
-    private String message;
-    private String status;
-    List<String> recipientId;
 }

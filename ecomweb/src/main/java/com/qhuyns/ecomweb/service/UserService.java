@@ -2,6 +2,7 @@ package com.qhuyns.ecomweb.service;
 
 
 import com.qhuyns.ecomweb.constant.PredefinedRole;
+import com.qhuyns.ecomweb.dto.request.UpgradeSellerRequest;
 import com.qhuyns.ecomweb.dto.request.UserCreationRequest;
 import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.UserResponse;
@@ -72,6 +73,17 @@ public class UserService {
         }
         emailService.sendVerificationEmail(user.getEmail(), vt.getToken(),user.getUsername());
         return userMapper.toUserResponse(user);
+    }
+
+    public void upgradeSellerRequest(UpgradeSellerRequest request) {
+       User user = userRepository.findByUsernameAndActive(
+               SecurityContextHolder.getContext().getAuthentication().getName(),true
+       ).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+       user.setFullName(request.getShopName());
+       user.getRoles().clear();
+       user.getRoles().add(roleRepository.findById(PredefinedRole.USER_ROLE)
+               .orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_EXISTS)));
+       userRepository.save(user);
     }
 
     public void activeUser(String username,String token) {
