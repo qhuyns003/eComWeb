@@ -23,9 +23,8 @@ public class UserController {
 
     @PutMapping("/toSeller")
     ApiResponse<?> upgradeToSeller(@RequestBody UpgradeSellerRequest request) throws Exception {
-        userService.upgradeSellerRequest(request);
         return ApiResponse.builder()
-                .result("Upgrade user infor to seller successful")
+                .result(userService.upgradeSellerRequest(request))
                 .build();
     }
 

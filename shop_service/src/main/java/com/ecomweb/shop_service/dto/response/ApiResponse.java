@@ -3,6 +3,7 @@ package com.ecomweb.shop_service.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 
 @Data
 @Builder
@@ -16,4 +17,6 @@ public class ApiResponse<T> {
 
     private String message;
     private T result;
+    @Builder.Default
+    private HttpStatus httpStatus = HttpStatus.OK;
 }

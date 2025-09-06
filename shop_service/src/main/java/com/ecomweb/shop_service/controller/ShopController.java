@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,11 +24,10 @@ public class ShopController {
     ShopService shopService;
 
     @PostMapping("")
-    ApiResponse<?> create(@RequestBody ShopCreateRequest shopCreateRequest) {
-        shopService.create(shopCreateRequest);
-        return ApiResponse.<String>builder()
-                .result("success")
-                .build();
+    ResponseEntity<ApiResponse<?>> create(@RequestBody ShopCreateRequest shopCreateRequest) throws Exception {
+        ApiResponse<?> apiResponse = shopService.create(shopCreateRequest);
+        return ResponseEntity.status(apiResponse.getHttpStatus())
+                .body(apiResponse);
     }
 
     @PutMapping("")

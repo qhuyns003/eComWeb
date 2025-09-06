@@ -75,7 +75,7 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public void upgradeSellerRequest(UpgradeSellerRequest request) {
+    public String upgradeSellerRequest(UpgradeSellerRequest request) {
        User user = userRepository.findByUsernameAndActive(
                SecurityContextHolder.getContext().getAuthentication().getName(),true
        ).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -84,6 +84,7 @@ public class UserService {
        user.getRoles().add(roleRepository.findById(PredefinedRole.USER_ROLE)
                .orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_EXISTS)));
        userRepository.save(user);
+       return user.getId();
     }
 
     public void activeUser(String username,String token) {

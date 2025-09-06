@@ -1,73 +1,89 @@
 package com.ecomweb.shop_service.service;
 
 
-import com.ecomweb.shop_service.dto.request.IntrospectRequest;
+import com.ecomweb.shop_service.dto.event.UpgradeToSellerSnapshot;
 import com.ecomweb.shop_service.dto.request.ShopCreateRequest;
+import com.ecomweb.shop_service.dto.request.UpgradeSellerRequest;
 import com.ecomweb.shop_service.dto.response.ApiResponse;
-import com.ecomweb.shop_service.dto.response.IntrospectResponse;
 import com.ecomweb.shop_service.entity.Shop;
 import com.ecomweb.shop_service.entity.ShopAddress;
 import com.ecomweb.shop_service.exception.AppException;
 import com.ecomweb.shop_service.exception.ErrorCode;
 import com.ecomweb.shop_service.mapper.ShopAddressMapper;
 import com.ecomweb.shop_service.mapper.ShopMapper;
+import com.ecomweb.shop_service.producer.UserProducer;
 import com.ecomweb.shop_service.repository.ShopRepository;
 import com.ecomweb.shop_service.util.AuthUtil;
+import com.ecomweb.shop_service.util.ErrorResponseUtil;
+import com.ecomweb.shop_service.util.RedisCacheHelper;
+import com.ecomweb.shop_service.util.RedisKey;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.BadJwtException;
-import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+// transaction annotation chi dam bao neu lan save thu 2 fail thi back lai lan save dau tien
+// khi co them call api phai handler bang mesage broker
+// muon transaction rollback khi catch thi phai throw lai loi
+// try catch bbat loi truoc globalExceptinoHanlder
 public class ShopService {
 
     ShopRepository shopRepository;
     ShopMapper shopMapper;
     ShopAddressMapper shopAddressMapper;
     WebClient webClient;
+    UserProducer userProducer;
+    RedisCacheHelper cacheHelper;
 
-    public void create(ShopCreateRequest shopCreateRequest) {
+    public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
 
         String token = AuthUtil.getToken();
-        webClient.post()
-                .uri("http://service-b/api/users/toSeller")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
-                .bodyValue(dto)
-                .retrieve()
-                .onStatus(HttpStatus::isError, response ->
-                        response.bodyToMono(String.class).flatMap(errorBody -> {
-                            // Publish lỗi lên RabbitMQ
-                            publishErrorMessage("ServiceB", response.statusCode(), errorBody, correlationId);
-                            return Mono.error(new ServiceException(response.statusCode(), errorBody));
-                        })
-                )
-                .bodyToMono(ResponseDTO.class) // map JSON về object
-                .block();                     // block để lấy object trực tiếp
+        String userId = "";
+        try {
+            userId = webClient.post()
+                    .uri("/users/toSeller")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer " + token)
+                    .bodyValue(UpgradeSellerRequest.builder()
+                            .shopName(shopCreateRequest.getName())
+                            .build())
+                    .retrieve()
+                    .bodyToMono(ApiResponse.class)
+                    .block().getResult().toString();
 
-
-
+        } catch (WebClientResponseException ex) {
+           return ErrorResponseUtil.getResponseBody(ex);
+        }
         Shop shop = shopMapper.toShop(shopCreateRequest);
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
         shop.setShopAddress(shopAddress);
-        shopRepository.save(shop);
+        try{
+            shopRepository.save(shop);
+        }
+        catch(Exception ex){
+            UpgradeToSellerSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UpgradeToSellerSnapshot.class);
+            userProducer.rollbackUser(data);
+            throw ex;
+        }
+        return ApiResponse.builder()
+                        .httpStatus(HttpStatus.OK)
+                        .result("create successfully")
+                        .build();
+
+
     }
 
     public void update(ShopUpdateRequest shopUpdateRequest) {
