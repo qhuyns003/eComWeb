@@ -1,7 +1,7 @@
 spring:
-  mongodb:
-    uri: mongodb://localhost:27017/shop_service
-    database: shop_service
+  data:
+    mongodb:
+      uri: mongodb://myuser:mypassword@localhost:27017/shop_service?authSource=admin
 
   rabbitmq:
     host: localhost
@@ -13,6 +13,6 @@ jwt:
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
 server:
-  port: 8084
+  port: 8083
   servlet:
     context-path: /shop

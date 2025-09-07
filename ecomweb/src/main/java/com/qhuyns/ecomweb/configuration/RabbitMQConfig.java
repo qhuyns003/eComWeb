@@ -1,4 +1,4 @@
-package com.ecomweb.shop_service.configuration;
+package com.qhuyns.ecomweb.configuration;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -13,7 +13,7 @@ public class RabbitMQConfig {
 
     public static final String USER_EXCHANGE = "userExchange";
 
-    // === Queues ===
+    // === Queues === producer k quan tam queue
     public static final String ROLLBACK_TOSELLER_QUEUE = "user.rollbackSellerQueue";
 
     // === Routing Keys ===

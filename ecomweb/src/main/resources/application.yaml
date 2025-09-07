@@ -32,6 +32,11 @@ spring:
     password: cassandra
     schema-action: none
     local-datacenter: datacenter1
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 ghn:
   api-url: "https://dev-online-gateway.ghn.vn/shiip/public-api/"

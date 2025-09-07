@@ -53,7 +53,7 @@ public class ShopService {
         String token = AuthUtil.getToken();
         String userId = "";
         try {
-            userId = webClient.post()
+            userId = webClient.put()
                     .uri("/users/toSeller")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token)
@@ -71,51 +71,52 @@ public class ShopService {
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
         shop.setShopAddress(shopAddress);
         try{
-            shopRepository.save(shop);
+            throw new RuntimeException();
+//            shopRepository.save(shop);
         }
         catch(Exception ex){
             UpgradeToSellerSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UpgradeToSellerSnapshot.class);
             userProducer.rollbackUser(data);
             throw ex;
         }
-        return ApiResponse.builder()
-                        .httpStatus(HttpStatus.OK)
-                        .result("create successfully")
-                        .build();
+//        return ApiResponse.builder()
+//                        .httpStatus(HttpStatus.OK)
+//                        .result("create successfully")
+//                        .build();
 
 
     }
 
-    public void update(ShopUpdateRequest shopUpdateRequest) {
-        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Shop shop = user.getShop();
-        shopMapper.toShop(shop,shopUpdateRequest);
-        ShopAddress shopAddress = shop.getShopAddress();
-        shopAddressMapper.toShopAddress(shopAddress,shopUpdateRequest);
-
-        shopRepository.save(shop);
-    }
-
-    public ShopResponse getInfo() {
-       Shop shop = shopRepository.findByUserUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-       ShopResponse shopResponse = shopMapper.toShopResponse(shop);
-       shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
-       return shopResponse;
-    }
-
-    public ShopResponse getInfoById(String id) {
-        Shop shop = shopRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SHOP_NOT_EXISTS));
-        ShopResponse shopResponse = shopMapper.toShopResponse(shop);
-        shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
-        return shopResponse;
-    }
-
-    public String getUserIdByShopId(String shopId){
-        return shopRepository.findById(shopId).orElseThrow(
-                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
-        ).getUser().getId();
-    }
+//    public void update(ShopUpdateRequest shopUpdateRequest) {
+//        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//        Shop shop = user.getShop();
+//        shopMapper.toShop(shop,shopUpdateRequest);
+//        ShopAddress shopAddress = shop.getShopAddress();
+//        shopAddressMapper.toShopAddress(shopAddress,shopUpdateRequest);
+//
+//        shopRepository.save(shop);
+//    }
+//
+//    public ShopResponse getInfo() {
+//       Shop shop = shopRepository.findByUserUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+//       ShopResponse shopResponse = shopMapper.toShopResponse(shop);
+//       shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
+//       return shopResponse;
+//    }
+//
+//    public ShopResponse getInfoById(String id) {
+//        Shop shop = shopRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SHOP_NOT_EXISTS));
+//        ShopResponse shopResponse = shopMapper.toShopResponse(shop);
+//        shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
+//        return shopResponse;
+//    }
+//
+//    public String getUserIdByShopId(String shopId){
+//        return shopRepository.findById(shopId).orElseThrow(
+//                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
+//        ).getUser().getId();
+//    }
 
 
 

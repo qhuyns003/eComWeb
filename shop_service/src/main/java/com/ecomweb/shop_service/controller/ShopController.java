@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/shop")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
@@ -23,34 +22,34 @@ public class ShopController {
 
     ShopService shopService;
 
-    @PostMapping("")
+    @PostMapping("/create")
     ResponseEntity<ApiResponse<?>> create(@RequestBody ShopCreateRequest shopCreateRequest) throws Exception {
         ApiResponse<?> apiResponse = shopService.create(shopCreateRequest);
         return ResponseEntity.status(apiResponse.getHttpStatus())
                 .body(apiResponse);
     }
 
-    @PutMapping("")
-    ApiResponse<?> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
-        shopService.update(shopUpdateRequest);
-        return ApiResponse.<String>builder()
-                .result("success")
-                .build();
-    }
-
-    @GetMapping("")
-    ApiResponse<ShopResponse> getInfo() {
-        return ApiResponse.<ShopResponse>builder()
-                .result(shopService.getInfo())
-                .build();
-    }
-
-    @GetMapping("/{id}")
-    ApiResponse<ShopResponse> getInfoById(@PathVariable String id) {
-        return ApiResponse.<ShopResponse>builder()
-                .result(shopService.getInfoById(id))
-                .build();
-    }
+//    @PutMapping("")
+//    ApiResponse<?> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
+//        shopService.update(shopUpdateRequest);
+//        return ApiResponse.<String>builder()
+//                .result("success")
+//                .build();
+//    }
+//
+//    @GetMapping("")
+//    ApiResponse<ShopResponse> getInfo() {
+//        return ApiResponse.<ShopResponse>builder()
+//                .result(shopService.getInfo())
+//                .build();
+//    }
+//
+//    @GetMapping("/{id}")
+//    ApiResponse<ShopResponse> getInfoById(@PathVariable String id) {
+//        return ApiResponse.<ShopResponse>builder()
+//                .result(shopService.getInfoById(id))
+//                .build();
+//    }
 
 
 
