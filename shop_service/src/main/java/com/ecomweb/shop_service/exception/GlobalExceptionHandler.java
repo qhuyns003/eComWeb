@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
         apiResponse.setHttpStatus(HttpStatus.valueOf(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode().value()));
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.internalServerError().body(apiResponse);
     }
 
     @ExceptionHandler(value = AppException.class)
