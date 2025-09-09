@@ -86,6 +86,13 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
+    public String getUserIdByUsername(String username){
+        User user = userRepository.findByUsernameAndActive(
+                username,true
+        ).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+        return user.getId();
+    }
+
     public String upgradeSellerRequest(UpgradeSellerRequest request) throws Exception {
        User user = userRepository.findByUsernameAndActive(
                SecurityContextHolder.getContext().getAuthentication().getName(),true

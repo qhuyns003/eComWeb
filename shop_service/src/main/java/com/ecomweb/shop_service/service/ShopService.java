@@ -3,8 +3,10 @@ package com.ecomweb.shop_service.service;
 
 import com.ecomweb.shop_service.dto.event.UpgradeToSellerSnapshot;
 import com.ecomweb.shop_service.dto.request.ShopCreateRequest;
+import com.ecomweb.shop_service.dto.request.ShopUpdateRequest;
 import com.ecomweb.shop_service.dto.request.UpgradeSellerRequest;
 import com.ecomweb.shop_service.dto.response.ApiResponse;
+import com.ecomweb.shop_service.dto.response.ShopResponse;
 import com.ecomweb.shop_service.entity.Shop;
 import com.ecomweb.shop_service.entity.ShopAddress;
 import com.ecomweb.shop_service.exception.AppException;
@@ -71,52 +73,86 @@ public class ShopService {
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
         shop.setShopAddress(shopAddress);
         try{
-            throw new RuntimeException();
-//            shopRepository.save(shop);
+            shopRepository.save(shop);
         }
         catch(Exception ex){
             UpgradeToSellerSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UpgradeToSellerSnapshot.class);
             userProducer.rollbackUser(data);
             throw ex;
         }
-//        return ApiResponse.builder()
-//                        .httpStatus(HttpStatus.OK)
-//                        .result("create successfully")
-//                        .build();
+        return ApiResponse.builder()
+                        .httpStatus(HttpStatus.OK)
+                        .result("create successfully")
+                        .build();
 
 
     }
 
-//    public void update(ShopUpdateRequest shopUpdateRequest) {
-//        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//        Shop shop = user.getShop();
-//        shopMapper.toShop(shop,shopUpdateRequest);
-//        ShopAddress shopAddress = shop.getShopAddress();
-//        shopAddressMapper.toShopAddress(shopAddress,shopUpdateRequest);
-//
-//        shopRepository.save(shop);
-//    }
-//
-//    public ShopResponse getInfo() {
-//       Shop shop = shopRepository.findByUserUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-//       ShopResponse shopResponse = shopMapper.toShopResponse(shop);
-//       shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
-//       return shopResponse;
-//    }
-//
-//    public ShopResponse getInfoById(String id) {
-//        Shop shop = shopRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SHOP_NOT_EXISTS));
-//        ShopResponse shopResponse = shopMapper.toShopResponse(shop);
-//        shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
-//        return shopResponse;
-//    }
-//
-//    public String getUserIdByShopId(String shopId){
-//        return shopRepository.findById(shopId).orElseThrow(
-//                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
-//        ).getUser().getId();
-//    }
+    public ApiResponse getInfo() {
+        String token = AuthUtil.getToken();
+        String userId = "";
+        try {
+            userId = webClient.get()
+                    .uri("/users/"+SecurityContextHolder.getContext().getAuthentication().getName())
+                    .header("Authorization", "Bearer " + token)
+                    .retrieve()
+                    .bodyToMono(ApiResponse.class)
+                    .block().getResult().toString();
+
+        } catch (WebClientResponseException ex) {
+            return ErrorResponseUtil.getResponseBody(ex);
+        }
+        Shop shop = shopRepository.findByUserId(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.SHOP_NOT_EXISTS));
+        ShopResponse shopResponse = shopMapper.toShopResponse(shop);
+        shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
+        return ApiResponse.builder()
+                .result(shopResponse)
+                .build();
+    }
+
+    public ApiResponse update(ShopUpdateRequest shopUpdateRequest) {
+        String token = AuthUtil.getToken();
+        String userId = "";
+        try {
+            userId = webClient.get()
+                    .uri("/users/"+SecurityContextHolder.getContext().getAuthentication().getName())
+                    .header("Authorization", "Bearer " + token)
+                    .retrieve()
+                    .bodyToMono(ApiResponse.class)
+                    .block().getResult().toString();
+
+        } catch (WebClientResponseException ex) {
+            return ErrorResponseUtil.getResponseBody(ex);
+        }
+        Shop shop = shopRepository.findByUserId(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.SHOP_NOT_EXISTS));
+
+        shopMapper.toShop(shop,shopUpdateRequest);
+        ShopAddress shopAddress = shop.getShopAddress();
+        shopAddressMapper.toShopAddress(shopAddress,shopUpdateRequest);
+        shopRepository.save(shop);
+        return ApiResponse.builder()
+                .result("update successful")
+                .build();
+    }
+
+    
+    public ApiResponse getInfoById(String id) {
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SHOP_NOT_EXISTS));
+        ShopResponse shopResponse = shopMapper.toShopResponse(shop);
+        shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
+        return ApiResponse.builder()
+                .result(shopResponse)
+                .build();
+    }
+
+    public String getUserIdByShopId(String shopId){
+        Shop shop = shopRepository.findById(shopId).orElseThrow(
+                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
+        );
+        return shop.getUserId();
+    }
 
 
 

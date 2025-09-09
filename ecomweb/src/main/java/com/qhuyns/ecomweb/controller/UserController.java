@@ -21,6 +21,13 @@ import java.util.List;
 public class UserController {
     UserService userService;
 
+    @GetMapping("/{username}")
+    ApiResponse<?> getUserIdbyUsername(@PathVariable String username){
+        return ApiResponse.builder()
+                .result(userService.getUserIdByUsername(username))
+                .build();
+    }
+
     @PutMapping("/toSeller")
     ApiResponse<?> upgradeToSeller(@RequestBody UpgradeSellerRequest request) throws Exception {
         return ApiResponse.builder()

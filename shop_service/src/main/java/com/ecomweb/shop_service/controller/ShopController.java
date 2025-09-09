@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,27 +30,29 @@ public class ShopController {
                 .body(apiResponse);
     }
 
-//    @PutMapping("")
-//    ApiResponse<?> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
-//        shopService.update(shopUpdateRequest);
-//        return ApiResponse.<String>builder()
-//                .result("success")
-//                .build();
-//    }
-//
-//    @GetMapping("")
-//    ApiResponse<ShopResponse> getInfo() {
-//        return ApiResponse.<ShopResponse>builder()
-//                .result(shopService.getInfo())
-//                .build();
-//    }
-//
-//    @GetMapping("/{id}")
-//    ApiResponse<ShopResponse> getInfoById(@PathVariable String id) {
-//        return ApiResponse.<ShopResponse>builder()
-//                .result(shopService.getInfoById(id))
-//                .build();
-//    }
+    @PutMapping("")
+    ResponseEntity<ApiResponse<?>> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
+        ApiResponse<?> apiResponse=shopService.update(shopUpdateRequest);
+        return ResponseEntity
+                .status(apiResponse.getHttpStatus())
+                .body(apiResponse);
+    }
+
+    @GetMapping("")
+    ResponseEntity<ApiResponse<?>> getInfo() {
+        ApiResponse<?> apiResponse = shopService.getInfo();
+        return ResponseEntity
+                .status(apiResponse.getHttpStatus())
+                .body(apiResponse);
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<ApiResponse<?>> getInfoById(@PathVariable String id) {
+        ApiResponse<?> apiResponse = shopService.getInfoById(id);
+        return ResponseEntity
+                .status(apiResponse.getHttpStatus())
+                .body(apiResponse);
+    }
 
 
 

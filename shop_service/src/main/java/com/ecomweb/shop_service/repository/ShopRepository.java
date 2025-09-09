@@ -3,6 +3,8 @@ package com.ecomweb.shop_service.repository;
 import com.ecomweb.shop_service.entity.Shop;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Optional;
+
 // mongodb:
 //    - truy van single document
 //    - de scale khi du lieu lon
@@ -19,5 +21,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface ShopRepository extends MongoRepository<Shop, String> {
 
    // tự generate query: { "user.username" : username }
-//   Shop findByUserUsername(String username);
+   Optional<Shop> findByUserId(String userId);
 }

@@ -19,6 +19,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+// embedd snapshot (vi du thong tin user) nhung du lieu it co su thay doi, query nhieu hon la ghi, vi neu ghi nhieu se phai sua nhieu noi
+// embedd nhung du lieu khong qua lon (vi du shopaddress 1-1 hoac 1-n vi shop co it address), neu k se phai tach bang vi se bi du lieu phinh to
+// k embedd n-n vi khong the truy van nguoc lai duoc
+// truy van dua vao 1 dieu kien cua bang khac thi co the nhanh hon mysql, nhung nhieu dk thi chac chan cham hon
 public class Shop {
 
     @Id
