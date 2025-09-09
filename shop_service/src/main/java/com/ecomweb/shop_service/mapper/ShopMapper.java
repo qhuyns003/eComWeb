@@ -21,6 +21,6 @@ public interface ShopMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void toShop(@MappingTarget Shop shop, ShopUpdateRequest shopUpdateRequest);
 
-  
+
 
 }

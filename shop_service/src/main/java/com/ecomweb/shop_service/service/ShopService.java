@@ -51,7 +51,7 @@ public class ShopService {
     RedisCacheHelper cacheHelper;
 
     public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
-
+        // chan neu da co shop
         String token = AuthUtil.getToken();
         String userId = "";
         try {
@@ -72,6 +72,7 @@ public class ShopService {
         Shop shop = shopMapper.toShop(shopCreateRequest);
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
         shop.setShopAddress(shopAddress);
+        shop.setUserId(userId);
         try{
             shopRepository.save(shop);
         }
@@ -93,7 +94,7 @@ public class ShopService {
         String userId = "";
         try {
             userId = webClient.get()
-                    .uri("/users/"+SecurityContextHolder.getContext().getAuthentication().getName())
+                    .uri("/users/byUsername/"+SecurityContextHolder.getContext().getAuthentication().getName())
                     .header("Authorization", "Bearer " + token)
                     .retrieve()
                     .bodyToMono(ApiResponse.class)
@@ -116,7 +117,7 @@ public class ShopService {
         String userId = "";
         try {
             userId = webClient.get()
-                    .uri("/users/"+SecurityContextHolder.getContext().getAuthentication().getName())
+                    .uri("/users/byUsername/"+SecurityContextHolder.getContext().getAuthentication().getName())
                     .header("Authorization", "Bearer " + token)
                     .retrieve()
                     .bodyToMono(ApiResponse.class)

@@ -21,7 +21,7 @@ import java.util.List;
 public class UserController {
     UserService userService;
 
-    @GetMapping("/{username}")
+    @GetMapping("/byUsername/{username}")
     ApiResponse<?> getUserIdbyUsername(@PathVariable String username){
         return ApiResponse.builder()
                 .result(userService.getUserIdByUsername(username))
