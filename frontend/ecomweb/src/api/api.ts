@@ -74,7 +74,7 @@ export const searchProductByImage = (file: File, page = 0, size = 8) => {
   });
 };
 export const updateShop = (shopUpdateRequest: any) => {
-  return axiosInstance.put('/shop', shopUpdateRequest);
+  return axiosInstance.put('/shop/', shopUpdateRequest);
 };
 // Cập nhật địa chỉ user
 export const updateUserAddress = (id: string, addressData: any) => {

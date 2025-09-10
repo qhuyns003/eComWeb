@@ -19,6 +19,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+// trailing slash: cơ chế giúp cho các path được khai báo ở ...mapping("../") được đồng nhất
+// ví dụ /shop/ và /shop coi như là 1, controller đều bắt đc, tuy nhiên "" và "/" là ngoại lệ, k coi là 1
+// với các service sử dụng context path mặc định thêm "/" vào cuối, nếu controller có "/.." rồi thì bỏ qua
+// => bestpractice luôn thêm "/" vào path không nên dể "" vì dễ gặp lỗi forward sang mapping của get
+
+
+// trong java 2 method phan biet voi nhau boi ham va tham so
+// => tuy nhien spring chap nhan dieu nay, chi can kac  url va http method
+// requestbody, param mac dinh la required, neu k co se bi loi tru khi set false
 public class ShopController {
 
     ShopService shopService;
@@ -30,7 +39,7 @@ public class ShopController {
                 .body(apiResponse);
     }
 
-    @PutMapping("")
+    @PutMapping("/")
     ResponseEntity<ApiResponse<?>> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
         ApiResponse<?> apiResponse=shopService.update(shopUpdateRequest);
         return ResponseEntity
@@ -38,7 +47,7 @@ public class ShopController {
                 .body(apiResponse);
     }
 
-    @GetMapping("")
+    @GetMapping
     ResponseEntity<ApiResponse<?>> getInfo() {
         ApiResponse<?> apiResponse = shopService.getInfo();
         return ResponseEntity

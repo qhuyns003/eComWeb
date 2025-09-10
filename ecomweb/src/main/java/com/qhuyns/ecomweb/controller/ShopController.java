@@ -33,7 +33,7 @@ public class ShopController {
                 .build();
     }
 
-    @PutMapping("")
+    @PutMapping("/")
     ApiResponse<?> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
         shopService.update(shopUpdateRequest);
         return ApiResponse.<String>builder()
