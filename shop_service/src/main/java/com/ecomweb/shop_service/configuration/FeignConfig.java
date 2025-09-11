@@ -16,7 +16,7 @@ public class FeignConfig {
             var auth = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.getToken() != null) {
                 String token = auth.getToken().getTokenValue();
-                template.header("Authorization", "Bearer" + token);
+                template.header("Authorization", "Bearer " + token);
             }
 
         };

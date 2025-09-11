@@ -3,7 +3,12 @@ package com.ecomweb.gateway.configuration;
 import com.ecomweb.gateway.dto.request.IntrospectRequest;
 import com.ecomweb.gateway.dto.response.ApiResponse;
 import com.ecomweb.gateway.dto.response.IntrospectResponse;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -17,17 +22,22 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Slf4j
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomJwtDecoder implements ReactiveJwtDecoder {
 
     @Value("${jwt.signerKey}")
-    private String signerKey;
+    @NonFinal
+    String signerKey;
 
-    private final WebClient webClient;
+    // k dung requiredArg duoc vi lombok khong doc duoc annotation qualifier vao de chon bean phu hop
+    @Qualifier("mainService")
+    WebClient webClient;
 
+    @NonFinal
     private NimbusReactiveJwtDecoder nimbusJwtDecoder;
 
-    public CustomJwtDecoder(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("http://localhost:8080").build();
+    public CustomJwtDecoder(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     @Override
