@@ -11,6 +11,7 @@ import com.ecomweb.shop_service.entity.Shop;
 import com.ecomweb.shop_service.entity.ShopAddress;
 import com.ecomweb.shop_service.exception.AppException;
 import com.ecomweb.shop_service.exception.ErrorCode;
+import com.ecomweb.shop_service.feignClient.MainFeignClient;
 import com.ecomweb.shop_service.mapper.ShopAddressMapper;
 import com.ecomweb.shop_service.mapper.ShopMapper;
 import com.ecomweb.shop_service.producer.UserProducer;
@@ -19,6 +20,7 @@ import com.ecomweb.shop_service.util.AuthUtil;
 import com.ecomweb.shop_service.util.ErrorResponseUtil;
 import com.ecomweb.shop_service.util.RedisCacheHelper;
 import com.ecomweb.shop_service.util.RedisKey;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -41,6 +43,9 @@ import java.util.List;
 // khi co them call api phai handler bang mesage broker
 // muon transaction rollback khi catch thi phai throw lai loi
 // try catch bbat loi truoc globalExceptinoHanlder
+
+// neu catch loi thi no se k in stack trace -> tu in
+// neu loi bi bat bang handler thi cung phai log trace ra neu muon in
 public class ShopService {
 
     ShopRepository shopRepository;
@@ -49,24 +54,19 @@ public class ShopService {
     WebClient webClient;
     UserProducer userProducer;
     RedisCacheHelper cacheHelper;
+    MainFeignClient mainFeignClient;
 
     public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
         // chan neu da co shop
         String token = AuthUtil.getToken();
         String userId = "";
         try {
-            userId = webClient.put()
-                    .uri("/users/toSeller")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", "Bearer " + token)
-                    .bodyValue(UpgradeSellerRequest.builder()
+            userId = mainFeignClient.upgradeToSeller(UpgradeSellerRequest.builder()
                             .shopName(shopCreateRequest.getName())
-                            .build())
-                    .retrieve()
-                    .bodyToMono(ApiResponse.class)
-                    .block().getResult().toString();
-
-        } catch (WebClientResponseException ex) {
+                            .build()).getResult().toString();
+        } catch (FeignException ex) {
+            // try chi co feign nen bat feignex la du
+            // bat exception neu con nhung code logic khac
            return ErrorResponseUtil.getResponseBody(ex);
         }
         Shop shop = shopMapper.toShop(shopCreateRequest);
@@ -93,14 +93,10 @@ public class ShopService {
         String token = AuthUtil.getToken();
         String userId = "";
         try {
-            userId = webClient.get()
-                    .uri("/users/byUsername/"+SecurityContextHolder.getContext().getAuthentication().getName())
-                    .header("Authorization", "Bearer " + token)
-                    .retrieve()
-                    .bodyToMono(ApiResponse.class)
-                    .block().getResult().toString();
-
-        } catch (WebClientResponseException ex) {
+            userId = mainFeignClient
+                    .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
+                    .getResult().toString();
+        } catch (FeignException ex) {
             return ErrorResponseUtil.getResponseBody(ex);
         }
         Shop shop = shopRepository.findByUserId(userId)
@@ -116,14 +112,11 @@ public class ShopService {
         String token = AuthUtil.getToken();
         String userId = "";
         try {
-            userId = webClient.get()
-                    .uri("/users/byUsername/"+SecurityContextHolder.getContext().getAuthentication().getName())
-                    .header("Authorization", "Bearer " + token)
-                    .retrieve()
-                    .bodyToMono(ApiResponse.class)
-                    .block().getResult().toString();
+            userId = mainFeignClient
+                    .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
+                    .getResult().toString();
 
-        } catch (WebClientResponseException ex) {
+        } catch (FeignException ex) {
             return ErrorResponseUtil.getResponseBody(ex);
         }
         Shop shop = shopRepository.findByUserId(userId)

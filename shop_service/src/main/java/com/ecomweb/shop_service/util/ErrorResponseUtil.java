@@ -5,6 +5,7 @@ import com.ecomweb.shop_service.dto.response.ApiResponse;
 import com.ecomweb.shop_service.exception.AppException;
 import com.ecomweb.shop_service.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,13 +16,12 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Slf4j
 public class ErrorResponseUtil {
 
-    public static ApiResponse getResponseBody(WebClientResponseException ex) {
+    public static ApiResponse getResponseBody(FeignException ex) {
 
         ApiResponse errorBody;
         try {
-            errorBody = new ObjectMapper().readValue(ex.getResponseBodyAsString(), ApiResponse.class);
-            log.info(ex.getResponseBodyAsString());
-            errorBody.setHttpStatus(HttpStatus.valueOf(ex.getRawStatusCode()));
+            errorBody = new ObjectMapper().readValue(ex.getMessage(), ApiResponse.class);
+            errorBody.setHttpStatus(HttpStatus.valueOf(ex.status()));
         } catch (Exception e) {
             errorBody = new ApiResponse();
             errorBody.setMessage("Cannot parse error body");

@@ -1,5 +1,4 @@
 spring:
-
   data:
     mongodb:
       uri: mongodb://myuser:mypassword@localhost:27017/shop_service?authSource=admin
