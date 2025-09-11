@@ -20,7 +20,7 @@ public class ErrorResponseUtil {
 
         ApiResponse errorBody;
         try {
-            errorBody = new ObjectMapper().readValue(ex.getMessage(), ApiResponse.class);
+            errorBody = new ObjectMapper().readValue(ex.contentUTF8(), ApiResponse.class);
             errorBody.setHttpStatus(HttpStatus.valueOf(ex.status()));
         } catch (Exception e) {
             errorBody = new ApiResponse();

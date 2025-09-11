@@ -4,6 +4,7 @@ import feign.RequestInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 @Configuration
 public class FeignConfig {
@@ -12,10 +13,10 @@ public class FeignConfig {
     @Bean
     public RequestInterceptor requestInterceptor() {
         return template -> {
-            var auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.getCredentials() != null) {
-                String token = auth.getCredentials().toString();
-                template.header("Authorization", "Bearer " + token);
+            var auth = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.getToken() != null) {
+                String token = auth.getToken().getTokenValue();
+                template.header("Authorization", "Bearer" + token);
             }
 
         };

@@ -20,18 +20,7 @@ public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
 
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
-        // loi bat in stacktrace ra
-        log.error("Exception: ", exception);
-        ApiResponse apiResponse = new ApiResponse();
 
-        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-        apiResponse.setHttpStatus(HttpStatus.valueOf(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode().value()));
-
-        return ResponseEntity.internalServerError().body(apiResponse);
-    }
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
@@ -92,6 +81,18 @@ public class GlobalExceptionHandler {
         apiResponse.setHttpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()));
 
         return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    @ExceptionHandler(value = Exception.class)
+    ResponseEntity<ApiResponse> handlingException(Exception exception) {
+        // loi bat in stacktrace ra
+        log.error("Exception: ", exception);
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        apiResponse.setHttpStatus(HttpStatus.valueOf(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode().value()));
+
+        return ResponseEntity.internalServerError().body(apiResponse);
     }
 
     private String mapAttribute(String message, Map<String, Object> attributes) {

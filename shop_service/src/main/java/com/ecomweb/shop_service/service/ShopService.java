@@ -31,9 +31,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.List;
+// try chi co feign nen bat feignex la du
+// bat exception neu con nhung code logic khac
+
+// tuy nhien k chi nen catch moi exception vi neu co nhieu subexxception khac thi se k get duoc body va status dung do moi subex co cach get khac nhau
+// Exception chỉ có message, cause, stacktrace -> nên bắt subclass của ex là dạng http ex thì mới lấy đc body và status
+// neu k bat Exception de trả về postman dạng không theo cấu trúc định sẵn, status mặc định 500 -> do spring config
+// cac loi checked luon phai xu ly bang code bang cach try catch hoac throw => handler cho exception chung de dua ve format chung de co the truyen loi di cho khac
+
 
 @Service
 @RequiredArgsConstructor
@@ -58,16 +64,13 @@ public class ShopService {
 
     public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
         // chan neu da co shop
-        String token = AuthUtil.getToken();
         String userId = "";
         try {
             userId = mainFeignClient.upgradeToSeller(UpgradeSellerRequest.builder()
                             .shopName(shopCreateRequest.getName())
                             .build()).getResult().toString();
         } catch (FeignException ex) {
-            // try chi co feign nen bat feignex la du
-            // bat exception neu con nhung code logic khac
-           return ErrorResponseUtil.getResponseBody(ex);
+            return ErrorResponseUtil.getResponseBody(ex);
         }
         Shop shop = shopMapper.toShop(shopCreateRequest);
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
@@ -90,7 +93,6 @@ public class ShopService {
     }
 
     public ApiResponse getInfo() {
-        String token = AuthUtil.getToken();
         String userId = "";
         try {
             userId = mainFeignClient
@@ -109,7 +111,6 @@ public class ShopService {
     }
 
     public ApiResponse update(ShopUpdateRequest shopUpdateRequest) {
-        String token = AuthUtil.getToken();
         String userId = "";
         try {
             userId = mainFeignClient

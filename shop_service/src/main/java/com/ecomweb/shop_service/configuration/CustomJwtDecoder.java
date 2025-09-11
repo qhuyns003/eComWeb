@@ -41,7 +41,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
 
-
+// dung webclient cua webflux ma .block thi toc do cung ngang feign
        return
                webClient.post()
                        .uri("/auth/introspect")

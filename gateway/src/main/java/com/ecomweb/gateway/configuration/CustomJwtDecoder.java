@@ -32,6 +32,7 @@ public class CustomJwtDecoder implements ReactiveJwtDecoder {
 
     @Override
     public Mono<Jwt> decode(String token) throws JwtException {
+ // bản thân gateway phải xây trên webflux => tất cả các api phải nên gọi dưới dngj non-blocking api để tận dụng ưu điểm của webflux
 
         return webClient.post()
                 .uri("/auth/introspect")
