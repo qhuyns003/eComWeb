@@ -62,6 +62,10 @@ public class ShopService {
     RedisCacheHelper cacheHelper;
     MainFeignClient mainFeignClient;
 
+    // inline saga voi UC don gian
+    // UC phuc tap su dung orchestrator
+    // Orchestrator Saga và Inline Saga KHÔNG đảm bảo ACID tuyệt đối ma chi la huy logic chu kp rollback db
+    // Trong microservice, ACID gần như không khả thi nếu cross-service, trừ khi dùng 2PC/XA transaction
     public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
         // chan neu da co shop
         String userId = "";
