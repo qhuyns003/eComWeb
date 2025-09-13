@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,27 +23,25 @@ public class NotificationController {
 
 
     @PostMapping("/send")
-    public ApiResponse<?> createNotification(@RequestBody NotificationRequest notificationRequest) {
-        notificationService.createNotification(notificationRequest);
-        return ApiResponse.builder()
-                .result("Notification created")
-                .build();
+    public ResponseEntity<ApiResponse<?>> createNotification(@RequestBody NotificationRequest notificationRequest) {
+        ApiResponse<?> apiResponse = notificationService.createNotification(notificationRequest);
+        return ResponseEntity.status(apiResponse.getHttpStatus())
+                .body(apiResponse);
     }
 
     @GetMapping("/{userId}")
-    public ApiResponse<List<NotificationResponse>> getNotificationsByUser(@PathVariable String userId) {
-        return ApiResponse.<List<NotificationResponse>>builder()
-                .result(notificationService.getNotificationsByUser(userId))
-                .build();
+    public ResponseEntity<ApiResponse<List<NotificationResponse>>> getNotificationsByUser(@PathVariable String userId) {
+        ApiResponse<List<NotificationResponse>> apiResponse = notificationService.getNotificationsByUser(userId);
+        return ResponseEntity.status(apiResponse.getHttpStatus())
+                .body(apiResponse);
     }
 
 
 
     @PostMapping("/read")
-    public ApiResponse<?> markNotificationAsRead(@RequestBody NotificationKeyRequest notificationKeyRequest) {
-        notificationService.markNotificationAsRead(notificationKeyRequest);
-        return ApiResponse.builder()
-                .result("Notification created")
-                .build();
+    public ResponseEntity<ApiResponse<?>> markNotificationAsRead(@RequestBody NotificationKeyRequest notificationKeyRequest) {
+        ApiResponse<?> apiResponse = notificationService.markNotificationAsRead(notificationKeyRequest);
+        return ResponseEntity.status(apiResponse.getHttpStatus())
+                .body(apiResponse);
     }
 }

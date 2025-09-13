@@ -62,7 +62,6 @@ public class NotificationService {
             notification.setStatus(NotificationStatus.UNREAD.name());
             notificationRepository.save(notification);
 
-            String token = AuthUtil.getToken();
             String username ="";
             try{
                 username = mainFeignClient.getUsernameById(userId).getResult();
@@ -87,14 +86,16 @@ public class NotificationService {
     };
 
     // Lấy tất cả thông báo của một user
-    public List<NotificationResponse> getNotificationsByUser(String userId) {
-
-        return notificationRepository.findByKeyUserIdOrderByKeyCreatedAtDesc(userId)
+    public ApiResponse<List<NotificationResponse>> getNotificationsByUser(String userId) {
+        List<NotificationResponse> responses = notificationRepository.findByKeyUserIdOrderByKeyCreatedAtDesc(userId)
                 .stream().map((notification) -> {
                     NotificationResponse notificationResponse = notificationMapper.toNotificationResponse(notification);
                     notificationResponse.setKey(notificationKeyMapper.toNotificationKeyResponse(notification.getKey()));
                     return notificationResponse;
                 }).collect(Collectors.toList());
+        return ApiResponse.<List<NotificationResponse>>builder()
+                .result(responses)
+                .build();
     }
 
     // Đánh dấu thông báo là đã đọc
