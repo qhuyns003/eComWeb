@@ -4,6 +4,7 @@ package com.ecomweb.notification_service.exception;
 import com.ecomweb.notification_service.dto.response.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,16 +20,7 @@ public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
 
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
-        log.error("Exception: ", exception);
-        ApiResponse apiResponse = new ApiResponse();
 
-        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-
-        return ResponseEntity.badRequest().body(apiResponse);
-    }
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
@@ -37,6 +29,7 @@ public class GlobalExceptionHandler {
 
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
+        apiResponse.setHttpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()));
         String message = errorCode.getMessage();
         if (exception.getArgs() != null && exception.getArgs().length > 0) {
             message = String.format(message, exception.getArgs());
@@ -54,6 +47,7 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
+                        .httpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()))
                         .build());
     }
 
@@ -84,8 +78,21 @@ public class GlobalExceptionHandler {
                 Objects.nonNull(attributes)
                         ? mapAttribute(errorCode.getMessage(), attributes)
                         : errorCode.getMessage());
+        apiResponse.setHttpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()));
 
         return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    @ExceptionHandler(value = Exception.class)
+    ResponseEntity<ApiResponse> handlingException(Exception exception) {
+        // loi bat in stacktrace ra
+        log.error("Exception: ", exception);
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        apiResponse.setHttpStatus(HttpStatus.valueOf(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode().value()));
+
+        return ResponseEntity.internalServerError().body(apiResponse);
     }
 
     private String mapAttribute(String message, Map<String, Object> attributes) {

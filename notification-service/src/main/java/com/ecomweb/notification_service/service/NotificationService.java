@@ -11,10 +11,13 @@ import com.ecomweb.notification_service.entity.Notification;
 import com.ecomweb.notification_service.entity.NotificationStatus;
 import com.ecomweb.notification_service.exception.AppException;
 import com.ecomweb.notification_service.exception.ErrorCode;
+import com.ecomweb.notification_service.feignClient.MainFeignClient;
 import com.ecomweb.notification_service.mapper.NotificationKeyMapper;
 import com.ecomweb.notification_service.mapper.NotificationMapper;
 import com.ecomweb.notification_service.repository.NotificationRepository;
 import com.ecomweb.notification_service.util.AuthUtil;
+import com.ecomweb.notification_service.util.ErrorResponseUtil;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -46,10 +49,11 @@ public class NotificationService {
     NotificationMapper  notificationMapper;
     NotificationKeyMapper  notificationKeyMapper;
     SimpMessagingTemplate messagingTemplate;
-    @Qualifier("mainService")
-    WebClient webClient;
-    // Tạo thông báo mới
-    public void createNotification(NotificationRequest notificationRequest) {
+    MainFeignClient mainFeignClient;
+    // chỉ cần 1 lỗi unchecked throw ra, tất cả save sẽ rollback dù trc đó có get (nó sẽ lấy dl cache), hay flush
+    @Transactional
+    public ApiResponse<?> createNotification(NotificationRequest notificationRequest) {
+
         for (String userId : notificationRequest.getRecipientId()) {
             Notification notification = notificationMapper.toNotification(notificationRequest);
             notification.getKey().setNotificationId(UUID.randomUUID().toString());
@@ -58,17 +62,14 @@ public class NotificationService {
             notification.setStatus(NotificationStatus.UNREAD.name());
             notificationRepository.save(notification);
 
-            JwtAuthenticationToken authentication =
-                    (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
-            String token = authentication.getToken().getTokenValue();
-
-            String username = webClient.get()
-                    .uri("/users/"+userId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                    .retrieve()// gui rq
-                    .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
-                            .block().getResult().getUsername();
+            String token = AuthUtil.getToken();
+            String username ="";
+            try{
+                username = mainFeignClient.getUsernameById(userId).getResult();
+            }
+            catch(FeignException ex){
+                return ErrorResponseUtil.getResponseBody(ex);
+            }
             NotificationResponse notificationResponse = notificationMapper.toNotificationResponse(notification);
             notificationResponse.setKey(notificationKeyMapper.toNotificationKeyResponse(notification.getKey()));
             messagingTemplate.convertAndSendToUser(
@@ -79,8 +80,11 @@ public class NotificationService {
                             .build()
             );
         }
+        return ApiResponse.builder()
+                .result("create successful")
+                .build();
 
-    }
+    };
 
     // Lấy tất cả thông báo của một user
     public List<NotificationResponse> getNotificationsByUser(String userId) {
@@ -94,25 +98,27 @@ public class NotificationService {
     }
 
     // Đánh dấu thông báo là đã đọc
-    public void markNotificationAsRead(NotificationKeyRequest notificationKeyRequest) {
+    public ApiResponse<?> markNotificationAsRead(NotificationKeyRequest notificationKeyRequest) {
         Notification notification = notificationRepository
                 .findByKeyUserIdAndKeyCreatedAtAndKeyNotificationId(notificationKeyRequest.getUserId(),notificationKeyRequest.getCreatedAt(),notificationKeyRequest.getNotificationId());
         notification.setStatus(NotificationStatus.READ.name());
         notificationRepository.save(notification);
 
         String token = AuthUtil.getToken();
-
-        String username = webClient.get()
-                .uri("/users/"+notificationKeyRequest.getUserId())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token )
-                .retrieve()// gui rq
-                .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserResponse>>() {})
-                .block().getResult().getUsername();
-
+        String username ="";
+        try{
+            username = mainFeignClient.getUsernameById(notificationKeyRequest.getUserId()).getResult();
+        }
+        catch(FeignException ex){
+            return ErrorResponseUtil.getResponseBody(ex);
+        }
         messagingTemplate.convertAndSendToUser(
                 username,
                 "/queue/notifications",
                 notificationMapper.toNotificationResponse(notification)
         );
+        return ApiResponse.builder()
+                .result("successful")
+                .build();
     }
 }
