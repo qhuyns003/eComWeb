@@ -1,7 +1,8 @@
 package com.qhuyns.ecomweb.listener;
 
 import com.qhuyns.ecomweb.configuration.RabbitMQConfig;
-import com.qhuyns.ecomweb.dto.event.UpgradeToSellerSnapshot;
+import com.qhuyns.ecomweb.dto.event.ShopCreationFailed;
+import com.qhuyns.ecomweb.dto.event.UserSnapshot;
 import com.qhuyns.ecomweb.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,10 @@ public class UserListener {
     UserService userService;
 
 // se bi lap vo han cho den khi message trong queue dc xu li
-    @RabbitListener(queues = RabbitMQConfig.ROLLBACK_TOSELLER_QUEUE)
-    public void handleRollback(UpgradeToSellerSnapshot snapshot) {
-        userService.upgradeSellerRollback(snapshot);
+    @RabbitListener(queues = RabbitMQConfig.USER_SERVICE_SHOP_CREATION_FAILED_QUEUE)
+    public void handleRollback(ShopCreationFailed shopCreationFailed) {
+        if(shopCreationFailed.getUserSnapshot() != null) {
+            userService.upgradeSellerRollback(shopCreationFailed.getUserSnapshot());
+        }
     }
 }

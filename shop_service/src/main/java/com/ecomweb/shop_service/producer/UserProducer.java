@@ -1,9 +1,9 @@
 package com.ecomweb.shop_service.producer;
 
 import com.ecomweb.shop_service.configuration.RabbitMQConfig;
-import com.ecomweb.shop_service.dto.event.UpgradeToSellerSnapshot;
+import com.ecomweb.shop_service.dto.event.ShopCreationFailed;
+import com.ecomweb.shop_service.dto.event.UserSnapshot;
 import com.ecomweb.shop_service.util.RedisCacheHelper;
-import com.ecomweb.shop_service.util.RedisKey;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,11 +20,11 @@ public class UserProducer {
     private final RabbitTemplate rabbitTemplate;
     RedisCacheHelper cacheHelper;
 
-    public void rollbackUser(UpgradeToSellerSnapshot upgradeToSellerSnapshot) {
+    public void shopCreationFailed(ShopCreationFailed shopCreationFailed) {
         rabbitTemplate.convertAndSend(
-                RabbitMQConfig.USER_EXCHANGE,
-                RabbitMQConfig.ROLLBACK_TOSELLER,
-                upgradeToSellerSnapshot
+                RabbitMQConfig.SHOP_EXCHANGE,
+                RabbitMQConfig.SHOP_CREATION_FAILED,
+                shopCreationFailed
         );
     }
 

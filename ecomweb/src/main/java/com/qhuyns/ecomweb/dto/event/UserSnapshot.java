@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpgradeToSellerSnapshot {
+public class UserSnapshot {
     String id;
     String username;
     String fullName;

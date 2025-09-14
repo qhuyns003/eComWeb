@@ -2,7 +2,7 @@ package com.qhuyns.ecomweb.service;
 
 
 import com.qhuyns.ecomweb.constant.PredefinedRole;
-import com.qhuyns.ecomweb.dto.event.UpgradeToSellerSnapshot;
+import com.qhuyns.ecomweb.dto.event.UserSnapshot;
 import com.qhuyns.ecomweb.dto.request.UpgradeSellerRequest;
 import com.qhuyns.ecomweb.dto.request.UserCreationRequest;
 import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
@@ -24,7 +24,6 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -99,7 +97,7 @@ public class UserService {
        ).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
 
         cacheHelper.saveToCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+user.getId()
-                , UpgradeToSellerSnapshot.builder()
+                , UserSnapshot.builder()
                                 .id(user.getId())
                         .fullName(user.getFullName())
                         .build()
@@ -116,7 +114,7 @@ public class UserService {
     }
 
     @Transactional
-    public void upgradeSellerRollback(UpgradeToSellerSnapshot data) {
+    public void upgradeSellerRollback(UserSnapshot data) {
         User user = userRepository.findByIdAndActive(
                 data.getId(),true
         ).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));

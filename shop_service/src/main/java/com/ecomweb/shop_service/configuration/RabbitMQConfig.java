@@ -10,32 +10,62 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
+    // exchange va key dat theo publisher
+    // queue dat theo consummer
 
-    public static final String USER_EXCHANGE = "userExchange";
+    public static final String SHOP_EXCHANGE = "shop.exchange";
+    public static final String DLQ_EXCHANGE = "dlq.exchange";
 
-    // === Queues ===
-    public static final String ROLLBACK_TOSELLER_QUEUE = "user.rollbackSellerQueue";
-
+    // === Queues === producer k quan tam queue
+    public static final String USER_SERVICE_SHOP_CREATION_FAILED_QUEUE = "user-service.shop-creation-failed.queue";
+    public static final String DLQ_QUEUE = "dlq.queue";
     // === Routing Keys ===
-    public static final String ROLLBACK_TOSELLER = "user.rollbackSeller";
+    public static final String SHOP_CREATION_FAILED = "shop.creation.failed";
+    public static final String DLQ = "dlq";
 
+
+
+
+    // Queue DLQ
     @Bean
-    public DirectExchange userExchange() {
-        return new DirectExchange(USER_EXCHANGE);
+    Queue deadLetterQueue() {
+        return QueueBuilder.durable(DLQ).build();
     }
 
     @Bean
-    public Queue rollbackToSellerQueue() {
-        return QueueBuilder.durable(ROLLBACK_TOSELLER_QUEUE).build();
+    public Queue userServiceShopCreationFailedQueue() {
+
+        return QueueBuilder.durable(USER_SERVICE_SHOP_CREATION_FAILED_QUEUE)
+                .withArgument("x-dead-letter-exchange", DLQ_EXCHANGE ) // exchange mặc định
+                .withArgument("x-dead-letter-routing-key", DLQ) // đẩy sang DLQ khi fail
+                .build();
+    }
+
+    // Exchange
+    @Bean
+    public DirectExchange shopExchange() {
+        return new DirectExchange(SHOP_EXCHANGE);
+    }
+
+    @Bean
+    DirectExchange exchange() {
+        return new DirectExchange(DLQ_EXCHANGE);
     }
 
     // dua vao ten tham so de lay ra bean queue va exchange tuogn ung
+    // Binding
     @Bean
-    public Binding bindingRollback(Queue rollbackToSellerQueue, DirectExchange userExchange) {
-        return BindingBuilder.bind(rollbackToSellerQueue)
-                .to(userExchange)
-                .with(ROLLBACK_TOSELLER);
+    Binding binding(Queue deadLetterQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(deadLetterQueue).to(exchange).with(DLQ);
     }
+
+    @Bean
+    public Binding bindingShopCreationFailed(Queue userServiceShopCreationFailedQueue, DirectExchange shopExchange) {
+        return BindingBuilder.bind(userServiceShopCreationFailedQueue)
+                .to(shopExchange)
+                .with(SHOP_CREATION_FAILED);
+    }
+
 
 
     // cau hinh giup serilizable vaf deseriliazlbe object thanh json

@@ -1,7 +1,8 @@
 package com.ecomweb.shop_service.service;
 
 
-import com.ecomweb.shop_service.dto.event.UpgradeToSellerSnapshot;
+import com.ecomweb.shop_service.dto.event.ShopCreationFailed;
+import com.ecomweb.shop_service.dto.event.UserSnapshot;
 import com.ecomweb.shop_service.dto.request.ShopCreateRequest;
 import com.ecomweb.shop_service.dto.request.ShopUpdateRequest;
 import com.ecomweb.shop_service.dto.request.UpgradeSellerRequest;
@@ -16,7 +17,6 @@ import com.ecomweb.shop_service.mapper.ShopAddressMapper;
 import com.ecomweb.shop_service.mapper.ShopMapper;
 import com.ecomweb.shop_service.producer.UserProducer;
 import com.ecomweb.shop_service.repository.ShopRepository;
-import com.ecomweb.shop_service.util.AuthUtil;
 import com.ecomweb.shop_service.util.ErrorResponseUtil;
 import com.ecomweb.shop_service.util.RedisCacheHelper;
 import com.ecomweb.shop_service.util.RedisKey;
@@ -26,8 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -84,8 +82,10 @@ public class ShopService {
             shopRepository.save(shop);
         }
         catch(Exception ex){
-            UpgradeToSellerSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UpgradeToSellerSnapshot.class);
-            userProducer.rollbackUser(data);
+            UserSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UserSnapshot.class);
+            userProducer.shopCreationFailed(ShopCreationFailed.builder()
+                            .userSnapshot(data)
+                    .build());
             throw ex;
         }
         return ApiResponse.builder()
