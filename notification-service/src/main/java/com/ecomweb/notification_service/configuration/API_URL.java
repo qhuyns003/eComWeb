@@ -4,7 +4,8 @@ public class API_URL {
     // co context path tu dong them vao, phai can than
     public static final String[] URL_ANONYMOUS_GET = {
             // /* la 1 duong dan /** la nhieu duong dan
-           "/**"
+            "/actuator/**",
+            "/**"
 
     };
 

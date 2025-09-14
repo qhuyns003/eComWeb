@@ -1,0 +1,19 @@
+global:                      # cấu hình chung
+  scrape_interval: 5s        # cứ mỗi 5 giây Prometheus sẽ gọi tới service để lấy metrics
+
+scrape_configs:              # danh sách service Prometheus cần theo dõi
+  - job_name: 'main-service' # tên job (dùng để phân biệt service trong Grafana/Prometheus)
+    metrics_path: '/actuator/prometheus'
+    static_configs:          # khai báo target thủ công (static)
+      - targets: ['host.docker.internal:8081']  # k dung localhost vi docker se nham thanh localhost cua docker
+        # URL của service -> Prometheus sẽ gọi http://host.docker.internal:8081/actuator/prometheus
+  - job_name: 'notification-service' 
+    metrics_path: '/notifications/actuator/prometheus'
+    static_configs:         
+      - targets: ['host.docker.internal:8082']
+  - job_name: 'shop-service' 
+    metrics_path: '/shop/actuator/prometheus'
+    static_configs:          
+      - targets: ['host.docker.internal:8083']
+
+# docker-compose restart prometheus -> them service moi

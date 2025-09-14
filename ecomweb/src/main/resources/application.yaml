@@ -57,4 +57,17 @@ vnpay:
 elastic.apm:
   server_urls: "http://127.0.0.1:8200"
   service_name: "ecomweb-backend"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus  # mở endpoint prometheus
+  endpoint:
+    prometheus:
+      access: unrestricted
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
 

@@ -26,3 +26,15 @@ server:
   port: 8082
   servlet:
     context-path: /notifications
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus  # mở endpoint prometheus
+  endpoint:
+    prometheus:
+      access: unrestricted
+  prometheus:
+    metrics:
+      export:
+        enabled: true
