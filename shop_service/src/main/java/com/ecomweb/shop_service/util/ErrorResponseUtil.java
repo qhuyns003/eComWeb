@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Slf4j
+// feign error
 public class ErrorResponseUtil {
 
     public static ApiResponse getResponseBody(FeignException ex) {

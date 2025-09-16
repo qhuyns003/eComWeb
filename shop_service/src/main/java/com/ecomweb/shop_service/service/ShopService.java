@@ -52,6 +52,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 // neu loi bi bat bang handler thi cung phai log trace ra neu muon in
 public class ShopService {
 
+    // choreo, gửi message kiểu dây chuyền service này sang serviec kia và cứ thế, thường dùng trong nghiệp vụ phụ
+    // orches, dùng trong các nghiệp vụ chính, thường là sync nhưu code bên dưới là orches do có 1 service chính quản lý
+    // khi nghiệp vụ dài ngta thường triển khai dưới dạng 1 pattern, còn 1-2 service có thể xử lí trong method
     ShopRepository shopRepository;
     ShopMapper shopMapper;
     ShopAddressMapper shopAddressMapper;
@@ -62,8 +65,9 @@ public class ShopService {
 
     // inline saga voi UC don gian
     // UC phuc tap su dung orchestrator
-    // Orchestrator Saga và Inline Saga KHÔNG đảm bảo ACID tuyệt đối ma chi la huy logic chu kp rollback db
+    // Orchestrator Saga và Choreography Saga KHÔNG đảm bảo ACID tuyệt đối ma chi la huy logic chu kp rollback db
     // Trong microservice, ACID gần như không khả thi nếu cross-service, trừ khi dùng 2PC/XA transaction
+   // compensation fail -> dua vao dlq
     public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
         // chan neu da co shop
         String userId = "";
@@ -78,8 +82,10 @@ public class ShopService {
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
         shop.setShopAddress(shopAddress);
         shop.setUserId(userId);
+
         try{
             shopRepository.save(shop);
+            throw new RuntimeException();
         }
         catch(Exception ex){
             UserSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UserSnapshot.class);
@@ -88,10 +94,10 @@ public class ShopService {
                     .build());
             throw ex;
         }
-        return ApiResponse.builder()
-                        .httpStatus(HttpStatus.OK)
-                        .result("create successfully")
-                        .build();
+//        return ApiResponse.builder()
+//                        .httpStatus(HttpStatus.OK)
+//                        .result("create successfully")
+//                        .build();
 
 
     }

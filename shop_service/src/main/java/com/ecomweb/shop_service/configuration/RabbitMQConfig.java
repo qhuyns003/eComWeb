@@ -19,8 +19,10 @@ public class RabbitMQConfig {
     // === Queues === producer k quan tam queue
     public static final String USER_SERVICE_SHOP_CREATION_FAILED_QUEUE = "user-service.shop-creation-failed.queue";
     public static final String DLQ_QUEUE = "dlq.queue";
+    public static final String USER_SERVICE_SHOP_CREATED_QUEUE = "user-service.shop-created.queue";
     // === Routing Keys ===
     public static final String SHOP_CREATION_FAILED = "shop.creation.failed";
+    public static final String SHOP_CREATED = "shop.created";
     public static final String DLQ = "dlq";
 
 
@@ -29,7 +31,7 @@ public class RabbitMQConfig {
     // Queue DLQ
     @Bean
     Queue deadLetterQueue() {
-        return QueueBuilder.durable(DLQ).build();
+        return QueueBuilder.durable(DLQ_QUEUE).build();
     }
 
     @Bean
@@ -40,6 +42,15 @@ public class RabbitMQConfig {
                 .withArgument("x-dead-letter-routing-key", DLQ) // đẩy sang DLQ khi fail
                 .build();
     }
+
+    @Bean
+    public Queue userServiceShopCreatedQueue() {
+
+        return QueueBuilder.durable(USER_SERVICE_SHOP_CREATED_QUEUE)
+                .build();
+    }
+
+
 
     // Exchange
     @Bean
@@ -64,6 +75,13 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(userServiceShopCreationFailedQueue)
                 .to(shopExchange)
                 .with(SHOP_CREATION_FAILED);
+    }
+
+    @Bean
+    public Binding bindingShopCreated(Queue userServiceShopCreatedQueue, DirectExchange shopExchange) {
+        return BindingBuilder.bind(userServiceShopCreatedQueue)
+                .to(shopExchange)
+                .with(SHOP_CREATED);
     }
 
 

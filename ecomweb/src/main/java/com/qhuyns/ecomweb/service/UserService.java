@@ -115,6 +115,7 @@ public class UserService {
 
     @Transactional
     public void upgradeSellerRollback(UserSnapshot data) {
+
         User user = userRepository.findByIdAndActive(
                 data.getId(),true
         ).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));

@@ -19,7 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 @FeignClient(name = "main-service", url = "http://localhost:8081", configuration = FeignConfig.class)
 public interface MainFeignClient {
-    @PutMapping("/shop/")
+    @PutMapping("/users/toSeller")
     ApiResponse<?> upgradeToSeller(@RequestBody UpgradeSellerRequest request);
 
     @GetMapping("/users/byUsername/{username}")
