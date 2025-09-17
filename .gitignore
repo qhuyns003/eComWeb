@@ -1,0 +1,36 @@
+# OS
+*.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Maven
+target/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Node
+node_modules/
+
+# Docker
+docker-compose.override.yml
+
+# MongoDB data (do not commit runtime DB files)
+/shop_service/mongoDB/data/
+/shop_service/mongoDB/data/**
+
+# Optional: ignore WiredTiger files pattern if someone accidentally committed them
+**/WiredTiger*
+**/*.wt
+
+# Build artifacts
+dist/
+
+# Temporary files
+*.tmp
+*.bak
