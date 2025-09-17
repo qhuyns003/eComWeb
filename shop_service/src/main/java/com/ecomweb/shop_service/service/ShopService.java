@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.reactive.function.client.WebClient;
 
 // try chi co feign nen bat feignex la du
@@ -47,6 +49,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 // khi co them call api phai handler bang mesage broker
 // muon transaction rollback khi catch thi phai throw lai loi
 // try catch bbat loi truoc globalExceptinoHanlder
+// neu loi do save thi k can transactional, nhung neu loi throw ra kp do save thi can (TH 1 save)
+// voi mông muon bat dc transactional phai cònig sang replica chu k dung standalone
+
 
 // neu catch loi thi no se k in stack trace -> tu in
 // neu loi bi bat bang handler thi cung phai log trace ra neu muon in
@@ -68,8 +73,11 @@ public class ShopService {
     // Orchestrator Saga và Choreography Saga KHÔNG đảm bảo ACID tuyệt đối ma chi la huy logic chu kp rollback db
     // Trong microservice, ACID gần như không khả thi nếu cross-service, trừ khi dùng 2PC/XA transaction
    // compensation fail -> dua vao dlq
+
+    @Transactional
     public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
         // chan neu da co shop
+        log.info("Transaction active? {}", TransactionSynchronizationManager.isActualTransactionActive());
         String userId = "";
         try {
             userId = mainFeignClient.upgradeToSeller(UpgradeSellerRequest.builder()
@@ -84,8 +92,9 @@ public class ShopService {
         shop.setUserId(userId);
 
         try{
+
             shopRepository.save(shop);
-            throw new RuntimeException();
+            throw  new RuntimeException();
         }
         catch(Exception ex){
             UserSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UserSnapshot.class);
@@ -94,6 +103,7 @@ public class ShopService {
                     .build());
             throw ex;
         }
+
 //        return ApiResponse.builder()
 //                        .httpStatus(HttpStatus.OK)
 //                        .result("create successfully")

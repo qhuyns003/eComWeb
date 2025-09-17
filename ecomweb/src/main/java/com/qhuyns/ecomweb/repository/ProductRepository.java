@@ -12,6 +12,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 
+// hibernate là trái tim của jpa, giúp chuyển jpq,format sang ngon ngu sql, goi truy van xuong db, tra du lieu
+// jpa don gian chi la 1 tap interface quy dinh cac annotation, cac ham persist,.. de hibernate implement no va thuc hien
+// vd : trong code ta chi khai bao ham, viet jpql (jpa interface) -> hibernate se thuc hien chung
+
 // cac query co the duco dung indexing voi thuoc tinh thuoc tap con cua index
 // vi du index abc
 // query a ab abc abe ade, khong duoc b bc c

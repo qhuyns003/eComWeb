@@ -1,0 +1,17 @@
+{
+	"ulid": "01K5BRADYRMQ5FKB3FC84BFG32",
+	"minTime": 1758099169368,
+	"maxTime": 1758103200000,
+	"stats": {
+		"numSamples": 21233,
+		"numSeries": 244,
+		"numChunks": 244
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01K5BRADYRMQ5FKB3FC84BFG32"
+		]
+	},
+	"version": 1
+}

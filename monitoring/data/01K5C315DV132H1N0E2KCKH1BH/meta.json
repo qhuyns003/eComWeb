@@ -1,0 +1,17 @@
+{
+	"ulid": "01K5C315DV132H1N0E2KCKH1BH",
+	"minTime": 1758110402338,
+	"maxTime": 1758117600000,
+	"stats": {
+		"numSamples": 5842,
+		"numSeries": 420,
+		"numChunks": 420
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01K5C315DV132H1N0E2KCKH1BH"
+		]
+	},
+	"version": 1
+}

@@ -19,7 +19,7 @@ public class UserProducer {
 
     private final RabbitTemplate rabbitTemplate;
     RedisCacheHelper cacheHelper;
-
+// compensation fail -> push dlq, k xu ly compen cua compen
     public void shopCreationFailed(ShopCreationFailed shopCreationFailed) {
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.SHOP_EXCHANGE,
