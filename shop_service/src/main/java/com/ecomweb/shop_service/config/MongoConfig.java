@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 
+// cau hinh replica set +config + annatation enabletransactionmanagement de co the bat transactional tren mongo
 @Configuration
 public class MongoConfig {
 
