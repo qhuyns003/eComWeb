@@ -52,9 +52,9 @@ public class WeaviateService {
 
     @Autowired
     RestTemplate restTemplate;
-    private static final String WEAVIATE_GRAPHQL = "http://localhost:8082/v1/graphql";
-    private static final String WEAVIATE_OBJECTS = "http://localhost:8082/v1/objects";
-    private static final String WEAVIATE_SCHEMA = "http://localhost:8082/v1/schema";
+    private static final String WEAVIATE_GRAPHQL = "http://localhost:8098/v1/graphql";
+    private static final String WEAVIATE_OBJECTS = "http://localhost:8098/v1/objects";
+    private static final String WEAVIATE_SCHEMA = "http://localhost:8098/v1/schema";
 
     ProductRepository productRepository;
     ProductImageMapper productImageMapper;

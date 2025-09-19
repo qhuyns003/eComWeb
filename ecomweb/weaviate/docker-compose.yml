@@ -1,0 +1,61 @@
+version: '3.4'
+services:
+  weaviate:
+    image: semitechnologies/weaviate:1.22.3
+    ports:
+      - "8098:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'img2vec-neural'
+      ENABLE_MODULES: 'img2vec-neural'
+      IMAGE_INFERENCE_API: 'http://img2vec-neural:8080'
+      CLUSTER_HOSTNAME: 'node1'
+    volumes:
+      - weaviate-docker_weaviate_data:/var/lib/weaviate
+    depends_on:
+      - img2vec-neural
+
+  img2vec-neural:
+    image: semitechnologies/img2vec-pytorch:resnet50
+    ports:
+      - "8099:8080"
+
+volumes:
+  weaviate-docker_weaviate_data:
+    external: true
+
+
+
+
+
+#version: "3.8"
+#
+#services:
+#  weaviate:
+#    image: semitechnologies/weaviate:1.22.3
+#    container_name: weaviate
+#    ports:
+#      - "8080:8080"      # REST API
+#      - "50051:50051"    # gRPC
+#    environment:
+#      - QUERY_DEFAULTS_LIMIT=25
+#      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+#      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+#      - ENABLE_MODULES=img2vec-pytorch
+#      - IMAGE_INFERENCE_API=http://img2vec:8080
+#    volumes:
+#      - weaviate-docker_weaviate_data:/var/lib/weaviate
+#    depends_on:
+#      - img2vec
+#
+#  img2vec:
+#    image: semitechnologies/img2vec-pytorch:resnet50
+#    container_name: img2vec
+#    expose:
+#      - "8080"
+#
+#volumes:
+#  weaviate-docker_weaviate_data:
+#    external: true

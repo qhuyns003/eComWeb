@@ -9,10 +9,10 @@ spring:
   cloud:
     gateway:
       routes:
-        #        doi thanh ws chu kp http de service biet day la api socket
-        #        sau khi ket noi thanh cong thi cac request sau khi qua k qua gateway n-ua
+        # can cu vao header de biet api rest nay la 1 api yeu cau ugrade len socket
+        #        sau khi ket noi thanh cong thi cac request sau khi qua k qua gateway nua
         #        ban chat ban dau ws gui 1 http rq de yeu cau ket noi, tai day se tan dung duoc http security
-
+        # 81.82 cua weavate
         - id: shop-service
           uri: http://localhost:8083
           predicates:
