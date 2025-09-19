@@ -1,0 +1,27 @@
+spring:
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # in seconds
+server:
+  port: 8084
+  servlet:
+    context-path: /users
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,info,prometheus  # m? endpoint prometheus
+#  endpoint:
+#    prometheus:
+#      access: unrestricted
+#  prometheus:
+#    metrics:
+#      export:
+#        enabled: true

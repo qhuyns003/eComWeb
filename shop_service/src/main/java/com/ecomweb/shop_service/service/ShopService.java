@@ -94,7 +94,6 @@ public class ShopService {
         try{
 
             shopRepository.save(shop);
-            throw  new RuntimeException();
         }
         catch(Exception ex){
             UserSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UserSnapshot.class);
@@ -104,10 +103,10 @@ public class ShopService {
             throw ex;
         }
 
-//        return ApiResponse.builder()
-//                        .httpStatus(HttpStatus.OK)
-//                        .result("create successfully")
-//                        .build();
+        return ApiResponse.builder()
+                        .httpStatus(HttpStatus.OK)
+                        .result("create successfully")
+                        .build();
 
 
     }
