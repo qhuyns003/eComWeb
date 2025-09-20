@@ -2,6 +2,7 @@ package com.ecomweb.user_service.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.List;
 // tuy nhien thao tac update insert se cham hon do phai tao ra 2 bang phu va cap nhat 2 bang 1 luc
 public class User {
     // luu y, khi quan he bi tach ra, cascade se phai xu ly thu cong khi xoa hoac them moi
+    @Id
     String id;
     String username;
     String password;

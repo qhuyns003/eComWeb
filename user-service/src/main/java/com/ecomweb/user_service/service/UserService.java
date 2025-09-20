@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Transactional
 // transactional : rollback va giu session
 // 1 session chinh la 1 entity manager, dai dien cho 1 phien lam viec voi db, quan ly voi hibernate
 // cac http request duoc tao va giu session nho co che OSIV, session duco giu cho toi khi co response
@@ -77,7 +78,6 @@ public class UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setActive(false);
-        user.setId(UUID.randomUUID().toString());
 
         try {
             user = userRepository.save(user);
@@ -103,6 +103,7 @@ public class UserService {
                                 .token(vt.getToken())
                                 .build())
                 .build());
+        // xu ly listener va compen
         return userMapper.toUserResponse(user);
     }
 
@@ -137,7 +138,6 @@ public class UserService {
         return user.getId();
     }
 
-    @Transactional
     public void upgradeSellerRollback(UserSnapshot data) {
     // khong xu li compensation cua compensation
     // chi xu li khi compen thay doi tren nhieu db khac nhau bi fail -> saga handle
