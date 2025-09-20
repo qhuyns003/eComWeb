@@ -1,32 +1,23 @@
-package com.qhuyns.ecomweb.entity;
+package com.ecomweb.user_service.entity;
 
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@Entity
+@Document(collection = "user-address")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserAddress {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
 
+    String id;
     String receiverName;
     String phoneNumber;
-    BigDecimal latitude;
-    BigDecimal longitude;
     String fullAddress;
     String detailAddress;
     String ward;
@@ -37,13 +28,5 @@ public class UserAddress {
     String provinceId;
     // tranh su dung is o ten bien vi de bi loi mapper do buider sinh getter sai isIsDefault -> isDefault, is bi nuot mat
     boolean defaultAddress;
-
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
-
-
-
-
-} 
+    String userId;
+}

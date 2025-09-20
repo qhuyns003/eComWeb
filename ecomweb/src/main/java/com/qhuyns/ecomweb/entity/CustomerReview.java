@@ -29,11 +29,4 @@ public class CustomerReview {
     @OneToOne(mappedBy = "customerReview")
     private OrderItem orderItem;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    User user;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "product_id")
-//    Product product;
 } 
