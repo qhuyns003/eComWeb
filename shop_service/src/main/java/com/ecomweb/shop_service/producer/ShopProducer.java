@@ -2,7 +2,6 @@ package com.ecomweb.shop_service.producer;
 
 import com.ecomweb.shop_service.configuration.RabbitMQConfig;
 import com.ecomweb.shop_service.dto.event.ShopCreationFailed;
-import com.ecomweb.shop_service.dto.event.UserSnapshot;
 import com.ecomweb.shop_service.util.RedisCacheHelper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserProducer {
+public class ShopProducer {
 
     private final RabbitTemplate rabbitTemplate;
     RedisCacheHelper cacheHelper;
