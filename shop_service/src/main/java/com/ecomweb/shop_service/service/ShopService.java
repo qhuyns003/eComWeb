@@ -15,7 +15,7 @@ import com.ecomweb.shop_service.exception.ErrorCode;
 import com.ecomweb.shop_service.feignClient.MainFeignClient;
 import com.ecomweb.shop_service.mapper.ShopAddressMapper;
 import com.ecomweb.shop_service.mapper.ShopMapper;
-import com.ecomweb.shop_service.producer.UserProducer;
+import com.ecomweb.shop_service.producer.ShopProducer;
 import com.ecomweb.shop_service.repository.ShopRepository;
 import com.ecomweb.shop_service.util.ErrorResponseUtil;
 import com.ecomweb.shop_service.util.RedisCacheHelper;
@@ -64,7 +64,7 @@ public class ShopService {
     ShopMapper shopMapper;
     ShopAddressMapper shopAddressMapper;
     WebClient webClient;
-    UserProducer userProducer;
+    ShopProducer shopProducer;
     RedisCacheHelper cacheHelper;
     MainFeignClient mainFeignClient;
 
@@ -97,7 +97,7 @@ public class ShopService {
         }
         catch(Exception ex){
             UserSnapshot data = cacheHelper.getFromCache(RedisKey.ROLLBACK_TO_SELLER.getKey()+userId,  UserSnapshot.class);
-            userProducer.shopCreationFailed(ShopCreationFailed.builder()
+            shopProducer.shopCreationFailed(ShopCreationFailed.builder()
                             .userSnapshot(data)
                     .build());
             throw ex;

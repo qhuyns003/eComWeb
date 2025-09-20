@@ -1,11 +1,8 @@
-package com.qhuyns.ecomweb.listener;
+package com.ecomweb.user_service.listener;
 
-import com.qhuyns.ecomweb.configuration.RabbitMQConfig;
-import com.qhuyns.ecomweb.dto.event.ShopCreated;
-import com.qhuyns.ecomweb.dto.event.ShopCreationFailed;
-import com.qhuyns.ecomweb.dto.event.UserSnapshot;
-import com.qhuyns.ecomweb.dto.request.UpgradeSellerRequest;
-import com.qhuyns.ecomweb.service.UserService;
+import com.ecomweb.user_service.configuration.RabbitMQConfig;
+import com.ecomweb.user_service.dto.event.ShopCreationFailed;
+import com.ecomweb.user_service.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -26,3 +26,15 @@ volumes:
 
 #docker-compose down -v
 #docker-compose up -d 
+
+# micrometer expose, tong hop du lieu tu server BE
+# prometheus goi api dinh ki den server BE de lay du lieu tu micrometer agent
+# graffana hien thi du lieu tu prometheus
+
+# ESagent tong hop du lieu gui ve APM server
+# APM server gui du lieu ve ES(luu tru du lieu)
+# Kibana hien thi du lieu tu ES
+
+# graffana cho cái nhìn tổng quan về hệ thống, giúp theo dõi hiệu suất và tình trạng của các dịch vụ
+# kibana không thể nhìn thấy được toàn cảnh hệ thống mà chỉ tập trung vào từng phần riêng lẻ
+# kibana cho cái nhìn chi tiết về log, trace, metric của từng service

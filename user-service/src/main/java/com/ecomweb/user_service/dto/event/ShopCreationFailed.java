@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.dto.event;
+package com.ecomweb.user_service.dto.event;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

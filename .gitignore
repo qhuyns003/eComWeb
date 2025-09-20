@@ -34,3 +34,6 @@ dist/
 # Temporary files
 *.tmp
 *.bak
+
+# Monitoring data
+monitoring/data/

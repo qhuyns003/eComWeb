@@ -14,12 +14,18 @@ public class RabbitMQConfig {
     // queue dat theo consummer
 
     public static final String DLQ_EXCHANGE = "dlq.exchange";
+    public static final String USER_EXCHANGE = "user.exchange";
+    public static final String SHOP_EXCHANGE = "shop.exchange";
 
     // === Queues === producer k quan tam queue
     public static final String DLQ_QUEUE = "dlq.queue";
+    public static final String USER_SERVICE_SHOP_CREATION_FAILED_QUEUE = "user-service.shop-creation-failed.queue";
     // === Routing Keys ===
 
     public static final String DLQ = "dlq";
+    public static final String USER_CREATED = "user.created";
+    public static final String SHOP_CREATION_FAILED = "shop.creation.failed";
+
 
 
 
@@ -30,10 +36,24 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(DLQ_QUEUE).build();
     }
 
+    @Bean
+    public Queue userServiceShopCreationFailedQueue() {
+
+        return QueueBuilder.durable(USER_SERVICE_SHOP_CREATION_FAILED_QUEUE)
+                .withArgument("x-dead-letter-exchange", DLQ_EXCHANGE ) // exchange mặc định
+                .withArgument("x-dead-letter-routing-key", DLQ) // đẩy sang DLQ khi fail
+                .build();
+    }
+
 
     @Bean
     DirectExchange exchange() {
         return new DirectExchange(DLQ_EXCHANGE);
+    }
+
+    @Bean
+    public DirectExchange shopExchange() {
+        return new DirectExchange(SHOP_EXCHANGE);
     }
 
     // dua vao ten tham so de lay ra bean queue va exchange tuogn ung
@@ -41,6 +61,12 @@ public class RabbitMQConfig {
     @Bean
     Binding binding(Queue deadLetterQueue, DirectExchange exchange) {
         return BindingBuilder.bind(deadLetterQueue).to(exchange).with(DLQ);
+    }
+    @Bean
+    public Binding bindingShopCreationFailed(Queue userServiceShopCreationFailedQueue, DirectExchange shopExchange) {
+        return BindingBuilder.bind(userServiceShopCreationFailedQueue)
+                .to(shopExchange)
+                .with(SHOP_CREATION_FAILED);
     }
 
 

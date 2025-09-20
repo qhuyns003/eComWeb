@@ -1,13 +1,14 @@
 package com.ecomweb.user_service.mapper;
 
 
+import com.ecomweb.user_service.dto.request.UserCreationRequest;
 import com.ecomweb.user_service.dto.response.UserResponse;
 import com.ecomweb.user_service.entity.User;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-//    User toUser(UserCreationRequest request);
+    User toUser(UserCreationRequest request);
 
     UserResponse toUserResponse(User user);
 

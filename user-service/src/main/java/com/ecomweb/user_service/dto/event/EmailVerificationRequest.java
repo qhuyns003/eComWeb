@@ -10,12 +10,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserSnapshot {
-    String id;
-    String username;
-    String fullName;
+public class EmailVerificationRequest {
+    String token;
     String email;
-    String phone;
-    LocalDate dob;
-    String role;
+
 }

@@ -1,7 +1,7 @@
-package com.qhuyns.ecomweb.dto.request;
+package com.ecomweb.user_service.dto.request;
 
 
-import com.qhuyns.ecomweb.validator.DobConstraint;
+import com.ecomweb.user_service.validator.DobConstraint;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
