@@ -58,6 +58,10 @@ import java.util.stream.Collectors;
 // chi rollback duoc nhung loi tra ra la runexception va cac thao tac cung 1 database, (nhiều db -> gọi service khác, dung saga)
 // neu A goi B (db rieng nhung cung service server) thi neu A fail ma B da commit thi chi rollback dc A thoi -> su dung saga de handle
 public class UserService {
+
+    // các nghiệp vụ chính của service thì phải dùng rest để call để đảm bảo response chính xsc success hay fail
+    // các nghiệp vụ phụ của service thì mới nên dùng message broker
+    // thường các nghiệp vụ xử lí chính hay compensation của MB thường nằm gói gọn trong  service đó nên thường sẽ k phải viết compen của nó mà sẽ tự rollback
     UserRepository userRepository;
     UserMapper userMapper;
     UserRoleRepository userRoleRepository;
@@ -101,9 +105,9 @@ public class UserService {
                         .emailVerificationRequest(EmailVerificationRequest.builder()
                                 .email(user.getEmail())
                                 .token(vt.getToken())
+                                .username(user.getUsername())
                                 .build())
                 .build());
-        // xu ly listener va compen
         return userMapper.toUserResponse(user);
     }
 
@@ -183,34 +187,34 @@ public class UserService {
 
         return userMapper.toUserResponse(user);
     }
-//
-//
-//    //    @PostAuthorize("returnObject.username == authentication.name")
-//    public UserResponse updateUser( UserUpdateRequest request) {
-//
-//        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//
-//        userMapper.updateUser(user, request);
-//        if(request.getPassword()!=null && !request.getPassword().equals(request.getRepeatPassword())){
-//            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
-//        }
-//        if(request.getPassword()!=null){
-//            if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-//                user.setPassword(passwordEncoder.encode(request.getPassword()));
-//            } else {
-//                throw new AppException(ErrorCode.WRONG_PASSWORD);
-//            }
-//        }
-//
-//        if(request.getRoles()!=null){
-//            var roles = roleRepository.findAllById(request.getRoles());
-//            user.setRoles(new ArrayList<>(roles));
-//        }
-//
-//        return userMapper.toUserResponse(userRepository.save(user));
-//    }
-//
+
+
+    //    @PostAuthorize("returnObject.username == authentication.name")
+    public UserResponse updateUser( UserUpdateRequest request) {
+
+        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        userMapper.updateUser(user, request);
+        if(request.getPassword()!=null && !request.getPassword().equals(request.getRepeatPassword())){
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        if(request.getPassword()!=null){
+            if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+            } else {
+                throw new AppException(ErrorCode.WRONG_PASSWORD);
+            }
+        }
+
+        if(request.getRoles()!=null){
+            var roles = roleRepository.findAllById(request.getRoles());
+            user.setRoles(new ArrayList<>(roles));
+        }
+
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
 //    @PreAuthorize("hasRole('ADMIN')")
 //    public void deleteUser(String userId) {
 //        userRepository.deleteById(userId);

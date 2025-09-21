@@ -1,9 +1,7 @@
-package com.ecomweb.user_service.dto.event;
+package com.qhuyns.ecomweb.dto.event;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor

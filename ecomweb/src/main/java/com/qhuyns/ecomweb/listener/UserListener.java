@@ -26,9 +26,19 @@ public class UserListener {
 
         if(shopCreationFailed.getUserSnapshot() != null) {
             userService.upgradeSellerRollback(shopCreationFailed.getUserSnapshot());
-
         }
 
     }
+
+//    @RabbitListener(queues = RabbitMQConfig.USER_SERVICE_SHOP_CREATION_FAILED_QUEUE, containerFactory ="rabbitListenerContainerFactory" )
+//    public void handleRollback(ShopCreationFailed shopCreationFailed) {
+//
+//        if(shopCreationFailed.getUserSnapshot() != null) {
+//            userService.upgradeSellerRollback(shopCreationFailed.getUserSnapshot());
+//        }
+//
+//    }
+
+
 
 }

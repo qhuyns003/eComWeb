@@ -4,6 +4,7 @@ import com.qhuyns.ecomweb.dto.response.CategoryResponse;
 import com.qhuyns.ecomweb.mapper.CategoryMapper;
 import com.qhuyns.ecomweb.repository.CategoryRepository;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Transactional
 public class EmailService {
     JavaMailSender mailSender;
     // content don gian

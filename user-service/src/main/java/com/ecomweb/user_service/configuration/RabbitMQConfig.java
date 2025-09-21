@@ -1,6 +1,7 @@
 package com.ecomweb.user_service.configuration;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -30,12 +31,24 @@ public class RabbitMQConfig {
 
 
 
-    // Queue DLQ
+    @Bean
+    DirectExchange exchange() {
+        return new DirectExchange(DLQ_EXCHANGE);
+    }
     @Bean
     Queue deadLetterQueue() {
         return QueueBuilder.durable(DLQ_QUEUE).build();
     }
+    @Bean
+    Binding binding(Queue deadLetterQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(deadLetterQueue).to(exchange).with(DLQ);
+    }
 
+
+    @Bean
+    public DirectExchange shopExchange() {
+        return new DirectExchange(SHOP_EXCHANGE);
+    }
     @Bean
     public Queue userServiceShopCreationFailedQueue() {
 
@@ -43,24 +56,6 @@ public class RabbitMQConfig {
                 .withArgument("x-dead-letter-exchange", DLQ_EXCHANGE ) // exchange mặc định
                 .withArgument("x-dead-letter-routing-key", DLQ) // đẩy sang DLQ khi fail
                 .build();
-    }
-
-
-    @Bean
-    DirectExchange exchange() {
-        return new DirectExchange(DLQ_EXCHANGE);
-    }
-
-    @Bean
-    public DirectExchange shopExchange() {
-        return new DirectExchange(SHOP_EXCHANGE);
-    }
-
-    // dua vao ten tham so de lay ra bean queue va exchange tuogn ung
-    // Binding
-    @Bean
-    Binding binding(Queue deadLetterQueue, DirectExchange exchange) {
-        return BindingBuilder.bind(deadLetterQueue).to(exchange).with(DLQ);
     }
     @Bean
     public Binding bindingShopCreationFailed(Queue userServiceShopCreationFailedQueue, DirectExchange shopExchange) {
@@ -73,15 +68,28 @@ public class RabbitMQConfig {
 
     // cau hinh giup serilizable vaf deseriliazlbe object thanh json
     @Bean
-    public MessageConverter jsonMessageConverter() {
+    public MessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
+                                         MessageConverter messageConverter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter);
         return template;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            ConnectionFactory connectionFactory,
+            MessageConverter messageConverter
+    ) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter);
+        factory.setDefaultRequeueRejected(false);
+        return factory;
     }
 }
 
