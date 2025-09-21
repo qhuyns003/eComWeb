@@ -1,5 +1,6 @@
 package com.ecomweb.user_service.mapper;
 
+import com.ecomweb.user_service.dto.request.UserAddressRequest;
 import com.ecomweb.user_service.dto.response.UserAddressResponse;
 import com.ecomweb.user_service.entity.UserAddress;
 import org.mapstruct.BeanMapping;
@@ -13,7 +14,7 @@ public interface UserAddressMapper {
     // tranh dat chu is vi lombok sinh getter voi boolean tu dong + is + tenbien
     // con mapstruct va java bean thi luon mac dinh boolean getter luon la isDefault ke ca ten bien co la default hay isDefault
     // => viet them getter isTenBien hoac k dat ten bien co chu is
-//    UserAddress toUserAddress(UserAddressRequest userAddressRequest);
+    UserAddress toUserAddress(UserAddressRequest userAddressRequest);
 
     UserAddressResponse toUserAddressResponse(UserAddress userAddress);
 

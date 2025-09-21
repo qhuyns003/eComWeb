@@ -1,5 +1,6 @@
 package com.ecomweb.user_service.service;
 
+import com.ecomweb.user_service.dto.request.UserAddressRequest;
 import com.ecomweb.user_service.dto.response.UserAddressResponse;
 import com.ecomweb.user_service.entity.User;
 import com.ecomweb.user_service.entity.UserAddress;
@@ -37,30 +38,31 @@ public class UserAddressService {
                 .collect(Collectors.toList());
 
     }
-//    public void create(UserAddressRequest userAddressRequest) {
-//        UserAddress userAddress = userAddressMapper.toUserAddress(userAddressRequest);
-//        if(userAddressRequest.isDefaultAddress()){
-//            List<UserAddress> userAddressList = userAddressRepository.findAllByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-//            for(UserAddress userAddress1 : userAddressList){
-//                userAddress1.setDefaultAddress(false);
-//                userAddressRepository.save(userAddress1);
-//            }
-//        }
-//        userAddress.setUser(userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-//                .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_EXISTED)));
-//        userAddressRepository.save(userAddress);
-//    }
-//
-//    public void delete(String id) {
-//        UserAddress userAddress = userAddressRepository.findById(id).orElseThrow(
-//                () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
-//        );
-//        if(userAddress.isDefaultAddress()){
-//            throw new AppException(ErrorCode.DO_NOT_DELETE_USER_ADDRESS);
-//        }
-//       userAddressRepository.deleteById(id);
-//    }
-//
+    public void create(UserAddressRequest userAddressRequest) {
+        UserAddress userAddress = userAddressMapper.toUserAddress(userAddressRequest);
+        User user= userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(userAddressRequest.isDefaultAddress()){
+            List<UserAddress> userAddressList = userAddressRepository.findAllByUserId(user.getId());
+            for(UserAddress userAddress1 : userAddressList){
+                userAddress1.setDefaultAddress(false);
+                userAddressRepository.save(userAddress1);
+            }
+        }
+        userAddress.setUserId(user.getId());
+        userAddressRepository.save(userAddress);
+    }
+
+    public void delete(String id) {
+        UserAddress userAddress = userAddressRepository.findById(id).orElseThrow(
+                () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
+        );
+        if(userAddress.isDefaultAddress()){
+            throw new AppException(ErrorCode.DO_NOT_DELETE_USER_ADDRESS);
+        }
+       userAddressRepository.deleteById(id);
+    }
+
 //    public void update(String id, UserAddressRequest userAddressRequest) {
 //        UserAddress userAddress = userAddressRepository.findById(id).orElseThrow(
 //                () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
