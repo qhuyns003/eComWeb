@@ -2,6 +2,7 @@ package com.ecomweb.user_service.mapper;
 
 
 import com.ecomweb.user_service.dto.request.UserCreationRequest;
+import com.ecomweb.user_service.dto.request.UserUpdateRequest;
 import com.ecomweb.user_service.dto.response.UserResponse;
 import com.ecomweb.user_service.entity.User;
 import org.mapstruct.*;
@@ -12,8 +13,8 @@ public interface UserMapper {
 
     UserResponse toUserResponse(User user);
 
-//    @Mapping(target = "password", ignore = true)
-//    @Mapping(target = "roles", ignore = true)
-//    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-//    void updateUser(@MappingTarget User user, UserUpdateRequest request);
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "roles", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateUser(@MappingTarget User user, UserUpdateRequest request);
 }

@@ -7,6 +7,7 @@ import com.ecomweb.user_service.dto.event.UserCreated;
 import com.ecomweb.user_service.dto.event.UserSnapshot;
 import com.ecomweb.user_service.dto.request.UpgradeSellerRequest;
 import com.ecomweb.user_service.dto.request.UserCreationRequest;
+import com.ecomweb.user_service.dto.request.UserUpdateRequest;
 import com.ecomweb.user_service.dto.response.UserResponse;
 import com.ecomweb.user_service.entity.Role;
 import com.ecomweb.user_service.entity.User;
@@ -189,7 +190,6 @@ public class UserService {
     }
 
 
-    //    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse updateUser( UserUpdateRequest request) {
 
         User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
@@ -208,8 +208,14 @@ public class UserService {
         }
 
         if(request.getRoles()!=null){
-            var roles = roleRepository.findAllById(request.getRoles());
-            user.setRoles(new ArrayList<>(roles));
+            for(String roleId : request.getRoles()){
+                Role role = roleRepository.findById(roleId).orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_EXISTS));
+                UserRole userRole = UserRole.builder()
+                        .userId(user.getId())
+                        .roleId(role.getName())
+                        .build();
+                userRoleRepository.save(userRole);
+            }
         }
 
         return userMapper.toUserResponse(userRepository.save(user));
