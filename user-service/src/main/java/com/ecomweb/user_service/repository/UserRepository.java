@@ -10,4 +10,5 @@ public interface UserRepository extends MongoRepository<User, String> {
    Optional<User> findByUsernameAndActive(String username, boolean active);
 
    Optional<User> findByIdAndActive(String userId, boolean active);
+
 }
