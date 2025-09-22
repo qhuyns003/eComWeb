@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-@Transactional
+
 // transactional : rollback va giu session
 // 1 session chinh la 1 entity manager, dai dien cho 1 phien lam viec voi db, quan ly voi hibernate
 // cac http request duoc tao va giu session nho co che OSIV, session duco giu cho toi khi co response
@@ -74,6 +74,7 @@ public class UserService {
     @NonFinal
     @Value("${spring.mail.expiryTime}")
     int expiryTime;
+    @Transactional
     public UserResponse createUser(UserCreationRequest request) throws Exception {
         if(!request.getPassword().equals(request.getConfirmPassword())){
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
@@ -117,6 +118,7 @@ public class UserService {
         return user.getId();
     }
 
+    @Transactional
     public String upgradeSellerRequest(UpgradeSellerRequest request) throws Exception {
         User user = userRepository.findByUsernameAndActive(
                 SecurityContextHolder.getContext().getAuthentication().getName(),true
@@ -141,6 +143,7 @@ public class UserService {
         return user.getId();
     }
 
+    @Transactional
     public void upgradeSellerRollback(UserSnapshot data) {
     // khong xu li compensation cua compensation
     // chi xu li khi compen thay doi tren nhieu db khac nhau bi fail -> saga handle
@@ -158,6 +161,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void activeUser(String username,String token) {
         User user = userRepository.findByUsernameAndActive(username,false)
                 .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -188,6 +192,7 @@ public class UserService {
     }
 
 
+    @Transactional
     public UserResponse updateUser( UserUpdateRequest request) {
 
         User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)

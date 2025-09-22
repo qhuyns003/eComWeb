@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Transactional
+
 public class UserAddressService {
     UserAddressRepository  userAddressRepository;
     UserRepository userRepository;
@@ -38,6 +38,8 @@ public class UserAddressService {
                 .collect(Collectors.toList());
 
     }
+
+    @Transactional
     public void create(UserAddressRequest userAddressRequest) {
         UserAddress userAddress = userAddressMapper.toUserAddress(userAddressRequest);
         User user= userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
@@ -53,6 +55,7 @@ public class UserAddressService {
         userAddressRepository.save(userAddress);
     }
 
+    @Transactional
     public void delete(String id) {
         UserAddress userAddress = userAddressRepository.findById(id).orElseThrow(
                 () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
@@ -63,6 +66,7 @@ public class UserAddressService {
        userAddressRepository.deleteById(id);
     }
 
+    @Transactional
     public void update(String id, UserAddressRequest userAddressRequest) {
         UserAddress userAddress = userAddressRepository.findById(id).orElseThrow(
                 () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
