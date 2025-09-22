@@ -39,8 +39,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     public Jwt decode(String token) throws JwtException {
 
     // dung webclient cua webflux ma .block thi toc do cung ngang feign
-
-            ApiResponse<IntrospectResponse> response = mainFeignClient.introspect(IntrospectRequest.builder()
+        ApiResponse<IntrospectResponse> response = mainFeignClient.introspect(IntrospectRequest.builder()
                     .token(token).build());
 
 
