@@ -19,7 +19,7 @@ public interface UserAddressMapper {
     UserAddressResponse toUserAddressResponse(UserAddress userAddress);
 
 
-//    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-//    void toUserAddress(@MappingTarget UserAddress userAddress, UserAddressRequest userAddressRequest);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void toUserAddress(@MappingTarget UserAddress userAddress, UserAddressRequest userAddressRequest);
 
 }
