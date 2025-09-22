@@ -13,10 +13,10 @@ spring:
         #        sau khi ket noi thanh cong thi cac request sau khi qua k qua gateway nua
         #        ban chat ban dau ws gui 1 http rq de yeu cau ket noi, tai day se tan dung duoc http security
         # 81.82 cua weavate
-        - id: user-service
+        - id: identity-service
           uri: http://localhost:8084
           predicates:
-            - Path=/users/**
+            - Path=/identity/**
 
         - id: shop-service
           uri: http://localhost:8083

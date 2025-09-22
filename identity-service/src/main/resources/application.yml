@@ -24,7 +24,7 @@ jwt:
 server:
   port: 8084
   servlet:
-    context-path: /users
+    context-path: /identity
 #management:
 #  endpoints:
 #    web:
