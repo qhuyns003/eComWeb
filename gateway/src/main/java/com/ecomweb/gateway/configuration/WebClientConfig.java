@@ -8,10 +8,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
 
-    @Bean("mainService")
+    @Bean("identityService")
     public WebClient mainWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8081/")
+                .baseUrl("http://localhost:8084/identity")
                 .build();
     }
 }

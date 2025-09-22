@@ -2,8 +2,16 @@ package com.qhuyns.ecomweb.configuration;
 
 
 import com.nimbusds.jose.JOSEException;
+import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.request.IntrospectRequest;
+import com.qhuyns.ecomweb.dto.response.IntrospectResponse;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import com.qhuyns.ecomweb.service.AuthenticationService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -19,26 +27,26 @@ import java.util.Objects;
 
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomJwtDecoder implements JwtDecoder {
     @Value("${jwt.signerKey}")
-    private String signerKey;
+    @NonFinal
+    String signerKey;
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    IdentityFeignClient identityFeignClient;
 
-    private NimbusJwtDecoder nimbusJwtDecoder = null;
+    @NonFinal
+    NimbusJwtDecoder nimbusJwtDecoder = null;
 
     @Override
     public Jwt decode(String token) throws JwtException {
 
-        try {
-            var response = authenticationService.introspect(
-                    IntrospectRequest.builder().token(token).build());
+        ApiResponse<IntrospectResponse> response = identityFeignClient.introspect(IntrospectRequest.builder()
+                .token(token).build());
 
-            if (!response.isValid()) throw new JwtException("Token invalid");
-        } catch (JOSEException | ParseException e) {
-            throw new JwtException(e.getMessage());
-        }
+        if (!response.getResult().isValid()) throw new JwtException("Token invalid");
 
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");

@@ -4,31 +4,19 @@ package com.ecomweb.shop_service.configuration;
 import com.ecomweb.shop_service.dto.request.IntrospectRequest;
 import com.ecomweb.shop_service.dto.response.ApiResponse;
 import com.ecomweb.shop_service.dto.response.IntrospectResponse;
-import com.ecomweb.shop_service.feignClient.MainFeignClient;
-import com.ecomweb.shop_service.util.ErrorResponseUtil;
-import com.nimbusds.jose.JOSEException;
-import feign.FeignException;
+import com.ecomweb.shop_service.feignClient.IdentityFeignClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 
 import javax.crypto.spec.SecretKeySpec;
-import java.text.ParseException;
 import java.util.Objects;
 
 
@@ -41,7 +29,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     @NonFinal
     String signerKey;
 
-    MainFeignClient  mainFeignClient;
+    IdentityFeignClient identityFeignClient;
 
     @NonFinal
     private NimbusJwtDecoder nimbusJwtDecoder = null;
@@ -52,7 +40,7 @@ public class CustomJwtDecoder implements JwtDecoder {
 
     // dung webclient cua webflux ma .block thi toc do cung ngang feign
 
-            ApiResponse<IntrospectResponse> response = mainFeignClient.introspect(IntrospectRequest.builder()
+            ApiResponse<IntrospectResponse> response = identityFeignClient.introspect(IntrospectRequest.builder()
                     .token(token).build());
 
 

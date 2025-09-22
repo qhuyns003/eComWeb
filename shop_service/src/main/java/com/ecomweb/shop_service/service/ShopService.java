@@ -12,7 +12,7 @@ import com.ecomweb.shop_service.entity.Shop;
 import com.ecomweb.shop_service.entity.ShopAddress;
 import com.ecomweb.shop_service.exception.AppException;
 import com.ecomweb.shop_service.exception.ErrorCode;
-import com.ecomweb.shop_service.feignClient.MainFeignClient;
+import com.ecomweb.shop_service.feignClient.IdentityFeignClient;
 import com.ecomweb.shop_service.mapper.ShopAddressMapper;
 import com.ecomweb.shop_service.mapper.ShopMapper;
 import com.ecomweb.shop_service.producer.ShopProducer;
@@ -66,7 +66,7 @@ public class ShopService {
     WebClient webClient;
     ShopProducer shopProducer;
     RedisCacheHelper cacheHelper;
-    MainFeignClient mainFeignClient;
+    IdentityFeignClient identityFeignClient;
 
     // inline saga voi UC don gian
     // UC phuc tap su dung orchestrator
@@ -80,7 +80,7 @@ public class ShopService {
         log.info("Transaction active? {}", TransactionSynchronizationManager.isActualTransactionActive());
         String userId = "";
         try {
-            userId = mainFeignClient.upgradeToSeller(UpgradeSellerRequest.builder()
+            userId = identityFeignClient.upgradeToSeller(UpgradeSellerRequest.builder()
                             .shopName(shopCreateRequest.getName())
                             .build()).getResult().toString();
         } catch (FeignException ex) {
@@ -114,7 +114,7 @@ public class ShopService {
     public ApiResponse getInfo() {
         String userId = "";
         try {
-            userId = mainFeignClient
+            userId = identityFeignClient
                     .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
                     .getResult().toString();
         } catch (FeignException ex) {
@@ -132,7 +132,7 @@ public class ShopService {
     public ApiResponse update(ShopUpdateRequest shopUpdateRequest) {
         String userId = "";
         try {
-            userId = mainFeignClient
+            userId = identityFeignClient
                     .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
                     .getResult().toString();
 

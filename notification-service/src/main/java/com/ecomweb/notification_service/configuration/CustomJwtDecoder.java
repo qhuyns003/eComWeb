@@ -28,7 +28,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Value("${jwt.signerKey}")
     private String signerKey;
 
-    @Qualifier("mainService")
+    @Qualifier("identityService")
     private final WebClient webClient;
 
     private NimbusReactiveJwtDecoder nimbusJwtDecoder = null;

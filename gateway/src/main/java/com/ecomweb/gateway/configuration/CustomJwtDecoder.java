@@ -30,7 +30,7 @@ public class CustomJwtDecoder implements ReactiveJwtDecoder {
     String signerKey;
 
     // k dung requiredArg duoc vi lombok khong doc duoc annotation qualifier vao de chon bean phu hop
-    @Qualifier("mainService")
+    @Qualifier("identityService")
     WebClient webClient;
 
     @NonFinal
