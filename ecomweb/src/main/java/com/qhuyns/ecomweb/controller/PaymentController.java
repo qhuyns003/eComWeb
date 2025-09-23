@@ -6,7 +6,6 @@ import com.qhuyns.ecomweb.dto.request.RoleRequest;
 import com.qhuyns.ecomweb.dto.response.PaymentResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
 import com.qhuyns.ecomweb.service.PaymentService;
-import com.qhuyns.ecomweb.service.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

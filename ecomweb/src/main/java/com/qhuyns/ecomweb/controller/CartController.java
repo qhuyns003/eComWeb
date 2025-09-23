@@ -7,7 +7,6 @@ import com.qhuyns.ecomweb.dto.request.RoleRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
 import com.qhuyns.ecomweb.service.CartService;
-import com.qhuyns.ecomweb.service.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

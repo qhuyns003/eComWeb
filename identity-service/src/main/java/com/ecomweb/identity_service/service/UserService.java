@@ -244,5 +244,10 @@ public class UserService {
                 userRepository.findByIdAndActive(id,true).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
+    public UserResponse getActivatedUserByUsername(String username) {
+        return userMapper.toUserResponse(
+                userRepository.findByUsernameAndActive(username,true).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
+    }
+
 }
 

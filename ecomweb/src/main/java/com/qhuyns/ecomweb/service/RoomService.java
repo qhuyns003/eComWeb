@@ -2,6 +2,7 @@ package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.dto.request.CreateRoomRequest;
 import com.qhuyns.ecomweb.dto.response.RoomResponse;
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
 import com.qhuyns.ecomweb.entity.Room;
 import com.qhuyns.ecomweb.entity.RoomMember;
@@ -9,6 +10,7 @@ import com.qhuyns.ecomweb.entity.UserRoom;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import com.qhuyns.ecomweb.mapper.RoomMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomMapper;
@@ -39,6 +41,7 @@ public class RoomService {
     RoomMemberService roomMemberService;
     SimpMessagingTemplate messagingTemplate;
     RoomMapper roomMapper;
+    IdentityFeignClient identityFeignClient;
     public void create(CreateRoomRequest createRoomRequest) {
 
         List<String> members = new ArrayList<>(createRoomRequest.getMembers());
@@ -48,8 +51,9 @@ public class RoomService {
                    .createdAt(LocalDateTime.now())
                    .roomId(UUID.randomUUID().toString())
                    .build();
-        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-                   .orElseThrow(()->new  AppException(ErrorCode.USER_NOT_EXISTED));
+        UserResponse user = identityFeignClient
+                .getActivatedUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult();
         members.add(user.getId());
 
         roomRepository.save(room);
@@ -59,8 +63,7 @@ public class RoomService {
             roomMemberService.create(userId,room.getRoomId());
         };
         for (String userId: members) {
-            User user2 = userRepository.findById(userId)
-                    .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+            UserResponse user2 = identityFeignClient.getActivatedUser(userId).getResult();
             messagingTemplate.convertAndSendToUser(user2.getUsername(), "/queue/chat-rooms", room.getRoomId());
         }
 

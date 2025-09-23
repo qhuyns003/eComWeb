@@ -39,6 +39,14 @@ public class UserAddressService {
 
     }
 
+    public UserAddressResponse getById(String id) {
+
+        return  userAddressMapper
+                .toUserAddressResponse(userAddressRepository.findById(id)
+                        .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED)));
+
+    }
+
     @Transactional
     public void create(UserAddressRequest userAddressRequest) {
         UserAddress userAddress = userAddressMapper.toUserAddress(userAddressRequest);

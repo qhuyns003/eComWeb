@@ -25,4 +25,5 @@ public interface ShopRepository extends MongoRepository<Shop, String> {
    Optional<Shop> findByUserId(String userId);
 
    List<Shop> findByShopIdIn(List<String> ids);
+
 }

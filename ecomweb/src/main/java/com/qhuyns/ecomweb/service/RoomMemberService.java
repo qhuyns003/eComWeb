@@ -2,7 +2,6 @@ package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
 import com.qhuyns.ecomweb.entity.RoomMember;
-import com.qhuyns.ecomweb.entity.User;
 import com.qhuyns.ecomweb.entity.UserRoom;
 import com.qhuyns.ecomweb.entity.key.RoomMemberKey;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
@@ -11,7 +10,6 @@ import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomMapper;
 import com.qhuyns.ecomweb.repository.RoomMemberRepository;
-import com.qhuyns.ecomweb.repository.UserRepository;
 import com.qhuyns.ecomweb.repository.UserRoomRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -20,9 +20,7 @@ public class Cart {
     int quantity;
     LocalDateTime addedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
+    String userId;
 
     @ManyToOne
     @JoinColumn(name = "product_variant_id")

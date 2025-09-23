@@ -6,7 +6,6 @@ import com.qhuyns.ecomweb.dto.request.PermissionRequest;
 import com.qhuyns.ecomweb.dto.response.OrderResponse;
 import com.qhuyns.ecomweb.dto.response.PermissionResponse;
 import com.qhuyns.ecomweb.entity.Order;
-import com.qhuyns.ecomweb.entity.Permission;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

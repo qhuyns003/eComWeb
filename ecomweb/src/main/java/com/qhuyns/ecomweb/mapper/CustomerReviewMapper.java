@@ -7,8 +7,6 @@ import com.qhuyns.ecomweb.dto.response.ReviewProductResponse;
 import com.qhuyns.ecomweb.dto.response.ShopResponse;
 import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.entity.CustomerReview;
-import com.qhuyns.ecomweb.entity.Shop;
-import com.qhuyns.ecomweb.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

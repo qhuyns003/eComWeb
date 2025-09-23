@@ -9,7 +9,6 @@ import com.qhuyns.ecomweb.dto.response.ProductOverviewResponse;
 import com.qhuyns.ecomweb.dto.response.ProductResponse;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
-import com.qhuyns.ecomweb.repository.UserRepository;
 import com.qhuyns.ecomweb.service.FileService;
 import com.qhuyns.ecomweb.service.ProductService;
 import lombok.AccessLevel;

@@ -3,8 +3,8 @@ package com.qhuyns.ecomweb.controller;
 
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import com.qhuyns.ecomweb.service.PrivateChatService;
-import com.qhuyns.ecomweb.service.ShopService;
 import com.qhuyns.ecomweb.service.UserRoomService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class PrivateChatController {
     PrivateChatService privateChatService;
-    ShopService shopService;
+    IdentityFeignClient identityFeignClient;
     @GetMapping()
     public ApiResponse<?> getRoomId(@RequestParam String user1,@RequestParam String user2) {
         if(user1.compareToIgnoreCase(user2) >0){
@@ -37,7 +37,7 @@ public class PrivateChatController {
 
     @GetMapping("/shop")
     public ApiResponse<?> getRoomIdByShopId(@RequestParam String user1,@RequestParam String shopId) {
-        String user2 = shopService.getUserIdByShopId(shopId);
+        String user2 = identityFeignClient.getUserIdByShopId(shopId).getResult();
         if(user1.compareToIgnoreCase(user2) >0){
             String tmp =user1;
             user1 =user2;

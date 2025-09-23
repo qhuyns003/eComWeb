@@ -1,17 +1,17 @@
 package com.qhuyns.ecomweb.service;
 
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.dto.response.UserRoomKeyResponse;
 import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
 import com.qhuyns.ecomweb.entity.Message;
-import com.qhuyns.ecomweb.entity.User;
 import com.qhuyns.ecomweb.entity.UserRoom;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomMapper;
 import com.qhuyns.ecomweb.repository.MessageRepository;
-import com.qhuyns.ecomweb.repository.UserRepository;
 import com.qhuyns.ecomweb.repository.UserRoomRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 
 public class UserRoomService {
     UserRoomRepository userRoomRepository;
-    UserRepository userRepository;
     UserRoomMapper userRoomMapper;
     UserRoomKeyMapper userRoomKeyMapper;
+    IdentityFeignClient  identityFeignClient;
 
 //    public void updateLastTime(String roomId) {
 //        UserRoom userRoom = userRoomRepository.findByKeyUserIdAndKeyRoomId(SecurityContextHolder.getContext().getAuthentication().getName(), roomId);
@@ -57,8 +57,8 @@ public class UserRoomService {
     }
 
     public List<UserRoomResponse> getRoomByUserId() {
-        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        UserResponse user = identityFeignClient.getActivatedUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult();
         List<UserRoom> userRooms = userRoomRepository.findByKeyUserIdOrderByKeyLastMessageAtDesc(user.getId());
         List<UserRoomResponse> userRoomResponseList = userRooms.stream().map(userRoom -> {
                     UserRoomResponse userRoomResponse = userRoomMapper.toUserRoomResponse(userRoom);

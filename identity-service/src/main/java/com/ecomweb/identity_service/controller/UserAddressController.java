@@ -29,6 +29,13 @@ public class UserAddressController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    ApiResponse<UserAddressResponse> getById(@PathVariable String id) {
+        return ApiResponse.<UserAddressResponse>builder()
+                .result(userAddressService.getById(id))
+                .build();
+    }
+
     @PostMapping("/")
     ApiResponse<String> create(@RequestBody UserAddressRequest userAddressRequest) {
         userAddressService.create(userAddressRequest);

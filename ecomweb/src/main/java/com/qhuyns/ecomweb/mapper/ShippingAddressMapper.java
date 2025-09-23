@@ -3,7 +3,6 @@ package com.qhuyns.ecomweb.mapper;
 import com.qhuyns.ecomweb.dto.request.UserAddressRequest;
 import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
 import com.qhuyns.ecomweb.entity.ShippingAddress;
-import com.qhuyns.ecomweb.entity.UserAddress;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -11,6 +10,6 @@ import org.mapstruct.Mapping;
 public interface ShippingAddressMapper {
 
     @Mapping(target = "id", ignore = true)
-    ShippingAddress toShippingAddress(UserAddress userAddress);
+    ShippingAddress toShippingAddress(UserAddressResponse userAddressResponse);
 
 }

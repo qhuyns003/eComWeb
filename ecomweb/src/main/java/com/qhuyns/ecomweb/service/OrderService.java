@@ -7,12 +7,13 @@ import com.qhuyns.ecomweb.dto.request.OrderShopGroupRequest;
 import com.qhuyns.ecomweb.dto.request.RoleRequest;
 import com.qhuyns.ecomweb.dto.response.OrderResponse;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.*;
-import com.qhuyns.ecomweb.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,25 +35,21 @@ public class OrderService {
     OrderMapper orderMapper;
     OrderShopGroupMapper  orderShopGroupMapper;
     OrderItemMapper orderItemMapper;
-    UserAddressRepository  userAddressRepository;
     CouponRepository  couponRepository;
     OrderRepository orderRepository;
-    UserRepository userRepository;
     ProductVariantRepository  productVariantRepository;
-    ShopRepository  shopRepository;
     ShippingAddressMapper  shippingAddressMapper;
+    IdentityFeignClient identityFeignClient;
     public OrderResponse create(OrderRequest orderRequest) {
         // kiem tra khong trung
       Order order = orderMapper.toOrder(orderRequest);
       order.setStatus(OrderStatus.PENDING);
-      order.setUser(userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true).orElseThrow(
-              ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
-      ));
-//      order.setUserAddress(userAddressRepository.findById(orderRequest.getUserAddressId()).orElseThrow(
-//              () -> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)
-//      ));
+      UserResponse userResponse = identityFeignClient.getActivatedUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                      .getResult();
+      order.setUserId(userResponse.getId());
+
       ShippingAddress shippingAddress = shippingAddressMapper.toShippingAddress(
-                userAddressRepository.findById(orderRequest.getUserAddressId()).orElseThrow(()-> new AppException(ErrorCode.USER_ADDRESS_NOT_EXISTS)));
+               identityFeignClient.getUserAddressById(orderRequest.getUserAddressId()).getResult());
       shippingAddress.setOrder(order);
       order.setShippingAddress(shippingAddress);
       for(String couponId : orderRequest.getCouponIds()) {
@@ -64,8 +61,7 @@ public class OrderService {
       }
       for(OrderShopGroupRequest orderShopGroupRequest : orderRequest.getOrderShopGroups()){
           OrderShopGroup orderShopGroup = orderShopGroupMapper.toOrderShopGroup(orderShopGroupRequest);
-          orderShopGroup.setShop(shopRepository.findById(orderShopGroupRequest.getShopId()).orElseThrow(
-                  ()->new AppException(ErrorCode.SHOP_NOT_EXISTS)));
+          orderShopGroup.setShopId(orderShopGroupRequest.getShopId());
           for(String shopCouponId : orderShopGroupRequest.getShopCouponIds()) {
               Coupon shopCoupon = couponRepository.findById(shopCouponId).orElseThrow(()-> new AppException(ErrorCode.COUPON_NOT_EXISTS));
               if(shopCoupon.getUsed().compareTo(shopCoupon.getQuantity())<0){

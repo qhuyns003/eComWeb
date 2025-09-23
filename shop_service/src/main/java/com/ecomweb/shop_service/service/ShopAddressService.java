@@ -2,6 +2,8 @@ package com.ecomweb.shop_service.service;
 
 
 import com.ecomweb.shop_service.dto.response.ShopAddressResponse;
+import com.ecomweb.shop_service.exception.AppException;
+import com.ecomweb.shop_service.exception.ErrorCode;
 import com.ecomweb.shop_service.mapper.ShopAddressMapper;
 import com.ecomweb.shop_service.repository.ShopRepository;
 import lombok.AccessLevel;
@@ -27,6 +29,9 @@ public class ShopAddressService {
                 .map(s -> shopAddressMapper.toShopAddressResponse(s.getShopAddress()))
                 .collect(Collectors.toList());
     }
+
+
+
 
 
 }

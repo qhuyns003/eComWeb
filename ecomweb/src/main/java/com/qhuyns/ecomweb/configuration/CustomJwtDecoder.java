@@ -6,7 +6,6 @@ import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.request.IntrospectRequest;
 import com.qhuyns.ecomweb.dto.response.IntrospectResponse;
 import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
-import com.qhuyns.ecomweb.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

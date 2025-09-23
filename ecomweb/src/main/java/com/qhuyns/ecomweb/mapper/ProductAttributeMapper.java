@@ -9,7 +9,6 @@ import com.qhuyns.ecomweb.dto.response.ProductVariantResponse;
 import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.entity.ProductAttribute;
 import com.qhuyns.ecomweb.entity.ProductVariant;
-import com.qhuyns.ecomweb.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

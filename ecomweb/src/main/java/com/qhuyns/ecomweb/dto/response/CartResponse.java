@@ -1,7 +1,6 @@
 package com.qhuyns.ecomweb.dto.response;
 
 import com.qhuyns.ecomweb.entity.ProductVariant;
-import com.qhuyns.ecomweb.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
