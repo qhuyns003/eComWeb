@@ -34,13 +34,13 @@ public class Coupon {
     boolean active;
     boolean requireCode;
 
-    @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "coupon_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    List<User> users= new ArrayList<>();
+//    @Builder.Default
+//    @ManyToMany
+//    @JoinTable(
+//            joinColumns = @JoinColumn(name = "coupon_id"),
+//            inverseJoinColumns = @JoinColumn(name = "user_id")
+//    )
+//    List<User> users= new ArrayList<>();
 
     @Builder.Default
     @ManyToMany(mappedBy = "coupons")
@@ -50,10 +50,12 @@ public class Coupon {
     @ManyToMany(mappedBy = "coupons")
     List<OrderShopGroup> orderShopGroups = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "shop_id")
-    Shop shop;
+//    @ManyToOne
+//    @JoinColumn(name = "shop_id")
+//    Shop shop;
+
+    String shopId;
 
 
 
-} 
+}

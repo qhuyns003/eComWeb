@@ -6,16 +6,16 @@ import com.qhuyns.ecomweb.dto.request.MessageRequest;
 import com.qhuyns.ecomweb.dto.request.UserRoomKeyRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
 import com.qhuyns.ecomweb.dto.response.MessageResponse;
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.entity.key.MessagePrimaryKey;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import com.qhuyns.ecomweb.mapper.MessageMapper;
 import com.qhuyns.ecomweb.mapper.MessagePrimaryKeyMapper;
-import com.qhuyns.ecomweb.mapper.ShopMapper;
 import com.qhuyns.ecomweb.repository.*;
-import com.qhuyns.ecomweb.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -44,12 +44,11 @@ public class MessageService {
     MessageMapper messageMapper;
     MessagePrimaryKeyMapper messagePrimaryKeyMapper;
     SimpMessagingTemplate  messagingTemplate;
-    UserRepository  userRepository;
+    IdentityFeignClient identityFeignClient;
 
     public void saveMessage(MessageRequest messageRequest) {
-        String sendername = userRepository.findByIdAndActive(messageRequest.getSender(),true)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED))
-                .getFullName();
+        String sendername = identityFeignClient.getActivatedUser(messageRequest.getSender())
+                .getResult().getFullName();
         Message message = Message.builder()
                 .content(messageRequest.getContent())
                 .type(messageRequest.getType())
@@ -86,8 +85,7 @@ public class MessageService {
         messagingTemplate.convertAndSend("/topic/room." + messageRequest.getKey().getRoomId(),messageResponse);
         // cap nhat dsach room cua user khi co tb moi
         for (RoomMember roomMember : roomMembers) {
-            User user = userRepository.findById(roomMember.getKey().getUserId())
-                    .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+            UserResponse user = identityFeignClient.getUser(roomMember.getKey().getUserId()).getResult();
             messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-rooms", messageRequest.getKey().getRoomId());
             messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-notification", messageRequest.getKey().getRoomId());
 

@@ -28,9 +28,7 @@ public class OrderShopGroup {
     @Enumerated(EnumType.STRING)
     Shipment shipment;
 
-    @ManyToOne
-    @JoinColumn(name = "shop_id")
-    Shop shop;
+    String shopId;
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "orderShopGroup", cascade = CascadeType.ALL, orphanRemoval = true)

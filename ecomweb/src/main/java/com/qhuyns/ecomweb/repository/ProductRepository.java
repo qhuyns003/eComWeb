@@ -15,6 +15,11 @@ import java.util.List;
 // hibernate là trái tim của jpa, giúp chuyển jpq,format sang ngon ngu sql, goi truy van xuong db, tra du lieu
 // jpa don gian chi la 1 tap interface quy dinh cac annotation, cac ham persist,.. de hibernate implement no va thuc hien
 // vd : trong code ta chi khai bao ham, viet jpql (jpa interface) -> hibernate se thuc hien chung
+// spring data jpa chi ho tro rdbms nhu mysql,h2,...
+// jpa noi chung chi ho tro rdbms (ho tro cac annotation jakarta), k ho tro nosql
+// cac thu vien cua jpa la bao gom jpa + hbernate roi, con khai niem jpa bthg chi la 1 interface bthg de hibernate implement
+// cac nosql khac k dung hibernate  ma dung 1 driver cua rieng no de compiler format thanh cau lenh querry tuong tu hibernate
+
 
 // cac query co the duco dung indexing voi thuoc tinh thuoc tap con cua index
 // vi du index abc

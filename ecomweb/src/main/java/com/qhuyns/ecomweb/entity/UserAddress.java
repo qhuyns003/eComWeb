@@ -1,49 +1,49 @@
-package com.qhuyns.ecomweb.entity;
-
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-@Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserAddress {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
-
-    String receiverName;
-    String phoneNumber;
-    BigDecimal latitude;
-    BigDecimal longitude;
-    String fullAddress;
-    String detailAddress;
-    String ward;
-    String wardCode;
-    String district;
-    Integer districtId;
-    String province;
-    String provinceId;
-    // tranh su dung is o ten bien vi de bi loi mapper do buider sinh getter sai isIsDefault -> isDefault, is bi nuot mat
-    boolean defaultAddress;
-
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
-
-
-
-
-} 
+//package com.qhuyns.ecomweb.entity;
+//
+//import jakarta.persistence.*;
+//import lombok.*;
+//import lombok.experimental.FieldDefaults;
+//import org.hibernate.annotations.CreationTimestamp;
+//import org.hibernate.annotations.Type;
+//
+//import java.math.BigDecimal;
+//import java.time.LocalDateTime;
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//@Entity
+//@Getter
+//@Setter
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Builder
+//@FieldDefaults(level = AccessLevel.PRIVATE)
+//public class UserAddress {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    String id;
+//
+//    String receiverName;
+//    String phoneNumber;
+//    BigDecimal latitude;
+//    BigDecimal longitude;
+//    String fullAddress;
+//    String detailAddress;
+//    String ward;
+//    String wardCode;
+//    String district;
+//    Integer districtId;
+//    String province;
+//    String provinceId;
+//    // tranh su dung is o ten bien vi de bi loi mapper do buider sinh getter sai isIsDefault -> isDefault, is bi nuot mat
+//    boolean defaultAddress;
+//
+//
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    User user;
+//
+//
+//
+//
+//}

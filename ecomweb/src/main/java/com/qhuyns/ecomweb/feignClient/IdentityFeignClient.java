@@ -4,6 +4,7 @@ import com.qhuyns.ecomweb.configuration.FeignConfig;
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.request.IntrospectRequest;
 import com.qhuyns.ecomweb.dto.response.IntrospectResponse;
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,5 +13,11 @@ public interface IdentityFeignClient {
 
     @PostMapping("/auth/introspect")
     ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request);
+
+    @GetMapping("/users/activated/{userId}")
+    ApiResponse<UserResponse> getActivatedUser(@PathVariable String userId);
+
+    @GetMapping("/users/{userId}")
+    ApiResponse<UserResponse> getUser(@PathVariable String userId);
 
 }

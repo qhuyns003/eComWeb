@@ -26,7 +26,5 @@ public class ActivityLog {
     @Column(updatable = false)
     LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
+    String userId;
 } 

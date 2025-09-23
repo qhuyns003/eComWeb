@@ -70,6 +70,13 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/activated/{userId}")
+    ApiResponse<UserResponse> getActivatedUser(@PathVariable("userId") String userId) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getActivatedUser(userId))
+                .build();
+    }
+
     @GetMapping("/my-info")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()

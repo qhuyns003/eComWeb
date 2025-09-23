@@ -4,7 +4,6 @@ import com.qhuyns.ecomweb.dto.request.CreateRoomRequest;
 import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
 import com.qhuyns.ecomweb.entity.PrivateChat;
 import com.qhuyns.ecomweb.entity.Room;
-import com.qhuyns.ecomweb.entity.User;
 import com.qhuyns.ecomweb.entity.UserRoom;
 import com.qhuyns.ecomweb.entity.key.PrivateChatKey;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
@@ -36,11 +35,9 @@ public class PrivateChatService {
     RoomRepository  roomRepository;
     PrivateChatRepository privateChatRepository;
     RoomService roomService;
-    UserRepository userRepository;
     UserRoomService userRoomService;
     RoomMemberService roomMemberService;
     SimpMessagingTemplate messagingTemplate;
-    ShopRepository shopRepository;
     public String getRoomId(String user1,String user2) {
         PrivateChat pc = privateChatRepository.findByKeyUser1AndKeyUser2(user1,user2);
         if (pc != null) {

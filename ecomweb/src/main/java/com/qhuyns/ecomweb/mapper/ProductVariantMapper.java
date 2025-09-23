@@ -7,7 +7,6 @@ import com.qhuyns.ecomweb.dto.request.UserUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.ProductVariantResponse;
 import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.entity.ProductVariant;
-import com.qhuyns.ecomweb.entity.User;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")

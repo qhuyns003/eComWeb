@@ -3,6 +3,7 @@ package com.ecomweb.shop_service.repository;
 import com.ecomweb.shop_service.entity.Shop;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 // mongodb:
@@ -22,4 +23,6 @@ public interface ShopRepository extends MongoRepository<Shop, String> {
 
    // tự generate query: { "user.username" : username }
    Optional<Shop> findByUserId(String userId);
+
+   List<Shop> findByShopIdIn(List<String> ids);
 }

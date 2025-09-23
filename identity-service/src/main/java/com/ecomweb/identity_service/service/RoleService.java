@@ -1,4 +1,4 @@
-package com.ecomweb.user_service.service;
+package com.ecomweb.identity_service.service;
 
 
 import com.ecomweb.identity_service.dto.request.RoleRequest;

@@ -5,7 +5,6 @@ import com.qhuyns.ecomweb.dto.response.RoomResponse;
 import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
 import com.qhuyns.ecomweb.entity.Room;
 import com.qhuyns.ecomweb.entity.RoomMember;
-import com.qhuyns.ecomweb.entity.User;
 import com.qhuyns.ecomweb.entity.UserRoom;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import com.qhuyns.ecomweb.exception.AppException;
@@ -14,7 +13,6 @@ import com.qhuyns.ecomweb.mapper.RoomMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomMapper;
 import com.qhuyns.ecomweb.repository.RoomRepository;
-import com.qhuyns.ecomweb.repository.UserRepository;
 import com.qhuyns.ecomweb.repository.UserRoomRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +34,6 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
 public class RoomService {
-    UserRepository userRepository;
     RoomRepository roomRepository;
     UserRoomService userRoomService;
     RoomMemberService roomMemberService;

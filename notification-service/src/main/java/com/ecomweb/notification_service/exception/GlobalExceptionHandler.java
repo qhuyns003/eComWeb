@@ -2,6 +2,9 @@ package com.ecomweb.notification_service.exception;
 
 
 import com.ecomweb.notification_service.dto.response.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,11 @@ public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
 
+    @ExceptionHandler(value = FeignException.class)
+    ResponseEntity<ApiResponse> handlingFeignException(FeignException exception) throws JsonProcessingException {
+        ApiResponse apiResponse = new ObjectMapper().readValue(exception.contentUTF8(), ApiResponse.class);
+        return ResponseEntity.status(HttpStatus.valueOf(exception.status())).body(apiResponse);
+    }
 
 
     @ExceptionHandler(value = AppException.class)
@@ -29,7 +37,6 @@ public class GlobalExceptionHandler {
 
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
-        apiResponse.setHttpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()));
         String message = errorCode.getMessage();
         if (exception.getArgs() != null && exception.getArgs().length > 0) {
             message = String.format(message, exception.getArgs());
@@ -47,7 +54,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
-                        .httpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()))
                         .build());
     }
 
@@ -78,7 +84,6 @@ public class GlobalExceptionHandler {
                 Objects.nonNull(attributes)
                         ? mapAttribute(errorCode.getMessage(), attributes)
                         : errorCode.getMessage());
-        apiResponse.setHttpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()));
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
@@ -90,7 +95,6 @@ public class GlobalExceptionHandler {
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-        apiResponse.setHttpStatus(HttpStatus.valueOf(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode().value()));
 
         return ResponseEntity.internalServerError().body(apiResponse);
     }

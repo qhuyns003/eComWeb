@@ -36,9 +36,7 @@ public class Order {
     @Column(updatable = false)
     LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
+    String userId;
 
     @Builder.Default
     @ManyToMany

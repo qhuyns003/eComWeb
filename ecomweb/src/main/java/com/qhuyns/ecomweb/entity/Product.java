@@ -39,9 +39,7 @@ public class Product {
     @Column(updatable = false)
     LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "shop_id")
-    Shop shop;
+    String shopId;
 
     // default là Eager
     @ManyToOne
