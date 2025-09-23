@@ -33,34 +33,33 @@ public class ShopController {
     ShopService shopService;
 
     @PostMapping("/create")
-    ResponseEntity<ApiResponse<?>> create(@RequestBody ShopCreateRequest shopCreateRequest) throws Exception {
-        ApiResponse<?> apiResponse = shopService.create(shopCreateRequest);
-        return ResponseEntity.status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+    ApiResponse<?> create(@RequestBody ShopCreateRequest shopCreateRequest) throws Exception {
+        shopService.create(shopCreateRequest);
+        return ApiResponse.builder()
+                .result("create successful")
+                .build();
     }
 
     @PutMapping("/")
-    ResponseEntity<ApiResponse<?>> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
-        ApiResponse<?> apiResponse=shopService.update(shopUpdateRequest);
-        return ResponseEntity
-                .status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+    ApiResponse<?> update(@RequestBody ShopUpdateRequest shopUpdateRequest) {
+        shopService.update(shopUpdateRequest);
+        return ApiResponse.builder()
+                .result("update successful")
+                .build();
     }
 
     @GetMapping
-    ResponseEntity<ApiResponse<?>> getInfo() {
-        ApiResponse<?> apiResponse = shopService.getInfo();
-        return ResponseEntity
-                .status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+    ApiResponse<?> getInfo() {
+        return ApiResponse.builder()
+                .result(shopService.getInfo())
+                .build();
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<ApiResponse<?>> getInfoById(@PathVariable String id) {
-        ApiResponse<?> apiResponse = shopService.getInfoById(id);
-        return ResponseEntity
-                .status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+    ApiResponse<?> getInfoById(@PathVariable String id) {
+        return ApiResponse.builder()
+                .result(shopService.getInfoById(id))
+                .build();
     }
 
 

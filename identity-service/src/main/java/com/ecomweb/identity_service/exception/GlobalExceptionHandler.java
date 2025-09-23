@@ -2,6 +2,9 @@ package com.ecomweb.identity_service.exception;
 
 
 import com.ecomweb.identity_service.dto.response.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,12 @@ public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
 
+
+    @ExceptionHandler(value = FeignException.class)
+    ResponseEntity<ApiResponse> handlingFeignException(FeignException exception) throws JsonProcessingException {
+        ApiResponse apiResponse = new ObjectMapper().readValue(exception.contentUTF8(), ApiResponse.class);
+        return ResponseEntity.status(HttpStatus.valueOf(exception.status())).body(apiResponse);
+    }
 
 
     @ExceptionHandler(value = AppException.class)

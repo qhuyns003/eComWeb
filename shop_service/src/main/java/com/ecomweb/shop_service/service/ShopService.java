@@ -75,17 +75,16 @@ public class ShopService {
    // compensation fail -> dua vao dlq
 
     @Transactional
-    public ApiResponse<?> create(ShopCreateRequest shopCreateRequest) throws Exception {
+    public void create(ShopCreateRequest shopCreateRequest) throws Exception {
         // chan neu da co shop
         log.info("Transaction active? {}", TransactionSynchronizationManager.isActualTransactionActive());
         String userId = "";
-        try {
-            userId = identityFeignClient.upgradeToSeller(UpgradeSellerRequest.builder()
-                            .shopName(shopCreateRequest.getName())
-                            .build()).getResult().toString();
-        } catch (FeignException ex) {
-            return ErrorResponseUtil.getResponseBody(ex);
-        }
+
+        // loi se bi bat boi handle
+        userId = identityFeignClient.upgradeToSeller(UpgradeSellerRequest.builder()
+                .shopName(shopCreateRequest.getName())
+                .build()).getResult().toString();
+
         Shop shop = shopMapper.toShop(shopCreateRequest);
         ShopAddress shopAddress = shopAddressMapper.toShopAddress(shopCreateRequest);
         shop.setShopAddress(shopAddress);
@@ -103,42 +102,26 @@ public class ShopService {
             throw ex;
         }
 
-        return ApiResponse.builder()
-                        .httpStatus(HttpStatus.OK)
-                        .result("create successfully")
-                        .build();
-
 
     }
 
-    public ApiResponse getInfo() {
-        String userId = "";
-        try {
-            userId = identityFeignClient
-                    .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
-                    .getResult().toString();
-        } catch (FeignException ex) {
-            return ErrorResponseUtil.getResponseBody(ex);
-        }
+    public ShopResponse getInfo() {
+
+        String userId = identityFeignClient
+                .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult().toString();
         Shop shop = shopRepository.findByUserId(userId)
                 .orElseThrow(()-> new AppException(ErrorCode.SHOP_NOT_EXISTS));
         ShopResponse shopResponse = shopMapper.toShopResponse(shop);
         shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
-        return ApiResponse.builder()
-                .result(shopResponse)
-                .build();
+        return shopResponse;
     }
 
-    public ApiResponse update(ShopUpdateRequest shopUpdateRequest) {
-        String userId = "";
-        try {
-            userId = identityFeignClient
-                    .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
-                    .getResult().toString();
+    public void update(ShopUpdateRequest shopUpdateRequest) {
+        String userId = identityFeignClient
+                .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult().toString();
 
-        } catch (FeignException ex) {
-            return ErrorResponseUtil.getResponseBody(ex);
-        }
         Shop shop = shopRepository.findByUserId(userId)
                 .orElseThrow(()-> new AppException(ErrorCode.SHOP_NOT_EXISTS));
 
@@ -146,19 +129,15 @@ public class ShopService {
         ShopAddress shopAddress = shop.getShopAddress();
         shopAddressMapper.toShopAddress(shopAddress,shopUpdateRequest);
         shopRepository.save(shop);
-        return ApiResponse.builder()
-                .result("update successful")
-                .build();
+
     }
 
 
-    public ApiResponse getInfoById(String id) {
+    public ShopResponse getInfoById(String id) {
         Shop shop = shopRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SHOP_NOT_EXISTS));
         ShopResponse shopResponse = shopMapper.toShopResponse(shop);
         shopResponse.setShopAddressResponse(shopAddressMapper.toShopAddressResponse(shop.getShopAddress()));
-        return ApiResponse.builder()
-                .result(shopResponse)
-                .build();
+        return shopResponse;
     }
 
     public String getUserIdByShopId(String shopId){
