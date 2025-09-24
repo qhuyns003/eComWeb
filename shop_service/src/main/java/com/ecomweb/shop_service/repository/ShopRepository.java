@@ -26,4 +26,6 @@ public interface ShopRepository extends MongoRepository<Shop, String> {
 
    List<Shop> findByShopIdIn(List<String> ids);
 
+   List<Shop> findByShopAddressProvinceId(String provinceId);
+
 }

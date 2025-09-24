@@ -157,6 +157,7 @@ public class ProductService {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         Pageable pageable = PageRequest.of(page, size);
+        String shopId = shopFeignClient.getShopIdByUserId(userId).getResult();
         Page<Object[]> results = productRepository.findProductsWithMainImageByUserId(userId,search,status,pageable);
         List<ProductResponse> productResponses = new ArrayList<>();
         for(Object[] rs : results.getContent()) {
@@ -184,7 +185,8 @@ public class ProductService {
             sort = Sort.by("price").descending();
         }
         Pageable pageable = PageRequest.of(page, size,sort);
-        Page<Object[]> results = productRepository.searchProduct(search,status,pageable,productFilterRequest);
+        List<String> shopIds = shopFeignClient.getShopIdByProvinceId(productFilterRequest.getProvinceId()).getResult();
+        Page<Object[]> results = productRepository.searchProduct(search,status,pageable,productFilterRequest,shopIds);
         List<ProductResponse> productResponses = new ArrayList<>();
         for(Object[] rs : results.getContent()) {
 

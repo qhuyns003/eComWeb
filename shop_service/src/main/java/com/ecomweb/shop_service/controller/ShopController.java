@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -52,6 +54,13 @@ public class ShopController {
     ApiResponse<?> getInfo() {
         return ApiResponse.builder()
                 .result(shopService.getInfo())
+                .build();
+    }
+
+    @GetMapping("/byProvinceId/{provinceId}")
+    ApiResponse<List<String>> getShopIdByProvinceId(@PathVariable String provinceId) {
+        return ApiResponse.<List<String>>builder()
+                .result(shopService.getShopIdByProvinceId(provinceId))
                 .build();
     }
 

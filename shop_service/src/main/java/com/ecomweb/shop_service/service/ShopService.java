@@ -32,6 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 // try chi co feign nen bat feignex la du
 // bat exception neu con nhung code logic khac
 
@@ -153,6 +156,12 @@ public class ShopService {
         );
         return shop.getId();
     }
+
+    public List<String> getShopIdByProvinceId(String provinceId){
+        return shopRepository.findByShopAddressProvinceId(provinceId)
+                .stream().map(Shop::getId).collect(Collectors.toList());
+    }
+
 
 
 

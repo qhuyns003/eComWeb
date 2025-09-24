@@ -84,8 +84,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     LEFT JOIN p.productVariants v
     LEFT JOIN v.orderItems oi
     LEFT JOIN oi.customerReview cr
-    LEFT JOIN p.shop s
-    WHERE s.id = :shopId 
+    WHERE p.shopId = :shopId
     AND p.status = '1'
     GROUP BY p
     ORDER BY p.createdAt DESC
@@ -96,7 +95,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Query("""
     SELECT p
     FROM Product p
-    LEFT JOIN FETCH p.shop s
     LEFT JOIN FETCH p.images imgs
     LEFT JOIN FETCH p.productVariants v
     LEFT JOIN FETCH v.detailAttributes da
@@ -122,25 +120,21 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             value = """
         SELECT p, img
         FROM Product p
-        JOIN p.shop s
-        JOIN s.user u
         LEFT JOIN p.images img WITH img.isMain = true
-        WHERE u.id = :userId
+        WHERE p.shopId = :shopId
           AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
           AND (:status IS NULL OR p.status = :status)
         """,
             countQuery = """
         SELECT COUNT(p)
         FROM Product p
-        JOIN p.shop s
-        JOIN s.user u
-        WHERE u.id = :userId
+        WHERE p.shopId = :shopId
           AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
           AND (:status IS NULL OR p.status = :status)
         """
     )
     Page<Object[]> findProductsWithMainImageByUserId(
-            @Param("userId") String userId,
+            @Param("shopId") String shopId,
             @Param("search") String search,
             @Param("status") Integer status,
             Pageable pageable
@@ -155,26 +149,22 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             SELECT p.id, p.name, p.description, p.price, p.status, p.created_at, img.id, img.url, img.is_main
             FROM product p
             LEFT JOIN product_image img ON img.product_id = p.id AND img.is_main = true
-            LEFT JOIN shop s ON p.shop_id = s.id
-            LEFT JOIN shop_address sa ON s.id = sa.shop_id
             WHERE
+                            p.shop_id IN :shopIds AND
               (:search IS NULL OR MATCH(p.name) AGAINST (:search IN NATURAL LANGUAGE MODE))
               AND (:status IS NULL OR p.status = :status)
               AND (:#{#productFilterRequest.categoryId} IS NULL OR p.category_id = :#{#productFilterRequest.categoryId})
-              AND (:#{#productFilterRequest.provinceId} IS NULL OR sa.province_id = :#{#productFilterRequest.provinceId})
               AND (:#{#productFilterRequest.minPrice} IS NULL OR p.price >= :#{#productFilterRequest.minPrice})
               AND (:#{#productFilterRequest.maxPrice} IS NULL OR p.price <= :#{#productFilterRequest.maxPrice})
             """,
             countQuery = """
             SELECT COUNT(*)
             FROM product p
-            LEFT JOIN shop s ON p.shop_id = s.id
-            LEFT JOIN shop_address sa ON s.id = sa.shop_id
             WHERE
+                            p.shop_id IN :shopIds AND
               (:search IS NULL OR MATCH(p.name) AGAINST (:search IN NATURAL LANGUAGE MODE))
               AND (:status IS NULL OR p.status = :status)
               AND (:#{#productFilterRequest.categoryId} IS NULL OR p.category_id = :#{#productFilterRequest.categoryId})
-              AND (:#{#productFilterRequest.provinceId} IS NULL OR sa.province_id = :#{#productFilterRequest.provinceId})
               AND (:#{#productFilterRequest.minPrice} IS NULL OR p.price >= :#{#productFilterRequest.minPrice})
               AND (:#{#productFilterRequest.maxPrice} IS NULL OR p.price <= :#{#productFilterRequest.maxPrice})
             """,
@@ -184,7 +174,8 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             @Param("search") String search,
             @Param("status") String status,
             Pageable pageable,
-            @Param("productFilterRequest") ProductFilterRequest productFilterRequest
+            @Param("productFilterRequest") ProductFilterRequest productFilterRequest,
+            @Param("shopIds") List<String> shopIds
     );
 
 

@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+// có 2 hướng giải quyết vấn đề câu querry cần truy vấn trên bảng service khác
+// cách1 : embeedded thuôc tính vào bảng hiện thời
+// cách2 : gọi sang service để lấy id thỏa mãn, intersection giữa các id và truyền vào querry
+// cách3 : sử dụng server ES de lam server trung gian luu thực thể tổng hợp dữ liệu
 public class ShopAddressService {
 
     ShopRepository shopRepository;

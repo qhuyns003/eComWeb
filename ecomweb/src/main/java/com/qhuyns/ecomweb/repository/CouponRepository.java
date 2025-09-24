@@ -22,27 +22,27 @@ public interface CouponRepository extends JpaRepository<Coupon, String> {
     WHERE c.endDate >= CURRENT_DATE
       AND c.active = true
       AND c.requireCode = false
-      AND c.shop.id = :shopId
+      AND c.shopId = :shopId
       AND c.quantity>c.used
       AND NOT EXISTS (
         SELECT osg FROM c.orderShopGroups osg
-        WHERE osg.order.user.username = :userName
+        WHERE osg.order.userId = :userId
       )
 """)
-    List<Coupon> findAvailableCouponsForShopAndUser(@Param("shopId") String shopId, @Param("userName") String userName);
+    List<Coupon> findAvailableCouponsForShopAndUser(@Param("shopId") String shopId, @Param("userId") String userId);
 
     @Query("""
     SELECT c FROM Coupon c
-    JOIN c.users u
-    WHERE u.username = :userName
+ 
+    WHERE c.id IN :ids
       AND c.endDate >= CURRENT_DATE
       AND c.active = true
       AND c.quantity>c.used
-      AND c.shop is null
+      AND c.shopId is null
       AND NOT EXISTS (
         SELECT o FROM c.orders o
-        WHERE o.user.username = :userName
+        WHERE o.userId = :userId
       )
 """)
-    List<Coupon> findValidUnusedCouponsOfUser(@Param("userName") String userName);
+    List<Coupon> findValidUnusedCouponsOfUser(@Param("userId") String userId, @Param("ids") List<String> ids);
 }

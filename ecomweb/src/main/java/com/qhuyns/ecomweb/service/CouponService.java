@@ -2,6 +2,8 @@ package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.dto.response.CategoryResponse;
 import com.qhuyns.ecomweb.dto.response.CouponResponse;
+import com.qhuyns.ecomweb.dto.response.UserCouponResponse;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import com.qhuyns.ecomweb.mapper.CategoryMapper;
 import com.qhuyns.ecomweb.mapper.CouponMapper;
 import com.qhuyns.ecomweb.repository.CategoryRepository;
@@ -24,12 +26,19 @@ public class CouponService {
 
     CouponRepository couponRepository;
     CouponMapper couponMapper;
+    IdentityFeignClient identityFeignClient;
     public List<CouponResponse> getByShopId(String shopId) {
-        return couponRepository.findAvailableCouponsForShopAndUser(shopId, SecurityContextHolder.getContext().getAuthentication().getName())
-                .stream().map(cp -> couponMapper.toCouponResponse(cp)).collect(Collectors.toList());
+
+        String userId = identityFeignClient.getUserIdByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getResult();
+        return couponRepository.findAvailableCouponsForShopAndUser(shopId, userId)
+                .stream().map(couponMapper::toCouponResponse).collect(Collectors.toList());
     };
     public List<CouponResponse> getByUserId() {
-        return couponRepository.findValidUnusedCouponsOfUser(SecurityContextHolder.getContext().getAuthentication().getName())
-                .stream().map(cp -> couponMapper.toCouponResponse(cp)).collect(Collectors.toList());
+        List<UserCouponResponse> userCouponResponses = identityFeignClient.getByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult();
+        List<String> couponId = userCouponResponses.stream().map(UserCouponResponse::getCouponId).collect(Collectors.toList());
+        String userId = userCouponResponses.getFirst().getUserId();
+        return couponRepository.findValidUnusedCouponsOfUser(userId,couponId)
+                .stream().map(couponMapper::toCouponResponse).collect(Collectors.toList());
     };
 }

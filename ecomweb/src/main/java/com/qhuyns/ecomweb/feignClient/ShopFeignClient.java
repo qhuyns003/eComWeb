@@ -7,6 +7,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 @FeignClient(name = "shop-service", url = "http://localhost:8083/shop", configuration = FeignConfig.class)
 public interface ShopFeignClient {
 
@@ -18,5 +20,8 @@ public interface ShopFeignClient {
 
     @GetMapping("/getUserId/{shopId}")
     ApiResponse<String> getUserIdByShopId(@PathVariable String shopId);
+
+    @GetMapping("/byProvinceId/{provinceId}")
+    ApiResponse<List<String>> getShopIdByProvinceId(@PathVariable String provinceId);
 
 }
