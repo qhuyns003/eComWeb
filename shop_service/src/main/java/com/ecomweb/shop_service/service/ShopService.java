@@ -17,7 +17,6 @@ import com.ecomweb.shop_service.mapper.ShopAddressMapper;
 import com.ecomweb.shop_service.mapper.ShopMapper;
 import com.ecomweb.shop_service.producer.ShopProducer;
 import com.ecomweb.shop_service.repository.ShopRepository;
-import com.ecomweb.shop_service.util.ErrorResponseUtil;
 import com.ecomweb.shop_service.util.RedisCacheHelper;
 import com.ecomweb.shop_service.util.RedisKey;
 import feign.FeignException;

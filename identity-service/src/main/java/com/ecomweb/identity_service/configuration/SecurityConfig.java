@@ -18,6 +18,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 // config cua rest
+// phan UserDetail chi su dung trong monolith service do chi chay 1 app duy nhat, sessionId luu tren trinh duyet se khop sesionId trong server, se lay lai duoc du lieu
+// k sd trong microservice vi khi xac thuc thi session + thongtin UserDetail chi xuat hien trong identity service -> neu rq sau goi sang service khac se k mapping dung
+// UserDetails cua springsecu, khi login se luu thong tin UserDeatil + sessionId trong 1 hash
+
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
         "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"

@@ -29,7 +29,7 @@ public class ShopAddressService {
     ShopAddressMapper shopAddressMapper;
 
     public List<ShopAddressResponse> getAll(List<String> ids) {
-        return shopRepository.findByShopIdIn(ids).stream()
+        return shopRepository.findByIdIn(ids).stream()
                 .map(s -> shopAddressMapper.toShopAddressResponse(s.getShopAddress()))
                 .collect(Collectors.toList());
     }

@@ -186,7 +186,7 @@ public class AuthenticationService {
 
         if (!CollectionUtils.isEmpty(roles))
             roles.forEach(role -> {
-                stringJoiner.add("ROLE_" + role.getName());
+                stringJoiner.add("ROLE_" + role.getId());
             });
 
         return stringJoiner.toString();

@@ -24,7 +24,7 @@ public interface ShopRepository extends MongoRepository<Shop, String> {
    // tự generate query: { "user.username" : username }
    Optional<Shop> findByUserId(String userId);
 
-   List<Shop> findByShopIdIn(List<String> ids);
+   List<Shop> findByIdIn(List<String> ids);
 
    List<Shop> findByShopAddressProvinceId(String provinceId);
 

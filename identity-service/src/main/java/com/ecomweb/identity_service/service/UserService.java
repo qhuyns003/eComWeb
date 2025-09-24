@@ -98,7 +98,7 @@ public class UserService {
         Role role = roleRepository.findById(PredefinedRole.USER_ROLE).orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_EXISTS));
         UserRole userRole = UserRole.builder()
                 .userId(user.getId())
-                .roleId(role.getName())
+                .roleId(role.getId())
                 .build();
         userRoleRepository.save(userRole);
         userProducer.userCreated(UserCreated.builder()
@@ -129,7 +129,7 @@ public class UserService {
         Role role = roleRepository.findById(PredefinedRole.SELLER_ROLE).orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_EXISTS));
         UserRole userRole = UserRole.builder()
                 .userId(user.getId())
-                .roleId(role.getName())
+                .roleId(role.getId())
                 .build();
         userRoleRepository.save(userRole);
         userRepository.save(user);
@@ -149,7 +149,7 @@ public class UserService {
         Role role = roleRepository.findById(PredefinedRole.USER_ROLE).orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_EXISTS));
         UserRole userRole = UserRole.builder()
                 .userId(user.getId())
-                .roleId(role.getName())
+                .roleId(role.getId())
                 .build();
         userRoleRepository.save(userRole);
         userRepository.save(user);
@@ -209,7 +209,7 @@ public class UserService {
                 Role role = roleRepository.findById(roleId).orElseThrow(()->new AppException(ErrorCode.ROLE_NOT_EXISTS));
                 UserRole userRole = UserRole.builder()
                         .userId(user.getId())
-                        .roleId(role.getName())
+                        .roleId(role.getId())
                         .build();
                 userRoleRepository.save(userRole);
             }
