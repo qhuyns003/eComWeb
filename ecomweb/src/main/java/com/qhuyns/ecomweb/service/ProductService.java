@@ -6,6 +6,8 @@ import com.qhuyns.ecomweb.dto.response.*;
 import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
+import com.qhuyns.ecomweb.feignClient.ShopFeignClient;
 import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.*;
 import com.qhuyns.ecomweb.util.RedisCacheHelper;
@@ -44,7 +46,6 @@ public class ProductService {
     ProductMapper productMapper;
     ProductImageService productImageService;
     ProductImageMapper productImageMapper;
-    ShopMapper shopMapper;
     ProductVariantMapper productVariantMapper;
     ProductAttributeMapper productAttributeMapper;
     DetailAttributeMapper detailAttributeMapper;
@@ -56,9 +57,10 @@ public class ProductService {
     ProductImageRepository productImageRepository;
     FileService fileService;
     ProductVariantRepository productVariantRepository;
-    ShopRepository shopRepository;
     WeaviateService  weaviateService;
     RedisCacheHelper cacheHelper;
+    ShopFeignClient shopFeignClient;
+    IdentityFeignClient identityFeignClient;
 
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) throws Exception {
         // Kiểm tra cache
@@ -129,7 +131,7 @@ public class ProductService {
             ).collect(Collectors.toList()));
             return productAttributeResponse;
         }).collect(Collectors.toList()));
-        productDetailResponse.setShop(shopMapper.toShopResponse(product.getShop()));
+        productDetailResponse.setShop(shopFeignClient.getShopInfoById(product.getShopId()).getResult());
 
         List<ProductVariantResponse> variantResponses = product.getProductVariants().stream()
                 .map(variant -> {
@@ -151,6 +153,9 @@ public class ProductService {
 
     public Page<ProductResponse> findProductsWithMainImageByUserId(String userId,int page, int size,String search, int status) {
 
+        if (!identityFeignClient.existsById(userId).getResult()){
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
         Pageable pageable = PageRequest.of(page, size);
         Page<Object[]> results = productRepository.findProductsWithMainImageByUserId(userId,search,status,pageable);
         List<ProductResponse> productResponses = new ArrayList<>();
@@ -295,7 +300,8 @@ public class ProductService {
             return pi;
         }).collect(Collectors.toList()));
         product.setStatus("1");
-        product.setShop(shopRepository.findByUserUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
+        String userId = identityFeignClient.getUserIdByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getResult();
+        product.setShopId(shopFeignClient.getShopIdByUserId(userId).getResult());
 
         for(ProductAttributeRequest par : productRequest.getProductAttributes()){
             ProductAttribute pa = productAttributeMapper.toProductAttribute(par);

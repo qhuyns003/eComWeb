@@ -147,6 +147,13 @@ public class ShopService {
         return shop.getUserId();
     }
 
+    public String getShopIdByUserId(String userId){
+        Shop shop = shopRepository.findByUserId(userId).orElseThrow(
+                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
+        );
+        return shop.getId();
+    }
+
 
 
 

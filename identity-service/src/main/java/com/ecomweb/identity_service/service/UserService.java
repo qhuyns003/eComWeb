@@ -111,12 +111,6 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public String getUserIdByUsername(String username){
-        User user = userRepository.findByUsernameAndActive(
-                username,true
-        ).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
-        return user.getId();
-    }
 
     @Transactional
     public String upgradeSellerRequest(UpgradeSellerRequest request) throws Exception {
@@ -248,6 +242,18 @@ public class UserService {
         return userMapper.toUserResponse(
                 userRepository.findByUsernameAndActive(username,true).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
+
+    public boolean existById(String id) {
+        return userRepository.existsById(id);
+    }
+
+    public String getUserIdByUsername(String username) {
+        return userRepository.findByUsernameAndActive(username,true)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED))
+                .getId();
+    }
+
+
 
 }
 

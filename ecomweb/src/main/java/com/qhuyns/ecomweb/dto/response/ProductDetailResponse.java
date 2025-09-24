@@ -4,7 +4,6 @@ package com.qhuyns.ecomweb.dto.response;
 import com.qhuyns.ecomweb.entity.Category;
 import com.qhuyns.ecomweb.entity.ProductImage;
 import com.qhuyns.ecomweb.entity.ProductVariant;
-import com.qhuyns.ecomweb.entity.Shop;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

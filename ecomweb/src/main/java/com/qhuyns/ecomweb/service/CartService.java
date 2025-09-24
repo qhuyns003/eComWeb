@@ -4,9 +4,13 @@ import com.qhuyns.ecomweb.constant.ImagePrefix;
 import com.qhuyns.ecomweb.dto.request.CartRequest;
 import com.qhuyns.ecomweb.dto.response.CartResponse;
 import com.qhuyns.ecomweb.dto.response.PaymentResponse;
+import com.qhuyns.ecomweb.dto.response.ShopResponse;
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
+import com.qhuyns.ecomweb.feignClient.ShopFeignClient;
 import com.qhuyns.ecomweb.repository.CartRepository;
 import com.qhuyns.ecomweb.repository.ProductVariantRepository;
 import lombok.AccessLevel;
@@ -26,14 +30,13 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CartService {
 
-    UserRepository userRepository;
     CartRepository cartRepository;
-    ShopMapper shopMapper;
-    ProductVariantRepository pvRepository;;
+    ProductVariantRepository pvRepository;
+    IdentityFeignClient identityFeignClient;
+    ShopFeignClient shopFeignClient;
     public List<CartResponse> getAll() {
-        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true).orElseThrow(
-                ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
-        );
+        UserResponse user = identityFeignClient.getActivatedUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult();
         List<Cart> carts = cartRepository.findByUserId(user.getId());
         List<CartResponse> cartResponseList = new ArrayList<>();
         for (Cart cart : carts) {
@@ -41,6 +44,7 @@ public class CartService {
             Product product = pv.getProduct();
             List<String> dan = cart.getProductVariant().getDetailAttributes().stream().map(da -> da.getName() )
                     .collect(Collectors.toList());
+            ShopResponse shopResponse = shopFeignClient.getShopInfoById(product.getShopId()).getResult();
             CartResponse cartResponse = CartResponse.builder()
                     .id(cart.getId())
                     .quantity(cart.getQuantity())
@@ -51,7 +55,7 @@ public class CartService {
                     .height(product.getHeight())
                     .length(product.getLength())
                     .weight(product.getWeight())
-                    .shop(shopMapper.toShopResponse(product.getShop()))
+                    .shop(shopResponse)
                     .detailAttributes(dan)
                     .imageUrl(ImagePrefix.IMAGE_PREFIX+product.getImages().stream().filter(img -> img.getIsMain()==true).findFirst().get().getUrl())
                     .build();
@@ -61,9 +65,8 @@ public class CartService {
     }
 
     public void addToCart(CartRequest cartRequest) {
-        User user = userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true).orElseThrow(
-                ()-> new AppException(ErrorCode.USER_NOT_EXISTED)
-        );
+        UserResponse user = identityFeignClient.getActivatedUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult();
         ProductVariant pv = pvRepository.findById(cartRequest.getProductVariantId()).orElseThrow(
                 () -> new AppException(ErrorCode.VARIANT_NOT_FOUND)
         );
@@ -71,7 +74,7 @@ public class CartService {
             throw new AppException(ErrorCode.DONNT_ENOUGH_PRODUCT);
         }
         Cart cart = Cart.builder()
-                .user(user)
+                .userId(user.getId())
                 .quantity(cartRequest.getQuantity())
                 .productVariant(pv)
                 .build();

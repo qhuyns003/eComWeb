@@ -55,6 +55,12 @@ public class UserController {
 
 
 
+    @GetMapping("/exists/{id}")
+    ApiResponse<Boolean> existsById(@PathVariable String id) {
+        return ApiResponse.<Boolean>builder()
+                .result(userService.existById(id))
+                .build();
+    }
 
     @GetMapping
     ApiResponse<List<UserResponse>> getUsers() {

@@ -1,6 +1,7 @@
 package com.qhuyns.ecomweb.service;
 
 import com.qhuyns.ecomweb.dto.request.CreateRoomRequest;
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
 import com.qhuyns.ecomweb.entity.PrivateChat;
 import com.qhuyns.ecomweb.entity.Room;
@@ -9,6 +10,8 @@ import com.qhuyns.ecomweb.entity.key.PrivateChatKey;
 import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
+import com.qhuyns.ecomweb.feignClient.ShopFeignClient;
 import com.qhuyns.ecomweb.mapper.UserRoomKeyMapper;
 import com.qhuyns.ecomweb.mapper.UserRoomMapper;
 import com.qhuyns.ecomweb.repository.*;
@@ -38,6 +41,8 @@ public class PrivateChatService {
     UserRoomService userRoomService;
     RoomMemberService roomMemberService;
     SimpMessagingTemplate messagingTemplate;
+    IdentityFeignClient identityFeignClient;
+    ShopFeignClient shopFeignClient;
     public String getRoomId(String user1,String user2) {
         PrivateChat pc = privateChatRepository.findByKeyUser1AndKeyUser2(user1,user2);
         if (pc != null) {
@@ -48,12 +53,12 @@ public class PrivateChatService {
 
     public String create(String shopId) {
 
-        User user1 = (userRepository.findByUsernameAndActive(SecurityContextHolder.getContext().getAuthentication().getName(),true)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED)));
+        UserResponse user1 = identityFeignClient
+                .getActivatedUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getResult();
         String userId1 = user1.getId();
-        User user2 = shopRepository.findById(shopId).orElseThrow(
-                ()-> new AppException(ErrorCode.SHOP_NOT_EXISTS)
-        ).getUser();
+        String user2Id = shopFeignClient.getShopIdByUserId(userId1).getResult();
+        UserResponse user2 = identityFeignClient.getActivatedUser(user2Id).getResult();
         String userId2 = user2.getId();
         if(userId1.compareToIgnoreCase(userId2) >0){
             String tmp =userId1;

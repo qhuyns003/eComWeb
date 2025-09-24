@@ -4,7 +4,6 @@ import com.qhuyns.ecomweb.configuration.RabbitMQConfig;
 import com.qhuyns.ecomweb.dto.event.ShopCreationFailed;
 import com.qhuyns.ecomweb.dto.event.UserCreated;
 import com.qhuyns.ecomweb.service.EmailService;
-import com.qhuyns.ecomweb.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

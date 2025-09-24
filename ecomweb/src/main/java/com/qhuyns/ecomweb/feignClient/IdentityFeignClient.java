@@ -27,7 +27,11 @@ public interface IdentityFeignClient {
     @GetMapping("/user_address/{id}")
     ApiResponse<UserAddressResponse> getUserAddressById(@PathVariable String id);
 
-    @GetMapping("/shop/getUserId/{shopId}")
-    ApiResponse<String> getUserIdByShopId(@PathVariable String shopId);
+    @GetMapping("/users/exists/{id}")
+    ApiResponse<Boolean> existsById(@PathVariable String id);
+
+    @GetMapping("/users/byUsername/{username}")
+    ApiResponse<String> getUserIdByUsername(@PathVariable String username);
+
 
 }

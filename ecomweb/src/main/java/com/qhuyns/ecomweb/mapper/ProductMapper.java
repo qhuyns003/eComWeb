@@ -30,7 +30,6 @@ public interface ProductMapper {
 
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "images",ignore = true)
-    @Mapping(target = "shop",ignore = true)
     @Mapping(target = "productVariants",ignore = true)
     @Mapping(target = "productAttributes",ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -40,7 +39,6 @@ public interface ProductMapper {
     // mapper hoạt động nhờ builder, nên muốn giữ giá trị khởi tạo của entity phải Builder.Dèault
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "images",ignore = true)
-    @Mapping(target = "shop",ignore = true)
     @Mapping(target = "productVariants",ignore = true)
     @Mapping(target = "productAttributes",ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

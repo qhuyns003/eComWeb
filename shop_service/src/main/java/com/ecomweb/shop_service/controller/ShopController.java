@@ -69,6 +69,13 @@ public class ShopController {
                 .build();
     }
 
+    @GetMapping("/getShopId/{userId}")
+    ApiResponse<?> getShopIdByUserId(@PathVariable String userId) {
+        return ApiResponse.builder()
+                .result(shopService.getShopIdByUserId(userId))
+                .build();
+    }
+
 
 
 

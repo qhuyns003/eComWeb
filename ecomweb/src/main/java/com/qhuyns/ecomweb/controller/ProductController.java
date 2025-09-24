@@ -7,7 +7,6 @@ import com.qhuyns.ecomweb.dto.request.ProductRequest;
 import com.qhuyns.ecomweb.dto.response.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
-import com.qhuyns.ecomweb.repository.UserRepository;
 import com.qhuyns.ecomweb.service.CategoryService;
 import com.qhuyns.ecomweb.service.ProductService;
 import lombok.AccessLevel;
@@ -28,7 +27,6 @@ import java.util.List;
 public class ProductController {
 
 
-    UserRepository userRepository;
     ProductService productService;
 
     @GetMapping("/top-selling")
@@ -61,9 +59,6 @@ public class ProductController {
             @RequestParam("size") int size,
             @RequestParam(value = "search", required = false,defaultValue = "") String search,
             @RequestParam(value = "status",required = false,defaultValue = "1") int status) {
-        if (!userRepository.existsById(id)){
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
         return ApiResponse.<Page<ProductResponse>>builder()
                 .result(productService.
                         findProductsWithMainImageByUserId(id,page,size,search,status))
