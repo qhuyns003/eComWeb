@@ -52,7 +52,7 @@ export const fetchRoomById = (roomId: string) => {
 };
 // Xác thực tài khoản (verify email)
 export const verifyAccount = (token: string, username: string) => {
-  return axiosInstance.post('/users/verification', null, { params: { token, username } });
+  return axiosInstance.post('/identity/users/verification', null, { params: { token, username } });
 };
 // Notification API
 
@@ -78,33 +78,33 @@ export const updateShop = (shopUpdateRequest: any) => {
 };
 // Cập nhật địa chỉ user
 export const updateUserAddress = (id: string, addressData: any) => {
-  return axiosInstance.put(`/user_address/${id}`, addressData);
+  return axiosInstance.put(`/identity/user_address/${id}`, addressData);
 };
 // Xóa địa chỉ user
 export const deleteUserAddress = (id: string) => {
-  return axiosInstance.delete(`/user_address/${id}`);
+  return axiosInstance.delete(`/identity/user_address/${id}`);
 };
 // Cập nhật thông tin user
 export const updateUser = (userData: any) => {
-  return axiosInstance.put('/users/my-info', userData);
+  return axiosInstance.put('/identity/my-info', userData);
 };
 
 
 export const login = (username: string, password: string) => {
-  return axiosInstance.post('/auth/token', { username, password });
+  return axiosInstance.post('/identity/auth/token', { username, password });
 };
 
 export const getMyInfo = (token: string) => {
-  return axiosInstance.get('/users/my-info',{headers: {Authorization: `Bearer ${token}`}});
+  return axiosInstance.get('/identity/users/my-info',{headers: {Authorization: `Bearer ${token}`}});
 };
 
 export const logout = (token: string) => {
-  return axiosInstance.post('/auth/logout', { token });
+  return axiosInstance.post('/identity/auth/logout', { token });
 };
 
 export const register = (userData: any) => {
-  return axiosInstance.post('/users', userData);
-}; 
+  return axiosInstance.post('/identity/users', userData);
+};
 
 export const registerShop = (shopData: any) => {
   return axiosInstance.post('/shop', shopData);
@@ -184,7 +184,7 @@ export const getUserAddresses = () => {
 };
 
 export const addUserAddress = (addressData: any) => {
-  return axiosInstance.post('/user_address/', addressData);
+  return axiosInstance.post('/identity/user_address/', addressData);
 };
 
 export const getProvinces = () => axiosInstance.get('/ghn/provinces');
@@ -204,7 +204,7 @@ export const getShopInfo = (shopIds: string[]) => {
   // Gửi shopIds dưới dạng query parameters
   const params = new URLSearchParams();
   shopIds.forEach(id => params.append('ids', id));
-  return axiosInstance.get(`/shop_address/?${params.toString()}`);
+  return axiosInstance.get(`/shop/shop_address/?${params.toString()}`);
 };
 
 export const getCouponsByShopId = (shopId: string) => {

@@ -5,6 +5,8 @@ import com.ecomweb.identity_service.dto.request.IntrospectRequest;
 import com.ecomweb.identity_service.dto.response.ApiResponse;
 import com.ecomweb.identity_service.dto.response.IntrospectResponse;
 import com.ecomweb.identity_service.feignClient.MainFeignClient;
+import com.ecomweb.identity_service.service.AuthenticationService;
+import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 
 import javax.crypto.spec.SecretKeySpec;
+import java.text.ParseException;
 import java.util.Objects;
 
 
@@ -29,7 +32,8 @@ public class CustomJwtDecoder implements JwtDecoder {
     @NonFinal
     String signerKey;
 
-    MainFeignClient mainFeignClient;
+    AuthenticationService authenticationService;
+
 
     @NonFinal
     private NimbusJwtDecoder nimbusJwtDecoder = null;
@@ -39,11 +43,19 @@ public class CustomJwtDecoder implements JwtDecoder {
     public Jwt decode(String token) throws JwtException {
 
     // dung webclient cua webflux ma .block thi toc do cung ngang feign
-        ApiResponse<IntrospectResponse> response = mainFeignClient.introspect(IntrospectRequest.builder()
+
+        IntrospectResponse response = null;
+        try {
+            response = authenticationService.introspect(IntrospectRequest.builder()
                     .token(token).build());
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
 
 
-        if (!response.getResult().isValid()) throw new JwtException("Token invalid");
+        if (!response.isValid()) throw new JwtException("Token invalid");
 
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
