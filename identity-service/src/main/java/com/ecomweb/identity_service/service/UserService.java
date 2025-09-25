@@ -101,6 +101,7 @@ public class UserService {
                 .roleId(role.getId())
                 .build();
         userRoleRepository.save(userRole);
+        verificationTokenRepository.save(vt);
         userProducer.userCreated(UserCreated.builder()
                         .emailVerificationRequest(EmailVerificationRequest.builder()
                                 .email(user.getEmail())

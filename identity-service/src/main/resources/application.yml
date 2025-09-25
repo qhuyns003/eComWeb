@@ -8,6 +8,18 @@ spring:
     port: 5672
     username: guest
     password: guest
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: quanghuytq3011@gmail.com
+    password: xhcz ykyn ooea hhgd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    expiryTime: 3600 #second
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 3600 # in second
