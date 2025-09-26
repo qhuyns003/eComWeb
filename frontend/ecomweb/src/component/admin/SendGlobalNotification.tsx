@@ -1,26 +1,30 @@
 import React, { useState } from 'react';
 import { sendNotification } from '../../api/api';
-import axiosInstance from '../../api/axiosInstance';
+import { getAllUsers } from '../../api/api';
 import SockJS from 'sockjs-client/dist/sockjs';
 import { Client } from '@stomp/stompjs';
 import { useAppSelector } from '../../store/hooks';
 import { selectUser } from '../../store/features/userSlice';
 
 const SendGlobalNotification: React.FC<{ onSent?: () => void }> = ({ onSent }) => {
+  const user = useAppSelector(selectUser);
+  // Chỉ cho phép ADMIN truy cập
+  if (!user?.roles?.some((role: any) => role.id === 'ADMIN')) {
+    return <div className="text-red-500 text-center font-bold p-8">Bạn không có quyền truy cập chức năng này.</div>;
+  }
+  const [stompClient, setStompClient] = useState<Client | null>(null);
   const [modal, setModal] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [userList, setUserList] = useState<{id: string, username: string, fullName?: string}[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   // Lấy danh sách user hệ thống khi mount
   React.useEffect(() => {
-    axiosInstance.get('/users')
+    getAllUsers()
       .then(res => {
         const users = res.data?.result || res.data;
         setUserList(users);
       })
       .catch(() => setUserList([]));
   }, []);
-  const user = useAppSelector(selectUser);
-  const [stompClient, setStompClient] = useState<Client | null>(null);
   // Khởi tạo kết nối socket khi component mount
   React.useEffect(() => {
     if (!user) return;
@@ -51,13 +55,6 @@ const SendGlobalNotification: React.FC<{ onSent?: () => void }> = ({ onSent }) =
     try {
       // Lấy danh sách user hệ thống từ userList
       const recipientIds = userList.map(u => u.id);
-      // Gửi qua REST API
-      await sendNotification({
-        recipientId: recipientIds,
-        type: 'text',
-        title,
-        message
-      });
       // Gửi qua socket nếu có kết nối
       if (stompClient && stompClient.connected) {
         stompClient.publish({
@@ -69,10 +66,13 @@ const SendGlobalNotification: React.FC<{ onSent?: () => void }> = ({ onSent }) =
             message
           })
         });
+        setSuccess(true);
+        setModal({ type: 'success', message: 'Gửi thông báo thành công!' });
+        if (onSent) onSent();
+      } else {
+        setError('Không kết nối được tới server socket!');
+        setModal({ type: 'error', message: 'Không kết nối được tới server socket!' });
       }
-      setSuccess(true);
-      setModal({ type: 'success', message: 'Gửi thông báo thành công!' });
-      if (onSent) onSent();
     } catch (err) {
       setError('Gửi thông báo thất bại!');
       setModal({ type: 'error', message: 'Gửi thông báo thất bại!' });

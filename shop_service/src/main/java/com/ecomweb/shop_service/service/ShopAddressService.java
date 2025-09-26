@@ -29,8 +29,13 @@ public class ShopAddressService {
     ShopAddressMapper shopAddressMapper;
 
     public List<ShopAddressResponse> getAll(List<String> ids) {
+
         return shopRepository.findByIdIn(ids).stream()
-                .map(s -> shopAddressMapper.toShopAddressResponse(s.getShopAddress()))
+                .map(s -> {
+                    ShopAddressResponse res = shopAddressMapper.toShopAddressResponse(s.getShopAddress());
+                    res.setId(s.getId());
+                    return res;
+                })
                 .collect(Collectors.toList());
     }
 

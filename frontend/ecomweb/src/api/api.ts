@@ -1,3 +1,7 @@
+// Lấy tất cả user hệ thống (dùng cho admin gửi thông báo)
+export const getAllUsers = () => {
+  return axiosInstance.get('/identity/users');
+};
 // Gửi thông báo hệ thống
 export const sendNotification = (payload: {
   recipientId: string[],

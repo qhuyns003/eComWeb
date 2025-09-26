@@ -38,7 +38,6 @@ public class GlobalExceptionHandler {
 
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
-        apiResponse.setHttpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()));
         String message = errorCode.getMessage();
         if (exception.getArgs() != null && exception.getArgs().length > 0) {
             message = String.format(message, exception.getArgs());
@@ -56,7 +55,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
-                        .httpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()))
                         .build());
     }
 
@@ -87,7 +85,6 @@ public class GlobalExceptionHandler {
                 Objects.nonNull(attributes)
                         ? mapAttribute(errorCode.getMessage(), attributes)
                         : errorCode.getMessage());
-        apiResponse.setHttpStatus(HttpStatus.valueOf(errorCode.getStatusCode().value()));
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
@@ -99,7 +96,6 @@ public class GlobalExceptionHandler {
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-        apiResponse.setHttpStatus(HttpStatus.valueOf(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode().value()));
 
         return ResponseEntity.internalServerError().body(apiResponse);
     }

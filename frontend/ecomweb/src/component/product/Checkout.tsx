@@ -88,6 +88,7 @@ const Checkout: React.FC = () => {
     const shopIds = orderShopGroups.map((group: any) => group.shop.id);
     if (shopIds.length) {
       getShopInfo(shopIds).then(res => {
+        console.log('Shop infos:', res.data.result);
         setShopInfos(res.data.result);
       });
     }

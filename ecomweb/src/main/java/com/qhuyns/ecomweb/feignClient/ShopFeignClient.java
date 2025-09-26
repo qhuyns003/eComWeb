@@ -13,15 +13,15 @@ import java.util.List;
 public interface ShopFeignClient {
 
     @GetMapping("/{shopId}")
-    ApiResponse<ShopResponse> getShopInfoById(@PathVariable String shopId);
+    ApiResponse<ShopResponse> getShopInfoById(@PathVariable("shopId") String shopId);
 
     @GetMapping("/getShopId/{userId}")
-    ApiResponse<String> getShopIdByUserId(@PathVariable String userId);
+    ApiResponse<String> getShopIdByUserId(@PathVariable("userId") String userId);
 
     @GetMapping("/getUserId/{shopId}")
-    ApiResponse<String> getUserIdByShopId(@PathVariable String shopId);
+    ApiResponse<String> getUserIdByShopId(@PathVariable("shopId") String shopId);
 
     @GetMapping("/byProvinceId/{provinceId}")
-    ApiResponse<List<String>> getShopIdByProvinceId(@PathVariable String provinceId);
+    ApiResponse<List<String>> getShopIdByProvinceId(@PathVariable("provinceId") String provinceId);
 
 }

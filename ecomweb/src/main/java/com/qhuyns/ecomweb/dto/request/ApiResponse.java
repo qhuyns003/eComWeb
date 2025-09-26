@@ -13,8 +13,8 @@ import lombok.experimental.FieldDefaults;
 // tra cac trg k null
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-// bo qua cac thuoc tinh JSON khong biet
-// neu k them vao thi se bi loi vi JSON toi co truong ma dto k mapping dc
+// bo qua cac thuoc tinh JSON khong biet, voi annotation @RequestBody thi dc ghi de mac dinh la true
+// neu k them vao thi se bi loi vi JSON toi co truong ma dto k mapping dc (vi du truong hop su dung objectmapper de read 1 json sang dto)
 public class ApiResponse<T> {
     @Builder.Default
     private int code = 1000;

@@ -37,7 +37,7 @@ public class CouponService {
         List<UserCouponResponse> userCouponResponses = identityFeignClient.getByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
                 .getResult();
         List<String> couponId = userCouponResponses.stream().map(UserCouponResponse::getCouponId).collect(Collectors.toList());
-        String userId = userCouponResponses.getFirst().getUserId();
+        String userId = identityFeignClient.getUserIdByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getResult();
         return couponRepository.findValidUnusedCouponsOfUser(userId,couponId)
                 .stream().map(couponMapper::toCouponResponse).collect(Collectors.toList());
     };

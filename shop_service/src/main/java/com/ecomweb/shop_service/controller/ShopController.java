@@ -30,6 +30,8 @@ import java.util.List;
 // trong java 2 method phan biet voi nhau boi ham va tham so
 // => tuy nhien spring chap nhan dieu nay, chi can kac  url va http method
 // requestbody, param mac dinh la required, neu k co se bi loi tru khi set false
+
+// /{id} va /id/{id} se bi xung dot voi nhau
 public class ShopController {
 
     ShopService shopService;

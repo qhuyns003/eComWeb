@@ -118,7 +118,7 @@ export const selectUser = (state: RootState) => (state.user as UserState).user;
 export const selectUserLoading = (state: RootState) => (state.user as UserState).loading;
 export const selectUserError = (state: RootState) => (state.user as UserState).error;
 export const selectIsSeller = (state: RootState) =>
-  (state.user as UserState).user?.roles?.some((role: Role) => role.id === 'SELLER') || false;
+  (state.user as UserState).user?.roles?.some((role: Role) => role.id === 'SELLER' || role.id === 'ADMIN' ) || false;
 export const selectIsAuthenticated = (state: RootState) => !!(state.user as UserState).user;
 
 export default userSlice.reducer; 

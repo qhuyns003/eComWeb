@@ -23,25 +23,28 @@ public class NotificationController {
 
 
     @PostMapping("/send")
-    public ResponseEntity<ApiResponse<?>> createNotification(@RequestBody NotificationRequest notificationRequest) {
-        ApiResponse<?> apiResponse = notificationService.createNotification(notificationRequest);
-        return ResponseEntity.status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+    public ApiResponse<?> createNotification(@RequestBody NotificationRequest notificationRequest) {
+        notificationService.createNotification(notificationRequest);
+        return ApiResponse.builder()
+                .result("Notification created")
+                .build();
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<NotificationResponse>>> getNotificationsByUser(@PathVariable String userId) {
-        ApiResponse<List<NotificationResponse>> apiResponse = notificationService.getNotificationsByUser(userId);
-        return ResponseEntity.status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+    public ApiResponse<List<NotificationResponse>> getNotificationsByUser(@PathVariable String userId) {
+        List<NotificationResponse> apiResponse = notificationService.getNotificationsByUser(userId);
+        return ApiResponse.<List<NotificationResponse>>builder()
+                .result(apiResponse)
+                .build();
     }
 
 
 
     @PostMapping("/read")
-    public ResponseEntity<ApiResponse<?>> markNotificationAsRead(@RequestBody NotificationKeyRequest notificationKeyRequest) {
-        ApiResponse<?> apiResponse = notificationService.markNotificationAsRead(notificationKeyRequest);
-        return ResponseEntity.status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+    public ApiResponse<?> markNotificationAsRead(@RequestBody NotificationKeyRequest notificationKeyRequest) {
+        notificationService.markNotificationAsRead(notificationKeyRequest);
+        return ApiResponse.builder()
+                .result("Notification marked as read")
+                .build();
     }
 }

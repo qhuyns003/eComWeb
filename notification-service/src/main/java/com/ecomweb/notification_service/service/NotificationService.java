@@ -11,8 +11,6 @@ import com.ecomweb.notification_service.mapper.NotificationKeyMapper;
 import com.ecomweb.notification_service.mapper.NotificationMapper;
 import com.ecomweb.notification_service.repository.NotificationRepository;
 import com.ecomweb.notification_service.util.AuthUtil;
-import com.ecomweb.notification_service.util.ErrorResponseUtil;
-import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -40,7 +38,7 @@ public class NotificationService {
     IdentityFeignClient identityFeignClient;
     // chỉ cần 1 lỗi unchecked throw ra, tất cả save sẽ rollback dù trc đó có get (nó sẽ lấy dl cache), hay flush
     @Transactional
-    public ApiResponse<?> createNotification(NotificationRequest notificationRequest) {
+    public void createNotification(NotificationRequest notificationRequest) {
 
         for (String userId : notificationRequest.getRecipientId()) {
             Notification notification = notificationMapper.toNotification(notificationRequest);
@@ -50,13 +48,8 @@ public class NotificationService {
             notification.setStatus(NotificationStatus.UNREAD.name());
             notificationRepository.save(notification);
 
-            String username ="";
-            try{
-                username = identityFeignClient.getUsernameById(userId).getResult();
-            }
-            catch(FeignException ex){
-                return ErrorResponseUtil.getResponseBody(ex);
-            }
+            String username = identityFeignClient.getUsernameById(userId).getResult().getUsername();
+
             NotificationResponse notificationResponse = notificationMapper.toNotificationResponse(notification);
             notificationResponse.setKey(notificationKeyMapper.toNotificationKeyResponse(notification.getKey()));
             messagingTemplate.convertAndSendToUser(
@@ -67,47 +60,33 @@ public class NotificationService {
                             .build()
             );
         }
-        return ApiResponse.builder()
-                .result("create successful")
-                .build();
 
     };
 
     // Lấy tất cả thông báo của một user
-    public ApiResponse<List<NotificationResponse>> getNotificationsByUser(String userId) {
+    public List<NotificationResponse> getNotificationsByUser(String userId) {
         List<NotificationResponse> responses = notificationRepository.findByKeyUserIdOrderByKeyCreatedAtDesc(userId)
                 .stream().map((notification) -> {
                     NotificationResponse notificationResponse = notificationMapper.toNotificationResponse(notification);
                     notificationResponse.setKey(notificationKeyMapper.toNotificationKeyResponse(notification.getKey()));
                     return notificationResponse;
                 }).collect(Collectors.toList());
-        return ApiResponse.<List<NotificationResponse>>builder()
-                .result(responses)
-                .build();
+        return responses;
     }
 
     // Đánh dấu thông báo là đã đọc
-    public ApiResponse<?> markNotificationAsRead(NotificationKeyRequest notificationKeyRequest) {
+    public void markNotificationAsRead(NotificationKeyRequest notificationKeyRequest) {
         Notification notification = notificationRepository
                 .findByKeyUserIdAndKeyCreatedAtAndKeyNotificationId(notificationKeyRequest.getUserId(),notificationKeyRequest.getCreatedAt(),notificationKeyRequest.getNotificationId());
         notification.setStatus(NotificationStatus.READ.name());
         notificationRepository.save(notification);
 
         String token = AuthUtil.getToken();
-        String username ="";
-        try{
-            username = identityFeignClient.getUsernameById(notificationKeyRequest.getUserId()).getResult();
-        }
-        catch(FeignException ex){
-            return ErrorResponseUtil.getResponseBody(ex);
-        }
+        String username = identityFeignClient.getUsernameById(notificationKeyRequest.getUserId()).getResult().getUsername();
         messagingTemplate.convertAndSendToUser(
                 username,
                 "/queue/notifications",
                 notificationMapper.toNotificationResponse(notification)
         );
-        return ApiResponse.builder()
-                .result("successful")
-                .build();
     }
 }

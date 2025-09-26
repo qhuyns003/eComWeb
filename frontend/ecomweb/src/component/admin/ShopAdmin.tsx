@@ -150,33 +150,35 @@ const ShopAdmin: React.FC = () => {
                   </button>
                 </li>
               ))}
-              {/* Phát thông báo cuối cùng trong menu */}
-              <li className="relative">
-                <button
-                  onClick={() => {
-                    setShowNotificationDropdown(v => !v);
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-gray-900 rounded-2xl group transition-all duration-300 shadow-sm hover:bg-[#ffeaea] hover:scale-[1.03] ${selectedMenuId === 'notification' ? 'bg-white font-bold text-[#cc3333] border-l-4 border-[#cc3333] shadow-lg' : ''}`}
-                >
-                  <svg className="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-[#cc3333]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                  <span className={`${isCollapsed ? 'hidden' : 'inline'} whitespace-nowrap`}>Phát thông báo</span>
-                  <svg className={`ml-auto w-4 h-4 transition-transform duration-300 ${showNotificationDropdown ? 'rotate-180' : ''}`} fill="none" stroke="#cc3333" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </button>
-                <div className={`overflow-hidden transition-all duration-300 ${showNotificationDropdown ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'} bg-white rounded-lg shadow border border-gray-200`} style={{marginBottom: showNotificationDropdown ? '1rem' : '0'}}>
-                  <ul>
-                    <li>
-                      <button
-                        className="w-full text-left px-4 py-3 hover:bg-[#faeaea] text-gray-700 font-semibold rounded-b-lg transition"
-                        onClick={() => {
-                          setSelectedMenuId('notification');
-                          setNotificationOption('global');
-                        }}
-                      >Phát thông báo chung</button>
-                    </li>
-                    {/* Có thể thêm các option khác ở đây */}
-                  </ul>
-                </div>
-              </li>
+              {/* Chỉ hiện menu Phát thông báo nếu là admin */}
+              {user?.roles?.some((role: any) => role.id === 'ADMIN') && (
+                <li className="relative">
+                  <button
+                    onClick={() => {
+                      setShowNotificationDropdown(v => !v);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-gray-900 rounded-2xl group transition-all duration-300 shadow-sm hover:bg-[#ffeaea] hover:scale-[1.03] ${selectedMenuId === 'notification' ? 'bg-white font-bold text-[#cc3333] border-l-4 border-[#cc3333] shadow-lg' : ''}`}
+                  >
+                    <svg className="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-[#cc3333]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span className={`${isCollapsed ? 'hidden' : 'inline'} whitespace-nowrap`}>Phát thông báo</span>
+                    <svg className={`ml-auto w-4 h-4 transition-transform duration-300 ${showNotificationDropdown ? 'rotate-180' : ''}`} fill="none" stroke="#cc3333" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  <div className={`overflow-hidden transition-all duration-300 ${showNotificationDropdown ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'} bg-white rounded-lg shadow border border-gray-200`} style={{marginBottom: showNotificationDropdown ? '1rem' : '0'}}>
+                    <ul>
+                      <li>
+                        <button
+                          className="w-full text-left px-4 py-3 hover:bg-[#faeaea] text-gray-700 font-semibold rounded-b-lg transition"
+                          onClick={() => {
+                            setSelectedMenuId('notification');
+                            setNotificationOption('global');
+                          }}
+                        >Phát thông báo chung</button>
+                      </li>
+                      {/* Có thể thêm các option khác ở đây */}
+                    </ul>
+                  </div>
+                </li>
+              )}
             </ul>
           </div>
         </aside>

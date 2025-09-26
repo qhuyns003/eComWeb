@@ -25,7 +25,7 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/byUsername/{username}")
-    ApiResponse<?> getUserIdbyUsername(@PathVariable String username){
+    ApiResponse<?> getUserIdbyUsername(@PathVariable("username") String username){
         return ApiResponse.builder()
                 .result(userService.getUserIdByUsername(username))
                 .build();
@@ -71,8 +71,9 @@ public class UserController {
 
     @GetMapping("/{userId}")
     ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
+        UserResponse userResponse  = userService.getUser(userId);
         return ApiResponse.<UserResponse>builder()
-                .result(userService.getUser(userId))
+                .result(userResponse)
                 .build();
     }
 
