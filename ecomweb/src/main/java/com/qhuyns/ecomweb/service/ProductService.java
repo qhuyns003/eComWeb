@@ -158,7 +158,7 @@ public class ProductService {
         }
         Pageable pageable = PageRequest.of(page, size);
         String shopId = shopFeignClient.getShopIdByUserId(userId).getResult();
-        Page<Object[]> results = productRepository.findProductsWithMainImageByUserId(userId,search,status,pageable);
+        Page<Object[]> results = productRepository.findProductsWithMainImageByShopId(shopId,search,status,pageable);
         List<ProductResponse> productResponses = new ArrayList<>();
         for(Object[] rs : results.getContent()) {
             Product product = (Product) rs[0];

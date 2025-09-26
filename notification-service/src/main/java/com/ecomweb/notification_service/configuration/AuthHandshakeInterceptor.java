@@ -28,7 +28,7 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
                     return username;
                 }
             });
-        }vs
+        }
         return true;
     }
 

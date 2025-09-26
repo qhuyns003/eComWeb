@@ -57,7 +57,7 @@ public class PrivateChatService {
                 .getActivatedUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
                 .getResult();
         String userId1 = user1.getId();
-        String user2Id = shopFeignClient.getShopIdByUserId(userId1).getResult();
+        String user2Id = shopFeignClient.getUserIdByShopId(shopId).getResult();
         UserResponse user2 = identityFeignClient.getActivatedUser(user2Id).getResult();
         String userId2 = user2.getId();
         if(userId1.compareToIgnoreCase(userId2) >0){

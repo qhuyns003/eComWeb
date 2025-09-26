@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction, Draft } from '@reduxjs/toolkit';
 import { getMyInfo, logout as logoutApi } from '../../api/api';
 import type { RootState } from '../store';
 
 interface Role {
-  name: string;
+  id: string;
   description: string;
   permissions: any[]; // Hoặc định nghĩa cụ thể hơn
 }
@@ -84,25 +84,25 @@ const userSlice = createSlice({
       state.error = action.payload;
     },
   },
-  extraReducers: (builder) => { //extraReducers giống như một "bộ lắng nghe" các action bất đồng bộ.
+  extraReducers: (builder) => {
     builder
       // fetchUserInfo
-      .addCase(fetchUserInfo.pending, (state) => {  //Dựa vào trạng thái (pending/fulfilled/rejected), nó sẽ cập nhật state một cách tương ứng.
-        state.loading = true;  // dang goi api
+      .addCase(fetchUserInfo.pending, (state: Draft<UserState>) => {
+        state.loading = true;
         state.error = null;
       })
-      .addCase(fetchUserInfo.fulfilled, (state, action) => {
-        state.loading = false;     // goi thanh cong
+      .addCase(fetchUserInfo.fulfilled, (state: Draft<UserState>, action) => {
+        state.loading = false;
         state.user = action.payload;
         state.error = null;
       })
-      .addCase(fetchUserInfo.rejected, (state, action) => {
-        state.loading = false;    // goi that bai
+      .addCase(fetchUserInfo.rejected, (state: Draft<UserState>, action) => {
+        state.loading = false;
         state.user = null;
         state.error = action.payload as string;
       })
       // logoutUser
-      .addCase(logoutUser.fulfilled, (state) => {
+      .addCase(logoutUser.fulfilled, (state: Draft<UserState>) => {
         state.user = null;
         state.error = null;
       });
@@ -112,11 +112,13 @@ const userSlice = createSlice({
 export const { setUser, clearUser, setLoading, setError } = userSlice.actions;
 
 // Selectors
-export const selectUser = (state: RootState) => state.user.user;
-export const selectUserLoading = (state: RootState) => state.user.loading;
-export const selectUserError = (state: RootState) => state.user.error;
-export const selectIsSeller = (state: RootState) => 
-  state.user.user?.roles?.some(role => role.name === 'SELLER') || false;
-export const selectIsAuthenticated = (state: RootState) => !!state.user.user;
+
+// Khi dùng redux-persist, state.user có thể là PersistPartial<UserState>
+export const selectUser = (state: RootState) => (state.user as UserState).user;
+export const selectUserLoading = (state: RootState) => (state.user as UserState).loading;
+export const selectUserError = (state: RootState) => (state.user as UserState).error;
+export const selectIsSeller = (state: RootState) =>
+  (state.user as UserState).user?.roles?.some((role: Role) => role.id === 'SELLER') || false;
+export const selectIsAuthenticated = (state: RootState) => !!(state.user as UserState).user;
 
 export default userSlice.reducer; 

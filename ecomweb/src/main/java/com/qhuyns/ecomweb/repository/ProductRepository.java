@@ -133,7 +133,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
           AND (:status IS NULL OR p.status = :status)
         """
     )
-    Page<Object[]> findProductsWithMainImageByUserId(
+    Page<Object[]> findProductsWithMainImageByShopId(
             @Param("shopId") String shopId,
             @Param("search") String search,
             @Param("status") Integer status,

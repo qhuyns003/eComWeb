@@ -8,6 +8,7 @@ import com.ecomweb.identity_service.dto.event.UserSnapshot;
 import com.ecomweb.identity_service.dto.request.UpgradeSellerRequest;
 import com.ecomweb.identity_service.dto.request.UserCreationRequest;
 import com.ecomweb.identity_service.dto.request.UserUpdateRequest;
+import com.ecomweb.identity_service.dto.response.RoleResponse;
 import com.ecomweb.identity_service.dto.response.UserResponse;
 import com.ecomweb.identity_service.entity.Role;
 import com.ecomweb.identity_service.entity.User;
@@ -182,8 +183,13 @@ public class UserService {
         String name = context.getAuthentication().getName();
 
         User user = userRepository.findByUsernameAndActive(name,true).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        return userMapper.toUserResponse(user);
+        UserResponse userResponse = userMapper.toUserResponse(user);
+        List<RoleResponse> roles = userRoleRepository.findByUserId(user.getId()).stream()
+                .map(ur -> RoleResponse.builder()
+                        .id(ur.getRoleId())
+                        .build()).collect(Collectors.toList());
+        userResponse.setRoles(roles);
+        return userResponse;
     }
 
 

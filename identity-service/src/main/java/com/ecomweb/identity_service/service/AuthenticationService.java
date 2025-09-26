@@ -85,9 +85,12 @@ public class AuthenticationService {
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         var token = generateToken(user);
+        String role = userRoleRepository.findByUserId(user.getId()).getFirst().getRoleId();
 
         return AuthenticationResponse.builder()
-                .token(token).authenticated(true).build();
+                .token(token)
+                .role(role)
+                .authenticated(true).build();
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {

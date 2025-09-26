@@ -15,12 +15,15 @@ public class FeignConfig {
     @Bean
     public RequestInterceptor requestInterceptor() {
         return template -> {
-            var auth = (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.getToken() != null) {
-                String token = auth.getToken().getTokenValue();
-                template.header("Authorization", "Bearer " + token);
-            }
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
 
+            if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+                String token = jwtAuth.getToken().getTokenValue();
+                template.header("Authorization", "Bearer " + token);
+            } else {
+                // Nếu là AnonymousAuthenticationToken thì bỏ qua, không set header
+            }
         };
     }
+
 }

@@ -9,6 +9,7 @@ import com.ecomweb.identity_service.dto.response.AuthenticationResponse;
 import com.ecomweb.identity_service.dto.response.IntrospectResponse;
 import com.ecomweb.identity_service.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

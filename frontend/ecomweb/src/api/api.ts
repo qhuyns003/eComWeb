@@ -175,7 +175,7 @@ export const deleteProducts = (ids: string[]) => {
 };
 
 export const getUserAddresses = () => {
-  return axiosInstance.get('http://localhost:8080/user_address/').then(res => {
+  return axiosInstance.get('http://localhost:8080/identity/user_address/').then(res => {
     if (res.data && res.data.code === 1000 && Array.isArray(res.data.result)) {
       return res.data.result;
     }

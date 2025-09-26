@@ -24,7 +24,7 @@ public interface IdentityFeignClient {
     @GetMapping("/users/{userId}")
     ApiResponse<UserResponse> getUser(@PathVariable String userId);
 
-    @GetMapping("/users/activated/buUsername/{username}")
+    @GetMapping("/users/activated/byUsername/{username}")
     ApiResponse<UserResponse> getActivatedUserByUsername(@PathVariable String username);
 
     @GetMapping("/user_address/{id}")

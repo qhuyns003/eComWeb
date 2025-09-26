@@ -20,11 +20,13 @@ import java.util.Objects;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
+// cac loi sinh ra trong qua trinh thuc hien api socket se k dc globalHandler xu ly
+// cac loi sinh ra trong globalHandler cung se k dc xu ly va chi tra ve log mac dinh
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = FeignException.class)
     ResponseEntity<ApiResponse> handlingFeignException(FeignException exception) throws JsonProcessingException {
+        // mapping fail neu JSON tra ve ben kia co field sai lech (thua)
         ApiResponse apiResponse = new ObjectMapper().readValue(exception.contentUTF8(), ApiResponse.class);
         return ResponseEntity.status(HttpStatus.valueOf(exception.status())).body(apiResponse);
     }
@@ -32,6 +34,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
+        log.info("AppException Catch");
         ErrorCode errorCode = exception.getErrorCode();
         ApiResponse apiResponse = new ApiResponse();
 
@@ -91,6 +94,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handlingException(Exception exception) {
         // loi bat in stacktrace ra
+        log.error("Catch-all handler: {}", exception.getClass().getName(), exception);
         log.error("Exception: ", exception);
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
