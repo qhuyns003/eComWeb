@@ -150,7 +150,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             FROM product p
             LEFT JOIN product_image img ON img.product_id = p.id AND img.is_main = true
             WHERE
-                            p.shop_id IN :shopIds AND
+             (:shopIds IS NULL OR p.shop_id IN (:shopIds)) AND
               (:search IS NULL OR MATCH(p.name) AGAINST (:search IN NATURAL LANGUAGE MODE))
               AND (:status IS NULL OR p.status = :status)
               AND (:#{#productFilterRequest.categoryId} IS NULL OR p.category_id = :#{#productFilterRequest.categoryId})
@@ -161,7 +161,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             SELECT COUNT(*)
             FROM product p
             WHERE
-                            p.shop_id IN :shopIds AND
+             (:shopIds IS NULL OR p.shop_id IN (:shopIds)) AND
               (:search IS NULL OR MATCH(p.name) AGAINST (:search IN NATURAL LANGUAGE MODE))
               AND (:status IS NULL OR p.status = :status)
               AND (:#{#productFilterRequest.categoryId} IS NULL OR p.category_id = :#{#productFilterRequest.categoryId})

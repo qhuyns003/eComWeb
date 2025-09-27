@@ -69,5 +69,11 @@ management:
     metrics:
       export:
         enabled: true
+logging:
+  level:
+    feign: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+
+
 
 

@@ -185,7 +185,10 @@ public class ProductService {
             sort = Sort.by("price").descending();
         }
         Pageable pageable = PageRequest.of(page, size,sort);
-        List<String> shopIds = shopFeignClient.getShopIdByProvinceId(productFilterRequest.getProvinceId()).getResult();
+        List<String> shopIds = null;
+        if(productFilterRequest.getProvinceId() != null){
+            shopIds = shopFeignClient.getShopIdByProvinceId(productFilterRequest.getProvinceId()).getResult();
+        }
         Page<Object[]> results = productRepository.searchProduct(search,status,pageable,productFilterRequest,shopIds);
         List<ProductResponse> productResponses = new ArrayList<>();
         for(Object[] rs : results.getContent()) {
