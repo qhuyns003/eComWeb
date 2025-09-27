@@ -90,7 +90,7 @@ export const deleteUserAddress = (id: string) => {
 };
 // Cập nhật thông tin user
 export const updateUser = (userData: any) => {
-  return axiosInstance.put('/identity/my-info', userData);
+  return axiosInstance.put('/identity/users/my-info', userData);
 };
 
 

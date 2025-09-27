@@ -116,10 +116,6 @@ public class RabbitMQConfig {
 
 
 
-
-
-
-
     // cau hinh giup serilizable vaf deseriliazlbe object thanh json, giong o tang controller thi dc impl san lop serializebale
     // Converter: chỉ cần Jackson, không quan tâm __TypeId__
     @Bean

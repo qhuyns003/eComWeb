@@ -120,7 +120,12 @@ public class ProductService {
         
         ProductDetailResponse productDetailResponse = productMapper.toProductDetailResponse(product);
         productDetailResponse.setImages(product.getImages().stream()
-                .map(img -> productImageMapper.toProductImageResponse(img))
+                .map(img -> {
+                    ProductImageResponse response = productImageMapper.toProductImageResponse(img);
+                    response.setUrl(ImagePrefix.IMAGE_PREFIX+img.getUrl());
+                    return  response;
+
+                })
                 .collect(Collectors.toList()));
         productDetailResponse.setNumberOfOrder(BigDecimal.valueOf((Long)((Object[]) rs[0])[0])) ;
         productDetailResponse.setRating((Double) ((Object[]) rs[0])[1]);
@@ -202,7 +207,7 @@ public class ProductService {
                     .createdAt(((Timestamp) rs[5]).toLocalDateTime())
                     .images(List.of(ProductImageResponse.builder()
                             .id((String)rs[6])
-                            .url((String)rs[7])
+                            .url(ImagePrefix.IMAGE_PREFIX+(String)rs[7])
                             .isMain((Boolean)rs[8])
                             .build()))
                     .build();

@@ -32,6 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const handleBuyNow = () => {
+    
     if (isAuthenticated) {
       navigate(`/product/${id}`);
     } else {
@@ -56,6 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const imageUrl = getMainImage();
+  console.log('ProductCard imageUrl:', imageUrl);
 
   // Hiển thị rating bằng sao
   const renderStars = (rating: number) => {
