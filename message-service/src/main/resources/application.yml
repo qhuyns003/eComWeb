@@ -1,0 +1,22 @@
+spring:
+  cassandra:
+    contact-points: localhost
+    port: 9042
+    keyspace-name: ecomweb
+    username: cassandra
+    password: cassandra
+    schema-action: none
+    local-datacenter: datacenter1
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # in seconds
+server:
+  port: 8085
+  servlet:
+    context-path: /messages
