@@ -248,5 +248,5 @@ export const searchProduct = (params: { page: number; size: number; search?: str
 };
 
 export const getShopInfoByUserId = () => {
-  return axiosInstance.get(`/shop`);
+  return axiosInstance.get(`/shop/`);
 };

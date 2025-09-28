@@ -108,7 +108,7 @@ public class ShopService {
     }
 
     public ShopResponse getInfo() {
-
+        log.info(SecurityContextHolder.getContext().getAuthentication().getName());
         String userId = identityFeignClient
                 .getUserId(SecurityContextHolder.getContext().getAuthentication().getName())
                 .getResult().toString();

@@ -25,9 +25,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 // config cua rest
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINTS = {
-        "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
-    };
+
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -35,18 +33,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-//                .cors(cors -> cors
-//                        .configurationSource(request -> {
-//                            CorsConfiguration config = new CorsConfiguration();
-//                            config.addAllowedOrigin("http://localhost:5173");
-//                            config.addAllowedMethod("*");
-//                            config.addAllowedHeader("*");
-//                            config.setAllowCredentials(true); // nếu origin là * thì xóa dòng này
-//                            return config;
-//                        })
-//                )
-                // luôn decode kiểm tra token trước khi permit
-                // ứng với mỗi request, sẽ có context khác nhau tùy vào token gửi theo
                 .authorizeHttpRequests(request -> request // nếu không yêu cầu token mà vẫn nhét token vào sẽ bị unauthorize
                         .requestMatchers(HttpMethod.GET, API_URL.URL_ANONYMOUS_GET).permitAll()
                         .requestMatchers(HttpMethod.POST, API_URL.URL_ANONYMOUS_POST).permitAll()
@@ -64,19 +50,6 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        CorsConfiguration corsConfiguration = new CorsConfiguration();
-//
-//        corsConfiguration.addAllowedOrigin("*");
-//        corsConfiguration.addAllowedMethod("*");
-//        corsConfiguration.addAllowedHeader("*");
-//
-//        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-//        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-//
-//        return new CorsFilter(urlBasedCorsConfigurationSource);
-//    }
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -93,12 +66,5 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
-//    @Bean
-//    public RoleHierarchy roleHierarchy() {
-//        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-//        String hierarchy = "ROLE_ADMIN > ROLE_USER  ROLE_ADMIN > ROLE_SELLER";
-//        roleHierarchy.setHierarchy(hierarchy);
-//        return roleHierarchy;
-//    }
 
 }
