@@ -242,6 +242,7 @@ public class ProductService {
     };
 
 
+    @Transactional
     public void update(String id, ProductRequest productRequest) throws IOException {
         Product product = productRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         productMapper.toProduct(product,productRequest);
@@ -300,6 +301,7 @@ public class ProductService {
         log.info("success");
     };
 
+    @Transactional
     public void create( ProductRequest productRequest) throws IOException {
         Product product = productMapper.toProduct(productRequest);
         product.setCategory(categoryRepository.findById(productRequest.getCategory().getId()).orElseThrow(()-> new AppException(ErrorCode.CATEGORY_NOT_FOUND)));

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiSmartphone, FiTruck, FiGift, FiMapPin, FiUser, FiChevronDown, FiPlus, FiX } from 'react-icons/fi';
 import { FaShippingFast, FaMoneyBillWave, FaTag, FaGift } from 'react-icons/fa';
 import { getUserAddresses, getProvinces, getDistricts, getWards, addUserAddress, getGhnServiceForOrderGroup, calculateShippingFee, getShopInfo, getCouponsByShopId, getUserOrderCoupons, createOrder, getPaymentMethods, createPayment } from '../../api/api';
@@ -21,6 +21,7 @@ const orderVoucherList = [
 
 const Checkout: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const orderShopGroups = useAppSelector(state => state.order.orderShopGroups);
   const dispatch = useAppDispatch();
   const [userAddresses, setUserAddresses] = useState<any[]>([]);
@@ -434,6 +435,7 @@ const Checkout: React.FC = () => {
             }
           });
           dispatch(clearOrder());
+          navigate('/'); // Chuyển về trang chủ
         }
       } else {
         toast.error(responseData?.message || 'Đặt hàng thất bại.');

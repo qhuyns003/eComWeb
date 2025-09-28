@@ -14,7 +14,7 @@ import java.util.List;
 public class ShippingFeeRequest {
 
 
-    private Integer shopId;
+    private String shopId;
     private Integer serviceTypeId;
     private Integer fromDistrictId;
     private String fromWardCode;

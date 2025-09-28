@@ -20,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class OrderService {
     ProductVariantRepository  productVariantRepository;
     ShippingAddressMapper  shippingAddressMapper;
     IdentityFeignClient identityFeignClient;
+
+    @Transactional
     public OrderResponse create(OrderRequest orderRequest) {
         // kiem tra khong trung
       Order order = orderMapper.toOrder(orderRequest);
@@ -87,6 +90,7 @@ public class OrderService {
         orderRepository.findById(orderId).orElseThrow(()-> new AppException(ErrorCode.ORDER_NOT_EXISTS));
      }
 
+     @Transactional
      public void changeStatus(OrderStatus orderStatus,String id) {
         Order order = orderRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.ORDER_NOT_EXISTS));
         order.setStatus(orderStatus);
