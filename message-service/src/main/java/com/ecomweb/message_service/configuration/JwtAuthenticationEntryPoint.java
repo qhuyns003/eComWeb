@@ -1,8 +1,8 @@
 package com.ecomweb.message_service.configuration;
 
 
-import com.ecomweb.identity_service.dto.response.ApiResponse;
-import com.ecomweb.identity_service.exception.ErrorCode;
+import com.ecomweb.message_service.dto.response.ApiResponse;
+import com.ecomweb.message_service.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

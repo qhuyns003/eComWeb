@@ -1,6 +1,6 @@
 package com.ecomweb.message_service.configuration;
 
-import com.ecomweb.identity_service.util.JwtUtil;
+import com.ecomweb.message_service.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;

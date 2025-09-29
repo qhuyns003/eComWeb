@@ -1,18 +1,23 @@
 package com.ecomweb.message_service.configuration;
 
 
-import com.ecomweb.identity_service.dto.request.IntrospectRequest;
-import com.ecomweb.identity_service.dto.response.IntrospectResponse;
-import com.ecomweb.identity_service.service.AuthenticationService;
+import com.ecomweb.message_service.dto.request.IntrospectRequest;
+import com.ecomweb.message_service.dto.response.ApiResponse;
+import com.ecomweb.message_service.dto.response.IntrospectResponse;
+import com.ecomweb.message_service.feignClient.IdentityFeignClient;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -29,30 +34,18 @@ public class CustomJwtDecoder implements JwtDecoder {
     @NonFinal
     String signerKey;
 
-    AuthenticationService authenticationService;
-
+    IdentityFeignClient identityFeignClient;
 
     @NonFinal
-    private NimbusJwtDecoder nimbusJwtDecoder = null;
-
+    NimbusJwtDecoder nimbusJwtDecoder = null;
 
     @Override
     public Jwt decode(String token) throws JwtException {
 
-    // dung webclient cua webflux ma .block thi toc do cung ngang feign
-        log.info("TOKEN INDENTTY LOG "+ token);
-        IntrospectResponse response = null;
-        try {
-            response = authenticationService.introspect(IntrospectRequest.builder()
-                    .token(token).build());
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        ApiResponse<IntrospectResponse> response = identityFeignClient.introspect(IntrospectRequest.builder()
+                .token(token).build());
 
-
-        if (!response.isValid()) throw new JwtException("Token invalid");
+        if (!response.getResult().isValid()) throw new JwtException("Token invalid");
 
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
@@ -62,6 +55,5 @@ public class CustomJwtDecoder implements JwtDecoder {
         }
 
         return nimbusJwtDecoder.decode(token);
-
     }
 }
