@@ -1,9 +1,8 @@
 package com.ecomweb.message_service.controller;
 
-
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.feignClient.ShopFeignClient;
-import com.qhuyns.ecomweb.service.PrivateChatService;
+import com.ecomweb.message_service.dto.request.ApiResponse;
+import com.ecomweb.message_service.feignClient.ShopFeignClient;
+import com.ecomweb.message_service.service.PrivateChatService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +19,7 @@ public class PrivateChatController {
     PrivateChatService privateChatService;
     ShopFeignClient shopFeignClient;
     @GetMapping()
-    public ApiResponse<?> getRoomId(@RequestParam String user1,@RequestParam String user2) {
+    public ApiResponse<?> getRoomId(@RequestParam String user1, @RequestParam String user2) {
         if(user1.compareToIgnoreCase(user2) >0){
             String tmp =user1;
             user1 =user2;

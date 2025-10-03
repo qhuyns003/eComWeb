@@ -1,10 +1,10 @@
 package com.ecomweb.message_service.controller;
 
 
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.MessageRequest;
-import com.qhuyns.ecomweb.dto.response.MessageResponse;
-import com.qhuyns.ecomweb.service.MessageService;
+import com.ecomweb.message_service.dto.request.ApiResponse;
+import com.ecomweb.message_service.dto.request.MessageRequest;
+import com.ecomweb.message_service.dto.response.MessageResponse;
+import com.ecomweb.message_service.service.MessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/messages")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
@@ -23,7 +22,7 @@ public class MessageController {
     MessageService messageService;
 
     @PostMapping
-    public ApiResponse<?> sendMessage(@RequestBody MessageRequest  messageRequest) {
+    public ApiResponse<?> sendMessage(@RequestBody MessageRequest messageRequest) {
         messageService.saveMessage(messageRequest);
         return ApiResponse.builder()
                 .result("success")

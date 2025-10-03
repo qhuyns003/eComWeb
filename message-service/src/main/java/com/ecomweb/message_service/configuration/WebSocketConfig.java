@@ -19,6 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // tu dong noi them context-path
     registry.addEndpoint("/ws-notification")
         .setAllowedOriginPatterns("*")
         .addInterceptors(new AuthHandshakeInterceptor())

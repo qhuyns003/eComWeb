@@ -1,8 +1,8 @@
 package com.ecomweb.message_service.configuration;
 
 
+import com.ecomweb.message_service.dto.request.ApiResponse;
 import com.ecomweb.message_service.dto.request.IntrospectRequest;
-import com.ecomweb.message_service.dto.response.ApiResponse;
 import com.ecomweb.message_service.dto.response.IntrospectResponse;
 import com.ecomweb.message_service.feignClient.IdentityFeignClient;
 import com.nimbusds.jose.JOSEException;

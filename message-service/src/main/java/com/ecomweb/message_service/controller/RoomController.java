@@ -1,9 +1,9 @@
 package com.ecomweb.message_service.controller;
 
 
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.CreateRoomRequest;
-import com.qhuyns.ecomweb.service.RoomService;
+import com.ecomweb.message_service.dto.request.ApiResponse;
+import com.ecomweb.message_service.dto.request.CreateRoomRequest;
+import com.ecomweb.message_service.service.RoomService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -1,9 +1,9 @@
 package com.ecomweb.message_service.controller;
 
 
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.response.UserRoomResponse;
-import com.qhuyns.ecomweb.service.UserRoomService;
+import com.ecomweb.message_service.dto.request.ApiResponse;
+import com.ecomweb.message_service.dto.response.UserRoomResponse;
+import com.ecomweb.message_service.service.UserRoomService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 
 public class UserRoomController {
-    UserRoomService  userRoomService;
+    UserRoomService userRoomService;
 
 //    @PostMapping("")
 //    public ApiResponse<?> create() {

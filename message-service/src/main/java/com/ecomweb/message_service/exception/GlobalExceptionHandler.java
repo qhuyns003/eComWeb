@@ -1,7 +1,7 @@
 package com.ecomweb.message_service.exception;
 
 
-import com.ecomweb.message_service.dto.response.ApiResponse;
+import com.ecomweb.message_service.dto.request.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;

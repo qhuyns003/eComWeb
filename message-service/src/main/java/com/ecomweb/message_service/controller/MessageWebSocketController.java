@@ -1,8 +1,8 @@
 package com.ecomweb.message_service.controller;
 
-import com.qhuyns.ecomweb.dto.request.MessageRequest;
-import com.qhuyns.ecomweb.dto.request.UserRoomKeyRequest;
-import com.qhuyns.ecomweb.service.MessageService;
+import com.ecomweb.message_service.dto.request.MessageRequest;
+import com.ecomweb.message_service.dto.request.UserRoomKeyRequest;
+import com.ecomweb.message_service.service.MessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +32,7 @@ public class MessageWebSocketController {
 
     // do khong trai qua filter nen token k duoc decode va luu vao secu -> dung thang principle cua ws ta da config
     @MessageMapping("/messages/mark-read")
-    public void markRead(@Payload UserRoomKeyRequest  userRoomKeyRequest, Principal principal) {
+    public void markRead(@Payload UserRoomKeyRequest userRoomKeyRequest, Principal principal) {
         messageService.markRead(userRoomKeyRequest,principal);
 
     }

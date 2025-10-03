@@ -28,6 +28,11 @@ spring:
           predicates:
             - Path=/notifications/**
 
+        - id: message-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/messages/**
+
         - id: main-service
           uri: http://localhost:8081
           predicates:
