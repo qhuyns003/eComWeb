@@ -26,6 +26,7 @@ import java.util.Base64;
 @Slf4j
 public class WeaviateController {
 
+    
     private final RestTemplate restTemplate = new RestTemplate();
     private static final String WEAVIATE_GRAPHQL = "http://localhost:8082/v1/graphql";
     private static final String WEAVIATE_OBJECTS = "http://localhost:8082/v1/objects";
