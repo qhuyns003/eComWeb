@@ -1,0 +1,53 @@
+server:
+  port: 8081
+#  servlet:
+#    context-path: /identity
+spring:
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/order_service}
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    password: ${DBMS_PASSWORD:root}
+    username: ${DBMS_USERNAME:root}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: quanghuytq3011@gmail.com
+    password: xhcz ykyn ooea hhgd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    expiryTime: 3600 #second
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+ghn:
+  api-url: "https://dev-online-gateway.ghn.vn/shiip/public-api/"
+  token: "f02c23e4-63c7-11f0-9b81-222185cb68c8"
+  shop-id: "197137"
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # in seconds
+vnpay:
+  tmnCode: "OWEBIU9I"
+  hashSecret: "0G59Z6IMX91B2X8GEIGHHHCQDJE3XY04"
+  paymentUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  returnUrl: "http://localhost:5173/payment/success"
+  #  phai config trong quan tri https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login, phai dung ngrok
+  ipnUrl: "https://572362ca02eb.ngrok-free.app/vnpay/IPN"
+#            "http://localhost:8080/vnpay/IPN"
+
+
+
+
+
