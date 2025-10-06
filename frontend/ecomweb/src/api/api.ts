@@ -13,11 +13,11 @@ export const sendNotification = (payload: {
 };
 // Kiểm tra phòng chat riêng giữa 2 user (user1 < user2)
 export const checkPrivateChat = (user1: string, shopId: string) => {
-  return axiosInstance.get(`/private_chats/shop`, { params: { user1, shopId } });
+  return axiosInstance.get(`/messages/private_chats/shop`, { params: { user1, shopId } });
 };
 // Tạo private chat với user2 (shop owner)
 export const createPrivateChat = (shopId: string) => {
-  return axiosInstance.post(`/private_chats?shopId=${shopId}`);
+  return axiosInstance.post(`/messages/private_chats?shopId=${shopId}`);
 };
 // Lấy danh sách sản phẩm theo shopId
 export const getProductsByShopId = (shopId: string) => {
@@ -34,25 +34,25 @@ export const fetchMessagesByRoomId = (roomId: string) => {
 
 // Gửi tin nhắn
 export const sendMessage = (message: any) => {
-  return axiosInstance.post('/messages', message);
+  return axiosInstance.post('/messages/', message);
 };
 import axiosInstance from './axiosInstance';
 
 // Lấy danh sách phòng chat của user
 // Lấy danh sách phòng chat của user, trả về kèm roomName nếu có
 export const fetchUserRooms = () => {
-  return axiosInstance.get('/user_rooms');
+  return axiosInstance.get('/messages/user_rooms');
 };
 
 // Lấy tên phòng theo roomId (chỉ gọi khi user_room không có roomName)
 export const getRoomNameByRoomId = async (roomId: string) => {
-  const res = await axiosInstance.get(`/rooms/${roomId}`);
+  const res = await axiosInstance.get(`/messages/rooms/${roomId}`);
   return res.data?.result?.roomName || '';
 };
 
 // Lấy chi tiết phòng theo roomId
 export const fetchRoomById = (roomId: string) => {
-  return axiosInstance.get(`/rooms/${roomId}`);
+  return axiosInstance.get(`/messages/rooms/${roomId}`);
 };
 // Xác thực tài khoản (verify email)
 export const verifyAccount = (token: string, username: string) => {

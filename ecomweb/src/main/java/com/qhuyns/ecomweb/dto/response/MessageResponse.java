@@ -1,10 +1,7 @@
 package com.qhuyns.ecomweb.dto.response;
 
-import com.qhuyns.ecomweb.entity.key.MessagePrimaryKey;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor

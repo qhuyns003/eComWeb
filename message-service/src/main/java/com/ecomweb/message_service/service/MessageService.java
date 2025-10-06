@@ -85,6 +85,7 @@ public class MessageService {
         // cap nhat dsach room cua user khi co tb moi
         for (RoomMember roomMember : roomMembers) {
             UserResponse user = identityFeignClient.getUser(roomMember.getKey().getUserId()).getResult();
+            // hai cai nay la 1/ bi thua
             messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-rooms", messageRequest.getKey().getRoomId());
             messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/chat-notification", messageRequest.getKey().getRoomId());
 

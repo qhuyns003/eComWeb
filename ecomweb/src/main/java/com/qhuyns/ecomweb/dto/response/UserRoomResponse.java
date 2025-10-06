@@ -1,6 +1,5 @@
 package com.qhuyns.ecomweb.dto.response;
 
-import com.qhuyns.ecomweb.entity.key.UserRoomKey;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

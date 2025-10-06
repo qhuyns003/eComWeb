@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // tu dong noi them context-path
-    registry.addEndpoint("/ws-notification")
+    registry.addEndpoint("/ws")
         .setAllowedOriginPatterns("*")
         .addInterceptors(new AuthHandshakeInterceptor())
         .setHandshakeHandler(new CustomPrincipalHandshakeHandler())

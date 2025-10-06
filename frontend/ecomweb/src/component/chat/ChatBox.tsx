@@ -43,7 +43,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ roomId, roomName, onClose }) => {
       .then(res => setMessages(res.data.result || []));
 
     // Subscribe WebSocket
-    const socket = new SockJS(`http://localhost:8080/ws${token ? `?token=${token}` : ''}`);
+    const socket = new SockJS(`http://localhost:8080/messages/ws${token ? `?token=${token}` : ''}`);
     const client = new Client({
       webSocketFactory: () => socket as any,
       onConnect: () => {

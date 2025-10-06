@@ -70,7 +70,7 @@ const Header: React.FC = () => {
 
     // Kết nối WebSocket
     const token = localStorage.getItem("token");
-    const socket = new SockJS(`http://localhost:8080/ws${token ? `?token=${token}` : ''}`);
+    const socket = new SockJS(`http://localhost:8080/messages/ws${token ? `?token=${token}` : ''}`);
     const client = new Client({
       webSocketFactory: () => socket as any,
       onConnect: () => {
