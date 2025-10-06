@@ -1,9 +1,8 @@
-package com.qhuyns.ecomweb.controller;
+package com.ecomweb.order_service.controller;
 
-
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.response.CouponResponse;
-import com.qhuyns.ecomweb.service.CouponService;
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.dto.response.CouponResponse;
+import com.ecomweb.order_service.service.CouponService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

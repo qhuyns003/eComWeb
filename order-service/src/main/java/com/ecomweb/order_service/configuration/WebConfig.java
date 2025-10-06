@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.configuration;
+package com.ecomweb.order_service.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

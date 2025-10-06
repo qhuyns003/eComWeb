@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.util;
+package com.ecomweb.order_service.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

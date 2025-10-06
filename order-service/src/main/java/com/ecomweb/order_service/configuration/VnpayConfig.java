@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.configuration;
+package com.ecomweb.order_service.configuration;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

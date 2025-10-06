@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.entity;
+package com.ecomweb.order_service.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,12 +25,8 @@ public class OrderItem {
     @JoinColumn(name = "order_shop_group_id")
     OrderShopGroup orderShopGroup;
 
-    @ManyToOne
-    @JoinColumn(name = "product_variant_id")
-    ProductVariant productVariant;
+    String productVariantId;
 
 
-    @OneToOne
-    @JoinColumn(name = "customer_review_id")
-    private CustomerReview customerReview;
+    String customerReviewId;
 } 

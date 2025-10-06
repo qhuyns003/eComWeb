@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.dto.request;
+package com.ecomweb.order_service.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RefreshRequest {
-    String token;
+public class ProductVariantStockUpdateRequest {
+    String variantId;
+    int quantity;
 }

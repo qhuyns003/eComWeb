@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.configuration;
+package com.ecomweb.order_service.configuration;
 
 public class API_URL {
     public static final String[] URL_ANONYMOUS_GET = {

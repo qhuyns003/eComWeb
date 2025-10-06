@@ -1,6 +1,6 @@
-package com.qhuyns.ecomweb.repository;
+package com.ecomweb.order_service.repository;
 
-import com.qhuyns.ecomweb.entity.Coupon;
+import com.ecomweb.order_service.entity.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

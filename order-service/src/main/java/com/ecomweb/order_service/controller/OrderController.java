@@ -1,22 +1,17 @@
-package com.qhuyns.ecomweb.controller;
+package com.ecomweb.order_service.controller;
 
-
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.OrderRequest;
-import com.qhuyns.ecomweb.dto.request.RoleRequest;
-import com.qhuyns.ecomweb.dto.response.OrderResponse;
-import com.qhuyns.ecomweb.dto.response.RoleResponse;
-import com.qhuyns.ecomweb.service.OrderService;
+import com.ecomweb.order_service.dto.request.OrderRequest;
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.dto.response.OrderResponse;
+import com.ecomweb.order_service.service.OrderService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/orders")
+//@RequestMapping("/orders")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j

@@ -1,6 +1,6 @@
-package com.qhuyns.ecomweb.service;
+package com.ecomweb.order_service.service;
 
-import com.qhuyns.ecomweb.dto.request.ShippingFeeRequest;
+import com.ecomweb.order_service.dto.request.ShippingFeeRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

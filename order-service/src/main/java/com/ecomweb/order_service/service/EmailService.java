@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.service;
+package com.ecomweb.order_service.service;
 
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;

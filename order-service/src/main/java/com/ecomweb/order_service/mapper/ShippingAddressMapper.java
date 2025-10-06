@@ -1,8 +1,7 @@
-package com.qhuyns.ecomweb.mapper;
+package com.ecomweb.order_service.mapper;
 
-import com.qhuyns.ecomweb.dto.request.UserAddressRequest;
-import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
-import com.qhuyns.ecomweb.entity.ShippingAddress;
+import com.ecomweb.order_service.dto.response.UserAddressResponse;
+import com.ecomweb.order_service.entity.ShippingAddress;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

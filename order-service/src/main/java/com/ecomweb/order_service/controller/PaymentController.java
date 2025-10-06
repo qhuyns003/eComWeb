@@ -1,11 +1,9 @@
-package com.qhuyns.ecomweb.controller;
+package com.ecomweb.order_service.controller;
 
 
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.RoleRequest;
-import com.qhuyns.ecomweb.dto.response.PaymentResponse;
-import com.qhuyns.ecomweb.dto.response.RoleResponse;
-import com.qhuyns.ecomweb.service.PaymentService;
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.dto.response.PaymentResponse;
+import com.ecomweb.order_service.service.PaymentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

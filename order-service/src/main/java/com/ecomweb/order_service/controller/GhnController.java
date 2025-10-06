@@ -1,10 +1,10 @@
-package com.qhuyns.ecomweb.controller;
+package com.ecomweb.order_service.controller;
 
 
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.GhnAvailableServiceRequest;
-import com.qhuyns.ecomweb.dto.request.ShippingFeeRequest;
-import com.qhuyns.ecomweb.service.GhnService;
+import com.ecomweb.order_service.dto.request.GhnAvailableServiceRequest;
+import com.ecomweb.order_service.dto.request.ShippingFeeRequest;
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.service.GhnService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

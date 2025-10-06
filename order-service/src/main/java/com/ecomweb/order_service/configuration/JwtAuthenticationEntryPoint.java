@@ -1,9 +1,9 @@
-package com.qhuyns.ecomweb.configuration;
+package com.ecomweb.order_service.configuration;
 
 
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.exception.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

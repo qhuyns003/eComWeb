@@ -1,10 +1,10 @@
-package com.qhuyns.ecomweb.service;
+package com.ecomweb.order_service.service;
 
-import com.qhuyns.ecomweb.dto.response.CouponResponse;
-import com.qhuyns.ecomweb.dto.response.UserCouponResponse;
-import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
-import com.qhuyns.ecomweb.mapper.CouponMapper;
-import com.qhuyns.ecomweb.repository.CouponRepository;
+import com.ecomweb.order_service.dto.response.CouponResponse;
+import com.ecomweb.order_service.dto.response.UserCouponResponse;
+import com.ecomweb.order_service.feignClient.IdentityFeignClient;
+import com.ecomweb.order_service.mapper.CouponMapper;
+import com.ecomweb.order_service.repository.CouponRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

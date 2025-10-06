@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.dto.request;
+package com.ecomweb.order_service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

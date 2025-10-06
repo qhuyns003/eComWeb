@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.validator;
+package com.ecomweb.order_service.validator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

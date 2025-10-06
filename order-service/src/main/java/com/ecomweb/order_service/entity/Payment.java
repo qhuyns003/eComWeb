@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.entity;
+package com.ecomweb.order_service.entity;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,13 +1,17 @@
-package com.qhuyns.ecomweb.service;
+package com.ecomweb.order_service.service;
 
 
-import com.qhuyns.ecomweb.configuration.VnpayConfig;
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.entity.*;
-import com.qhuyns.ecomweb.exception.AppException;
-import com.qhuyns.ecomweb.exception.ErrorCode;
-import com.qhuyns.ecomweb.repository.OrderRepository;
-import com.qhuyns.ecomweb.repository.ProductVariantRepository;
+import com.ecomweb.order_service.configuration.VnpayConfig;
+import com.ecomweb.order_service.dto.request.ProductVariantStockUpdateRequest;
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.entity.Order;
+import com.ecomweb.order_service.entity.OrderItem;
+import com.ecomweb.order_service.entity.OrderShopGroup;
+import com.ecomweb.order_service.entity.OrderStatus;
+import com.ecomweb.order_service.exception.AppException;
+import com.ecomweb.order_service.exception.ErrorCode;
+import com.ecomweb.order_service.feignClient.ProductFeignClient;
+import com.ecomweb.order_service.repository.OrderRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -37,8 +42,8 @@ public class VnpayService {
     String hashSecret;
     VnpayConfig vnpayConfig;
     OrderService orderService;
-    ProductVariantRepository productVariantRepository;
     OrderRepository orderRepository;
+    ProductFeignClient productFeignClient;
 
     public String createPaymentUrl(String orderId, BigDecimal amount, String orderInfo, String clientIp) {
         String vnp_Version = "2.1.0";
@@ -92,6 +97,7 @@ public class VnpayService {
     }
 
 
+    @Transactional
     public ApiResponse<String> vnpayIpn(Map<String, String> params) {
         String vnp_SecureHash = params.get("vnp_SecureHash");
         params.remove("vnp_SecureHash");
@@ -112,18 +118,23 @@ public class VnpayService {
         String responseCode = params.get("vnp_ResponseCode");
         if (checkSum.equalsIgnoreCase(vnp_SecureHash)) {
             if ("00".equals(responseCode)) {
+                // ham nay k can transactional van co the rollback vi nam trong 1 transactional khac
                 orderService.changeStatus(OrderStatus.PAID,orderId);
                 // tru stock
                 Order order = orderRepository.findById(orderId).orElseThrow(
                         ()-> new AppException(ErrorCode.ORDER_NOT_EXISTS)
                 );
+                List<ProductVariantStockUpdateRequest> data = new ArrayList<>();
                 for(OrderShopGroup osg : order.getOrderShopGroups()){
                     for(OrderItem oi : osg.getOrderItems()){
-                        ProductVariant pv =oi.getProductVariant();
-                        pv.setStock(pv.getStock()-oi.getQuantity());
-                        productVariantRepository.save(pv);
+                       data.add(ProductVariantStockUpdateRequest.builder()
+                                       .quantity(oi.getQuantity())
+                                       .variantId(oi.getProductVariantId())
+                               .build());
                     }
                 }
+                productFeignClient.updateStock(data);
+
                 return ApiResponse.<String>builder()
                         .code(1000)
                         .message("IPN: Thanh toán thành công cho đơn hàng: " + orderId)

@@ -1,7 +1,7 @@
-package com.qhuyns.ecomweb.service;
+package com.ecomweb.order_service.service;
 
-import com.qhuyns.ecomweb.dto.response.PaymentResponse;
-import com.qhuyns.ecomweb.entity.Payment;
+import com.ecomweb.order_service.dto.response.PaymentResponse;
+import com.ecomweb.order_service.entity.Payment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

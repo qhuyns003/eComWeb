@@ -3,17 +3,12 @@ package com.qhuyns.ecomweb.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
-
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserRoomKeyRequest {
-    private String userId;
-    private LocalDateTime lastMessageAt;
-    private String roomId;
-
+public class ProductVariantStockUpdateRequest {
+    String variantId;
+    int quantity;
 }

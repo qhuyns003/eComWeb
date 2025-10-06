@@ -1,11 +1,11 @@
-package com.qhuyns.ecomweb.configuration;
+package com.ecomweb.order_service.configuration;
 
 
+import com.ecomweb.order_service.dto.request.IntrospectRequest;
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.dto.response.IntrospectResponse;
+import com.ecomweb.order_service.feignClient.IdentityFeignClient;
 import com.nimbusds.jose.JOSEException;
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.IntrospectRequest;
-import com.qhuyns.ecomweb.dto.response.IntrospectResponse;
-import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

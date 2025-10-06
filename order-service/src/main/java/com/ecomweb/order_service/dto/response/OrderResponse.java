@@ -1,6 +1,5 @@
-package com.qhuyns.ecomweb.dto.response;
+package com.ecomweb.order_service.dto.response;
 
-import com.qhuyns.ecomweb.dto.request.OrderShopGroupRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

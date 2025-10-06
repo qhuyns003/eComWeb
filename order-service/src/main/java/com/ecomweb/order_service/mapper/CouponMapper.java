@@ -1,7 +1,7 @@
-package com.qhuyns.ecomweb.mapper;
+package com.ecomweb.order_service.mapper;
 
-import com.qhuyns.ecomweb.dto.response.CouponResponse;
-import com.qhuyns.ecomweb.entity.Coupon;
+import com.ecomweb.order_service.dto.response.CouponResponse;
+import com.ecomweb.order_service.entity.Coupon;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

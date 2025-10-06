@@ -1,8 +1,8 @@
-package com.qhuyns.ecomweb.controller;
+package com.ecomweb.order_service.controller;
 
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.VnpayPaymentRequest;
-import com.qhuyns.ecomweb.service.VnpayService;
+import com.ecomweb.order_service.dto.request.VnpayPaymentRequest;
+import com.ecomweb.order_service.dto.response.ApiResponse;
+import com.ecomweb.order_service.service.VnpayService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

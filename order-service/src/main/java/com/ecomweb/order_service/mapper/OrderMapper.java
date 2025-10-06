@@ -1,11 +1,9 @@
-package com.qhuyns.ecomweb.mapper;
+package com.ecomweb.order_service.mapper;
 
 
-import com.qhuyns.ecomweb.dto.request.OrderRequest;
-import com.qhuyns.ecomweb.dto.request.PermissionRequest;
-import com.qhuyns.ecomweb.dto.response.OrderResponse;
-import com.qhuyns.ecomweb.dto.response.PermissionResponse;
-import com.qhuyns.ecomweb.entity.Order;
+import com.ecomweb.order_service.dto.request.OrderRequest;
+import com.ecomweb.order_service.dto.response.OrderResponse;
+import com.ecomweb.order_service.entity.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

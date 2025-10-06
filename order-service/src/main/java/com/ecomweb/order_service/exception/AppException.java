@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.exception;
+package com.ecomweb.order_service.exception;
 
 public class AppException extends RuntimeException {
 

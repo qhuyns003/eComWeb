@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.util;
+package com.ecomweb.order_service.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

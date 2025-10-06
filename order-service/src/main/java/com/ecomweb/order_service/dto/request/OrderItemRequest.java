@@ -1,4 +1,4 @@
-package com.qhuyns.ecomweb.dto.request;
+package com.ecomweb.order_service.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

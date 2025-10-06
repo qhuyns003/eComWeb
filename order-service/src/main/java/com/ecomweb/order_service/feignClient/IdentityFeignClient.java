@@ -1,12 +1,8 @@
-package com.qhuyns.ecomweb.feignClient;
+package com.ecomweb.order_service.feignClient;
 
-import com.qhuyns.ecomweb.configuration.FeignConfig;
-import com.qhuyns.ecomweb.dto.request.ApiResponse;
-import com.qhuyns.ecomweb.dto.request.IntrospectRequest;
-import com.qhuyns.ecomweb.dto.response.IntrospectResponse;
-import com.qhuyns.ecomweb.dto.response.UserAddressResponse;
-import com.qhuyns.ecomweb.dto.response.UserCouponResponse;
-import com.qhuyns.ecomweb.dto.response.UserResponse;
+import com.ecomweb.order_service.configuration.FeignConfig;
+import com.ecomweb.order_service.dto.request.IntrospectRequest;
+import com.ecomweb.order_service.dto.response.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

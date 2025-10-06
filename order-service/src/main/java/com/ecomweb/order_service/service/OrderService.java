@@ -1,19 +1,21 @@
-package com.qhuyns.ecomweb.service;
+package com.ecomweb.order_service.service;
 
 
-import com.qhuyns.ecomweb.dto.request.OrderItemRequest;
-import com.qhuyns.ecomweb.dto.request.OrderRequest;
-import com.qhuyns.ecomweb.dto.request.OrderShopGroupRequest;
-import com.qhuyns.ecomweb.dto.request.RoleRequest;
-import com.qhuyns.ecomweb.dto.response.OrderResponse;
-import com.qhuyns.ecomweb.dto.response.RoleResponse;
-import com.qhuyns.ecomweb.dto.response.UserResponse;
-import com.qhuyns.ecomweb.entity.*;
-import com.qhuyns.ecomweb.exception.AppException;
-import com.qhuyns.ecomweb.exception.ErrorCode;
-import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
-import com.qhuyns.ecomweb.mapper.*;
-import com.qhuyns.ecomweb.repository.*;
+import com.ecomweb.order_service.dto.request.OrderItemRequest;
+import com.ecomweb.order_service.dto.request.OrderRequest;
+import com.ecomweb.order_service.dto.request.OrderShopGroupRequest;
+import com.ecomweb.order_service.dto.response.OrderResponse;
+import com.ecomweb.order_service.dto.response.UserResponse;
+import com.ecomweb.order_service.entity.*;
+import com.ecomweb.order_service.exception.AppException;
+import com.ecomweb.order_service.exception.ErrorCode;
+import com.ecomweb.order_service.feignClient.IdentityFeignClient;
+import com.ecomweb.order_service.mapper.OrderItemMapper;
+import com.ecomweb.order_service.mapper.OrderMapper;
+import com.ecomweb.order_service.mapper.OrderShopGroupMapper;
+import com.ecomweb.order_service.mapper.ShippingAddressMapper;
+import com.ecomweb.order_service.repository.CouponRepository;
+import com.ecomweb.order_service.repository.OrderRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,9 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +33,11 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     OrderMapper orderMapper;
-    OrderShopGroupMapper  orderShopGroupMapper;
+    OrderShopGroupMapper orderShopGroupMapper;
     OrderItemMapper orderItemMapper;
-    CouponRepository  couponRepository;
+    CouponRepository couponRepository;
     OrderRepository orderRepository;
-    ProductVariantRepository  productVariantRepository;
-    ShippingAddressMapper  shippingAddressMapper;
+    ShippingAddressMapper shippingAddressMapper;
     IdentityFeignClient identityFeignClient;
 
     @Transactional
@@ -74,9 +72,7 @@ public class OrderService {
           }
           for(OrderItemRequest oir: orderShopGroupRequest.getOrderItems()){
               OrderItem orderItem = orderItemMapper.toOrderItem(oir);
-              ProductVariant productVariant = productVariantRepository.findById(oir.getProductVariantId()).orElseThrow(
-                      () -> new AppException(ErrorCode.VARIANT_NOT_FOUND));
-              orderItem.setProductVariant(productVariant);
+              orderItem.setProductVariantId(oir.getProductVariantId());
               orderItem.setOrderShopGroup(orderShopGroup);
               orderShopGroup.getOrderItems().add(orderItem);
           }

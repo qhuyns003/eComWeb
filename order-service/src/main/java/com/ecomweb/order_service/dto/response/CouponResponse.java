@@ -1,7 +1,7 @@
-package com.qhuyns.ecomweb.dto.response;
+package com.ecomweb.order_service.dto.response;
 
-import com.qhuyns.ecomweb.entity.CouponType;
-import com.qhuyns.ecomweb.entity.DiscountType;
+import com.ecomweb.order_service.entity.CouponType;
+import com.ecomweb.order_service.entity.DiscountType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
