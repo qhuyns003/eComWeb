@@ -191,17 +191,17 @@ export const addUserAddress = (addressData: any) => {
   return axiosInstance.post('/identity/user_address/', addressData);
 };
 
-export const getProvinces = () => axiosInstance.get('/ghn/provinces');
-export const getDistricts = (provinceId: number) => axiosInstance.get('/ghn/districts', { params: { provinceId } });
-export const getWards = (districtId: number) => axiosInstance.get('/ghn/wards', { params: { districtId } });
+export const getProvinces = () => axiosInstance.get('/orders/ghn/provinces');
+export const getDistricts = (provinceId: number) => axiosInstance.get('/orders/ghn/districts', { params: { provinceId } });
+export const getWards = (districtId: number) => axiosInstance.get('/orders/ghn/wards', { params: { districtId } });
 
 export const getGhnServiceForOrderGroup = (orderGroupPayload: any) => {
   // Gửi về endpoint backend, ví dụ /api/shipping/ghn-service
-  return axiosInstance.post('/ghn/available-service', orderGroupPayload);
+  return axiosInstance.post('/orders/ghn/available-service', orderGroupPayload);
 };
 
 export const calculateShippingFee = (payload: any) => {
-  return axiosInstance.post('/ghn/calculate-fee', payload);
+  return axiosInstance.post('/orders/ghn/calculate-fee', payload);
 };
 
 export const getShopInfo = (shopIds: string[]) => {
@@ -212,24 +212,24 @@ export const getShopInfo = (shopIds: string[]) => {
 };
 
 export const getCouponsByShopId = (shopId: string) => {
-  return axiosInstance.get(`/coupons/shop?shopId=${shopId}`);
+  return axiosInstance.get(`/orders/coupons/shop?shopId=${shopId}`);
 };
 
-export const getUserOrderCoupons = () => axiosInstance.get('/coupons/user');
+export const getUserOrderCoupons = () => axiosInstance.get('/orders/coupons/user');
 
 export const createOrder = (orderData: any) => {
-  return axiosInstance.post('/orders', orderData);
+  return axiosInstance.post('/orders/', orderData);
 };
 
 export const getOrderPaymentStatus = (orderId: string) =>
-  axiosInstance.get(`/vnpay/payment-status?vnp_TxnRef=${orderId}`);
+  axiosInstance.get(`/orders/vnpay/payment-status?vnp_TxnRef=${orderId}`);
 
 export const getPaymentMethods = () => {
-  return axiosInstance.get('/payments');
+  return axiosInstance.get('/orders/payments/');
 };
 
 export const createPayment = (paymentData: any) => {
-  return axiosInstance.post('/vnpay/create-payment', paymentData);
+  return axiosInstance.post('/orders/vnpay/create-payment', paymentData);
 };
 
 export const getCartItems = () => {

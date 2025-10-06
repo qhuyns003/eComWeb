@@ -20,7 +20,7 @@ import java.util.List;
 public class PaymentController {
     PaymentService paymentService;
 
-    @GetMapping
+    @GetMapping("/")
     ApiResponse<List<PaymentResponse>> getAll() {
         return ApiResponse.<List<PaymentResponse>>builder()
                 .result(paymentService.getAll())

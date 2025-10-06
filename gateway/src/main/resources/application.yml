@@ -33,6 +33,10 @@ spring:
           predicates:
             - Path=/messages/**
 
+        - id: order-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/orders/**
 
         - id: main-service
           uri: http://localhost:8081

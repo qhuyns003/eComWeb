@@ -34,9 +34,9 @@ public class ProductVariant {
     @JoinColumn(name = "product_id")
     Product product;
 
-    @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems= new ArrayList<>();;
+//    @Builder.Default
+//    @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<OrderItem> orderItems= new ArrayList<>();;
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)

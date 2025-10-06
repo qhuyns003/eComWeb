@@ -26,7 +26,7 @@ public class CustomerReview {
     @Column(updatable = false)
     LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "customerReview")
-    private OrderItem orderItem;
+//    @OneToOne(mappedBy = "customerReview")
+//    private OrderItem orderItem;
 
 } 

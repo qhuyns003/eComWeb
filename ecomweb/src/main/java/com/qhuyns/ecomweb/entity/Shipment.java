@@ -1,5 +1,5 @@
-package com.qhuyns.ecomweb.entity;
-
-public enum Shipment {
-    NORMAL;
-}
+//package com.qhuyns.ecomweb.entity;
+//
+//public enum Shipment {
+//    NORMAL;
+//}
