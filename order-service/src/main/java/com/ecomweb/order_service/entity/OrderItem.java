@@ -28,5 +28,7 @@ public class OrderItem {
     String productVariantId;
 
 
-    String customerReviewId;
+    @OneToOne
+    @JoinColumn(name = "customer_review_id")
+    private CustomerReview customerReview;
 } 

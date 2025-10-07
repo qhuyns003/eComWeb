@@ -1,9 +1,5 @@
-package com.qhuyns.ecomweb.dto.response;
+package com.ecomweb.order_service.dto.response;
 
-import com.qhuyns.ecomweb.entity.Cart;
-import com.qhuyns.ecomweb.entity.Product;
-import com.qhuyns.ecomweb.entity.ProductAttribute;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

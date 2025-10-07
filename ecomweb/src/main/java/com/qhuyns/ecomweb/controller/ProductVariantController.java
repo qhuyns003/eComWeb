@@ -8,6 +8,7 @@ import com.qhuyns.ecomweb.dto.request.ProductVariantStockUpdateRequest;
 import com.qhuyns.ecomweb.dto.response.ProductDetailResponse;
 import com.qhuyns.ecomweb.dto.response.ProductOverviewResponse;
 import com.qhuyns.ecomweb.dto.response.ProductResponse;
+import com.qhuyns.ecomweb.dto.response.ProductVariantResponse;
 import com.qhuyns.ecomweb.service.ProductService;
 import com.qhuyns.ecomweb.service.ProductVariantService;
 import lombok.AccessLevel;
@@ -31,9 +32,17 @@ public class ProductVariantController {
     ProductVariantService productVariantService;
 
     @PutMapping("/stockUpdating")
-    ApiResponse<?> updateStock(@RequestBody ProductVariantStockUpdateRequest productVariantStockUpdateRequest){
+    ApiResponse<?> updateStock(@RequestBody List<ProductVariantStockUpdateRequest> productVariantStockUpdateRequest){
+        productVariantService.updateStock(productVariantStockUpdateRequest);
         return ApiResponse.builder()
                 .result("successful")
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    ApiResponse<ProductVariantResponse> getById(@PathVariable String id){
+        return ApiResponse.<ProductVariantResponse>builder()
+                .result(productVariantService.getById(id))
                 .build();
     }
 

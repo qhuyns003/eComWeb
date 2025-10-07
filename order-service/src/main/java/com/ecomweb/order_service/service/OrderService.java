@@ -5,6 +5,8 @@ import com.ecomweb.order_service.dto.request.OrderItemRequest;
 import com.ecomweb.order_service.dto.request.OrderRequest;
 import com.ecomweb.order_service.dto.request.OrderShopGroupRequest;
 import com.ecomweb.order_service.dto.response.OrderResponse;
+import com.ecomweb.order_service.dto.response.ProductStatResponse;
+import com.ecomweb.order_service.dto.response.ReviewStatResponse;
 import com.ecomweb.order_service.dto.response.UserResponse;
 import com.ecomweb.order_service.entity.*;
 import com.ecomweb.order_service.exception.AppException;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +95,14 @@ public class OrderService {
         order.setStatus(orderStatus);
         orderRepository.save(order);
      }
+
+    public ProductStatResponse findNumberOfOrderAndRating(OrderStatus orderStatus, List<String> ids) {
+        Object[] rs = orderRepository.findNumberOfOrderAndRating(ids, orderStatus);
+        return ProductStatResponse.builder()
+                .numberOfOrder((Long)((Object[]) rs[0])[0])
+                .rating((Double) ((Object[]) rs[0])[1])
+                .build();
+    }
 
     public void delete(String id) {
        orderRepository.deleteById(id);

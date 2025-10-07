@@ -2,7 +2,6 @@ package com.qhuyns.ecomweb.repository;
 
 import com.qhuyns.ecomweb.dto.request.ProductFilterRequest;
 import com.qhuyns.ecomweb.entity.Category;
-import com.qhuyns.ecomweb.entity.OrderStatus;
 import com.qhuyns.ecomweb.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;

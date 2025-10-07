@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductVariantService {
     ProductVariantRepository productVariantRepository;
+    ProductVariantMapper productVariantMapper;
+    DetailAttributeMapper detailAttributeMapper;
 
     @Transactional
     public void updateStock(List<ProductVariantStockUpdateRequest> requests){
@@ -48,6 +50,18 @@ public class ProductVariantService {
             productVariantRepository.save(productVariant);
         };
     };
+
+    public ProductVariantResponse getById(String id){
+       ProductVariant productVariant = productVariantRepository.findById(id)
+               .orElseThrow(()-> new AppException(ErrorCode.VARIANT_NOT_FOUND));
+       ProductVariantResponse productVariantResponse = productVariantMapper
+               .toProductVariantResponse(productVariant);
+       productVariantResponse.setDetailAttributes(productVariant.getDetailAttributes()
+               .stream().map(detailAttributeMapper::toDetailAttributeResponse).collect(Collectors.toList()));
+       return productVariantResponse;
+    };
+
+
 
 
 
