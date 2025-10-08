@@ -7,6 +7,7 @@ import com.qhuyns.ecomweb.entity.*;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
 import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
+import com.qhuyns.ecomweb.feignClient.OrderFeignClient;
 import com.qhuyns.ecomweb.feignClient.ShopFeignClient;
 import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.*;
@@ -61,6 +62,7 @@ public class ProductService {
     RedisCacheHelper cacheHelper;
     ShopFeignClient shopFeignClient;
     IdentityFeignClient identityFeignClient;
+    OrderFeignClient orderFeignClient;
 
 
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) throws Exception {
@@ -116,9 +118,11 @@ public class ProductService {
     }
 
     public ProductDetailResponse getDetailProduct(String id) {
-        Object[] rs = productRepository.findNumberOfOrderAndRating(id,OrderStatus.PAID);
+
         Product product = productRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-        
+        List<String> variantIds = product.getProductVariants().stream().map(ProductVariant::getId).collect(Collectors.toList());
+        ProductStatResponse productStatResponse = orderFeignClient.findNumberOfOrderAndRating(variantIds).getResult();
+
         ProductDetailResponse productDetailResponse = productMapper.toProductDetailResponse(product);
         productDetailResponse.setImages(product.getImages().stream()
                 .map(img -> {
@@ -128,8 +132,8 @@ public class ProductService {
 
                 })
                 .collect(Collectors.toList()));
-        productDetailResponse.setNumberOfOrder(BigDecimal.valueOf((Long)((Object[]) rs[0])[0])) ;
-        productDetailResponse.setRating((Double) ((Object[]) rs[0])[1]);
+        productDetailResponse.setNumberOfOrder(BigDecimal.valueOf(productStatResponse.getNumberOfOrder()));
+        productDetailResponse.setRating(productStatResponse.getRating());
         productDetailResponse.setProductAttributes(product.getProductAttributes().stream().map(pa -> {
             ProductAttributeResponse productAttributeResponse = productAttributeMapper.toProductAttributeResponse(pa);
             productAttributeResponse.setDetailAttributes(pa.getDetailAttributes().stream().map(

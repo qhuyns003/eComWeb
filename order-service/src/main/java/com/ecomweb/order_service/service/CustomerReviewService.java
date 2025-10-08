@@ -28,12 +28,13 @@ public class CustomerReviewService {
      CustomerReviewMapper customerReviewMapper;
      ProductFeignClient productFeignClient;
     public List<ReviewProductResponse> getAllReview(String id) {
-        List<CustomerReview> customerReview = customerReviewRepository.findAllWithUserAndProductVariantAndProductDetail(id);
+        List<String> variantIds = productFeignClient.getVariantIdsByProductId(id).getResult();
+        List<CustomerReview> customerReview = customerReviewRepository.findAllWithUserAndProductVariantAndProductDetail(variantIds);
         List<ReviewProductResponse> reviewProductResponses = new ArrayList<>();
         for (CustomerReview cr : customerReview) {
             ReviewProductResponse reviewProductResponse = customerReviewMapper.toReviewProductResponse(cr);
             reviewProductResponse.setUserId(cr.getOrderItem().getOrderShopGroup().getOrder().getUserId());
-            ProductVariantResponse productVariantResponse = productFeignClient.getById(cr.getOrderItem().getProductVariantId());
+            ProductVariantResponse productVariantResponse = productFeignClient.getById(cr.getOrderItem().getProductVariantId()).getResult();
             reviewProductResponse.setProductVariant(productVariantResponse);
             reviewProductResponses.add(reviewProductResponse);
         }
@@ -41,7 +42,9 @@ public class CustomerReviewService {
     }
 
     public ReviewStatResponse countReviewByRating(String id) {
-        List<Object[]> rs = customerReviewRepository.countReviewByRating(id);
+
+        List<String> variantIds = productFeignClient.getVariantIdsByProductId(id).getResult();
+        List<Object[]> rs = customerReviewRepository.countReviewByRating(variantIds);
         TreeMap<String, Long> ratingCount = new TreeMap<>();
         Long total =0L;
         Double avrRating = 0.0;

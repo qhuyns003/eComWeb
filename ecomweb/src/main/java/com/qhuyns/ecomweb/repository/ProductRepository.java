@@ -102,17 +102,17 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 """)
     Product findProductDetailById(@Param("id") String id);
 
-    @Query("""
-    SELECT COUNT(oi), COALESCE(AVG(cr.rating), 0)
-    FROM Product p
-    LEFT JOIN p.productVariants v
-    LEFT JOIN v.orderItems oi
-    LEFT JOIN oi.customerReview cr
-    LEFT JOIN oi.orderShopGroup osg
-    LEFT JOIN osg.order o
-    WHERE p.id = :id and o.status = :status
-""")
-    Object[] findNumberOfOrderAndRating(@Param("id") String id,@Param("status") OrderStatus status);
+//    @Query("""
+//    SELECT COUNT(oi), COALESCE(AVG(cr.rating), 0)
+//    FROM Product p
+//    LEFT JOIN p.productVariants v
+//    LEFT JOIN v.orderItems oi
+//    LEFT JOIN oi.customerReview cr
+//    LEFT JOIN oi.orderShopGroup osg
+//    LEFT JOIN osg.order o
+//    WHERE p.id = :id and o.status = :status
+//""")
+//    Object[] findNumberOfOrderAndRating(@Param("id") String id,@Param("status") OrderStatus status);
  // khong can fetch de lay quan he, select luon anh cho nhanh
 
     @Query(

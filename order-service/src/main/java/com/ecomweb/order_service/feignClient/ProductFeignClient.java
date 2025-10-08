@@ -18,7 +18,9 @@ public interface ProductFeignClient {
     void updateStock(@RequestBody List<ProductVariantStockUpdateRequest> productVariantStockUpdateRequests);
 
     @GetMapping("/productVariants/{id}")
-    ProductVariantResponse getById(@PathVariable String id);
+    ApiResponse<ProductVariantResponse> getById(@PathVariable String id);
 
+    @GetMapping("/productVariants/byProductId/{id}")
+    ApiResponse<List<String>> getVariantIdsByProductId(@PathVariable String id);
 
 }

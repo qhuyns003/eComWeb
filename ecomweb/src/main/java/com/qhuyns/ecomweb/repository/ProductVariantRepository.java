@@ -61,4 +61,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     );
 
     List<ProductVariant> findByProductIdAndStatus(String productId, String status);
+
+    List<ProductVariant> findByProductId(String productId);
 }

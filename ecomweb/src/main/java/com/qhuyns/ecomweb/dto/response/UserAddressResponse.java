@@ -1,7 +1,5 @@
 package com.qhuyns.ecomweb.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.qhuyns.ecomweb.entity.Order;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

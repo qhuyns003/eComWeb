@@ -61,6 +61,10 @@ public class ProductVariantService {
        return productVariantResponse;
     };
 
+    public List<String> getVariantIdsByProdutId(String produtId){
+        return productVariantRepository.findByProductId(produtId).stream().map(ProductVariant::getId).collect(Collectors.toList());
+    }
+
 
 
 

@@ -1,7 +1,5 @@
 package com.qhuyns.ecomweb.dto.response;
 
-import com.qhuyns.ecomweb.entity.Cart;
-import com.qhuyns.ecomweb.entity.OrderItem;
 import com.qhuyns.ecomweb.entity.Product;
 import com.qhuyns.ecomweb.entity.ProductAttribute;
 import jakarta.persistence.*;
