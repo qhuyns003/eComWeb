@@ -64,6 +64,7 @@ public class ProductService {
     IdentityFeignClient identityFeignClient;
     private final OrderFeignClient orderFeignClient;
 
+    // loi chi hien thi so luong mat hang da mua = da co review
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) throws Exception {
         // Kiểm tra cache
         List<ProductOverviewResponse> cachedProducts = cacheHelper.getFromCache(RedisKey.TOP_SELLING_PROD.getKey(),  List.class);
