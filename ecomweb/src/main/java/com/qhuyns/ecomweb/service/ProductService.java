@@ -62,8 +62,7 @@ public class ProductService {
     RedisCacheHelper cacheHelper;
     ShopFeignClient shopFeignClient;
     IdentityFeignClient identityFeignClient;
-    OrderFeignClient orderFeignClient;
-
+    private final OrderFeignClient orderFeignClient;
 
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) throws Exception {
         // Kiểm tra cache
@@ -118,10 +117,8 @@ public class ProductService {
     }
 
     public ProductDetailResponse getDetailProduct(String id) {
-
+        Object[] rs = productRepository.findNumberOfOrderAndRating(id);
         Product product = productRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-        List<String> variantIds = product.getProductVariants().stream().map(ProductVariant::getId).collect(Collectors.toList());
-        ProductStatResponse productStatResponse = orderFeignClient.findNumberOfOrderAndRating(variantIds).getResult();
 
         ProductDetailResponse productDetailResponse = productMapper.toProductDetailResponse(product);
         productDetailResponse.setImages(product.getImages().stream()
@@ -132,8 +129,8 @@ public class ProductService {
 
                 })
                 .collect(Collectors.toList()));
-        productDetailResponse.setNumberOfOrder(BigDecimal.valueOf(productStatResponse.getNumberOfOrder()));
-        productDetailResponse.setRating(productStatResponse.getRating());
+        productDetailResponse.setNumberOfOrder(BigDecimal.valueOf((Long)((Object[]) rs[0])[0])) ;
+        productDetailResponse.setRating((Double) ((Object[]) rs[0])[1]);
         productDetailResponse.setProductAttributes(product.getProductAttributes().stream().map(pa -> {
             ProductAttributeResponse productAttributeResponse = productAttributeMapper.toProductAttributeResponse(pa);
             productAttributeResponse.setDetailAttributes(pa.getDetailAttributes().stream().map(
@@ -369,7 +366,8 @@ public class ProductService {
 
         for(String id : ids){
             Product product = productRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-            if(productRepository.existsOrderForProduct(id)){
+            if(orderFeignClient.existsOrderByProductId(product.getProductVariants().stream()
+                    .map(pv -> pv.getId()).collect(Collectors.toList())).getResult()){
                 throw new AppException(ErrorCode.PRODUCT_HAS_ORDER,product.getName());
             }
             for(ProductImage img : product.getImages()){

@@ -38,51 +38,46 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     // Fetch join và tính toán aggregate không thể dùng chung trong 1 query JPQL.
     // Han che tinh toan o service neu co the tinh toan duoc o db de toi uu hieu nang do khong can phai load du lieu vao mem
     // 1 obj[] la 1 ban ghi
-    @Query(
-            value = """
-                 SELECT p.*, COUNT(oi.id) as order_count, ROUND(AVG(cr.rating),1) as rating
-                 FROM product p
-                 LEFT JOIN order_item oi ON oi.product_id = p.id
-                 LEFT JOIN customer_review cr ON cr.product_id = p.id
-                 GROUP BY p.id
-                 ORDER BY COUNT(oi.id) DESC
-                 LIMIT :limit
-        """,
-            nativeQuery = true
-    )
-    List<Object[]> findTopSellingProductsNative(@Param("limit") int limit);
+//    @Query(
+//            value = """
+//                 SELECT p.*, COUNT(oi.id) as order_count, ROUND(AVG(cr.rating),1) as rating
+//                 FROM product p
+//                 LEFT JOIN order_item oi ON oi.product_id = p.id
+//                 LEFT JOIN customer_review cr ON cr.product_id = p.id
+//                 GROUP BY p.id
+//                 ORDER BY COUNT(oi.id) DESC
+//                 LIMIT :limit
+//        """,
+//            nativeQuery = true
+//    )
+//    List<Object[]> findTopSellingProductsNative(@Param("limit") int limit);
 
     @Query("""
-    SELECT p, COUNT(oi), COALESCE(ROUND(AVG(cr.rating), 1), 0)
+    SELECT p, COUNT(cr), COALESCE(ROUND(AVG(cr.rating), 1), 0)
     FROM Product p
     LEFT JOIN p.productVariants v
-    LEFT JOIN v.orderItems oi
-    LEFT JOIN oi.customerReview cr
-    LEFT JOIN oi.orderShopGroup osg
-    LEFT JOIN osg.order o
-    WHERE o.status = com.qhuyns.ecomweb.entity.OrderStatus.PAID OR o.id IS NULL
+    LEFT JOIN v.customerReviews cr
     GROUP BY p
-    ORDER BY COUNT(oi) DESC
+    ORDER BY COUNT(cr) DESC
 """)
     List<Object[]> findTopSellingProducts(Pageable pageable);
 
     @Query("""
-    SELECT p, COUNT(oi), COALESCE(ROUND(AVG(cr.rating), 1), 0)
+    SELECT p, COUNT(cr), COALESCE(ROUND(AVG(cr.rating), 1), 0)
     FROM Product p
     LEFT JOIN p.productVariants v
-    LEFT JOIN v.orderItems oi
-    LEFT JOIN oi.customerReview cr
+    LEFT JOIN v.customerReviews cr
     GROUP BY p
     ORDER BY p.createdAt DESC
+    
 """)
     List<Object[]> findNewestProducts(Pageable pageable);
 
     @Query("""
-    SELECT p, COUNT(oi), COALESCE(ROUND(AVG(cr.rating), 1), 0)
+    SELECT p, COUNT(cr), COALESCE(ROUND(AVG(cr.rating), 1), 0)
     FROM Product p
     LEFT JOIN p.productVariants v
-    LEFT JOIN v.orderItems oi
-    LEFT JOIN oi.customerReview cr
+    LEFT JOIN v.customerReviews cr
     WHERE p.shopId = :shopId
     AND p.status = '1'
     GROUP BY p
@@ -102,18 +97,15 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 """)
     Product findProductDetailById(@Param("id") String id);
 
-//    @Query("""
-//    SELECT COUNT(oi), COALESCE(AVG(cr.rating), 0)
-//    FROM Product p
-//    LEFT JOIN p.productVariants v
-//    LEFT JOIN v.orderItems oi
-//    LEFT JOIN oi.customerReview cr
-//    LEFT JOIN oi.orderShopGroup osg
-//    LEFT JOIN osg.order o
-//    WHERE p.id = :id and o.status = :status
-//""")
-//    Object[] findNumberOfOrderAndRating(@Param("id") String id,@Param("status") OrderStatus status);
- // khong can fetch de lay quan he, select luon anh cho nhanh
+    @Query("""
+    SELECT COUNT(cr), COALESCE(AVG(cr.rating), 0)
+    FROM Product p
+    LEFT JOIN p.productVariants v
+    LEFT JOIN v.customerReviews cr
+    WHERE p.id = :id 
+""")
+    Object[] findNumberOfOrderAndRating(@Param("id") String id);
+//  khong can fetch de lay quan he, select luon anh cho nhanh
 
     @Query(
             value = """
@@ -180,7 +172,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     void deleteByIdIn(List<String> ids);
 
-    @Query("SELECT COUNT(oi) > 0 FROM OrderItem oi WHERE oi.productVariant.product.id = :productId")
-    boolean existsOrderForProduct(@Param("productId") String productId);
+//    @Query("SELECT COUNT(oi) > 0 FROM OrderItem oi WHERE oi.productVariant.product.id = :productId")
+//    boolean existsOrderForProduct(@Param("productId") String productId);
 
 }

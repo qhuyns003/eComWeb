@@ -17,6 +17,7 @@ public interface OrderFeignClient {
     @GetMapping("/numberAndRating")
     ApiResponse<ProductStatResponse> findNumberOfOrderAndRating(@RequestParam List<String> ids);
 
-
+    @GetMapping("/orderItems/")
+    ApiResponse<Boolean> existsOrderByProductId(@RequestParam List<String> variantIds);
 
 }

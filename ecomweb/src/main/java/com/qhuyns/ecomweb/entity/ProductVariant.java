@@ -40,5 +40,9 @@ public class ProductVariant {
 
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Cart> carts= new ArrayList<>();;
+    private List<Cart> carts= new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CustomerReview> customerReviews = new ArrayList<>();
 }

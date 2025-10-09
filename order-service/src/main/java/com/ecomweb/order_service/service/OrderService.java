@@ -96,13 +96,13 @@ public class OrderService {
         orderRepository.save(order);
      }
 
-    public ProductStatResponse findNumberOfOrderAndRating(OrderStatus orderStatus, List<String> ids) {
-        Object[] rs = orderRepository.findNumberOfOrderAndRating(ids, orderStatus);
-        return ProductStatResponse.builder()
-                .numberOfOrder((Long)((Object[]) rs[0])[0])
-                .rating((Double) ((Object[]) rs[0])[1])
-                .build();
-    }
+//    public ProductStatResponse findNumberOfOrderAndRating(OrderStatus orderStatus, List<String> ids) {
+//        Object[] rs = orderRepository.findNumberOfOrderAndRating(ids, orderStatus);
+//        return ProductStatResponse.builder()
+//                .numberOfOrder((Long)((Object[]) rs[0])[0])
+//                .rating((Double) ((Object[]) rs[0])[1])
+//                .build();
+//    }
 
     public void delete(String id) {
        orderRepository.deleteById(id);

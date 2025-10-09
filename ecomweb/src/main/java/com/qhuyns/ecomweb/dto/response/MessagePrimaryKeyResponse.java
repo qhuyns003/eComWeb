@@ -2,8 +2,6 @@ package com.qhuyns.ecomweb.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

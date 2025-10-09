@@ -38,11 +38,11 @@ public class OrderController {
     };
 
     // khong nen get + rqbody -> co the gay loi
-    @GetMapping("/numberAndRating")
-    ApiResponse<ProductStatResponse> findNumberOfOrderAndRating(@RequestParam List<String> ids) {
-        return new ApiResponse().<ProductStatResponse>builder()
-                .result(orderService.findNumberOfOrderAndRating(OrderStatus.PAID,ids))
-                .build();
-    };
+//    @GetMapping("/numberAndRating")
+//    ApiResponse<ProductStatResponse> findNumberOfOrderAndRating(@RequestParam List<String> ids) {
+//        return new ApiResponse().<ProductStatResponse>builder()
+//                .result(orderService.findNumberOfOrderAndRating(OrderStatus.PAID,ids))
+//                .build();
+//    };
 
 }
