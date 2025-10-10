@@ -37,4 +37,8 @@ public class OrderItemService {
   public boolean existsOrderForProduct(List<String> variantIds) {
       return orderItemRepository.existsOrderForProduct(variantIds);
   }
+
+    public Long getNumberOfOrder(List<String> variantIds) {
+        return orderItemRepository.getNumberOfOrder(variantIds);
+    }
 }

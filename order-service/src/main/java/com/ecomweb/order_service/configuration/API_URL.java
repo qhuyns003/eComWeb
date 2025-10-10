@@ -26,6 +26,7 @@ public class API_URL {
             "/private_chats/**",
             "/rooms/**",
             "/user_rooms/**",
+            "/orderItems/**",
 
     };
 
@@ -45,6 +46,7 @@ public class API_URL {
             "/private_chats/**",
             "/rooms/**",
             "/user_rooms/**",
+            "/orderItems/**",
 
     };
 
@@ -71,6 +73,7 @@ public class API_URL {
             "/private_chats/**",
             "/rooms/**",
             "/user_rooms/**",
+            "/orderItems/**",
 
 
     };
@@ -89,6 +92,7 @@ public class API_URL {
             "/private_chats/**",
             "/rooms/**",
             "/user_rooms/**",
+            "/orderItems/**",
 
     };
 }

@@ -78,7 +78,8 @@ public class ProductService {
         for (Object[] rs : results) {
             Product product = (Product) rs[0]; // có thể ép xuống lớp con vì vốn dĩ rs[0] là 1 íntance của Product (có các attribute của nó)
             Double rating = (Double)rs[2];
-            BigDecimal count = (BigDecimal.valueOf((long)rs[1])) ;
+            Long qtt = orderFeignClient.getNumberOfOrder(product.getProductVariants().stream().map(pv -> pv.getId()).collect(Collectors.toList())).getResult();
+            BigDecimal count = (BigDecimal.valueOf(qtt)) ;
             ProductOverviewResponse productOverviewResponse = productMapper.toProductOverviewResponse(product);
             productOverviewResponse.setImages(productImageService.getAllByProductId(product.getId()));
             productOverviewResponse.setRating(rating != null ? rating : 0.0);
@@ -105,7 +106,8 @@ public class ProductService {
         for (Object[] rs : results) {
             Product product = (Product) rs[0]; // có thể ép xuống lớp con vì vốn dĩ rs[0] là 1 íntance của Product (có các attribute của nó)
             Double rating = (Double)rs[2];
-            BigDecimal count = (BigDecimal.valueOf((long)rs[1])) ;
+            Long qtt = orderFeignClient.getNumberOfOrder(product.getProductVariants().stream().map(pv -> pv.getId()).collect(Collectors.toList())).getResult();
+            BigDecimal count = (BigDecimal.valueOf(qtt)) ;
             ProductOverviewResponse productOverviewResponse = productMapper.toProductOverviewResponse(product);
             productOverviewResponse.setImages(productImageService.getAllByProductId(product.getId()));
             productOverviewResponse.setRating(rating != null ? rating : 0.0);
@@ -392,7 +394,8 @@ public class ProductService {
         for (Object[] rs : results) {
             Product product = (Product) rs[0]; // có thể ép xuống lớp con vì vốn dĩ rs[0] là 1 íntance của Product (có các attribute của nó)
             Double rating = (Double)rs[2];
-            BigDecimal count = (BigDecimal.valueOf((long)rs[1])) ;
+            Long qtt = orderFeignClient.getNumberOfOrder(product.getProductVariants().stream().map(pv -> pv.getId()).collect(Collectors.toList())).getResult();
+            BigDecimal count = (BigDecimal.valueOf(qtt)) ;
             ProductOverviewResponse productOverviewResponse = productMapper.toProductOverviewResponse(product);
             productOverviewResponse.setImages(productImageService.getAllByProductId(product.getId()));
             productOverviewResponse.setRating(rating != null ? rating : 0.0);

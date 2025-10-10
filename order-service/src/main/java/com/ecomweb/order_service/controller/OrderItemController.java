@@ -4,6 +4,7 @@ import com.ecomweb.order_service.dto.request.OrderRequest;
 import com.ecomweb.order_service.dto.response.ApiResponse;
 import com.ecomweb.order_service.dto.response.OrderResponse;
 import com.ecomweb.order_service.repository.OrderItemRepository;
+import com.ecomweb.order_service.service.OrderItemService;
 import com.ecomweb.order_service.service.OrderService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,22 @@ import java.util.List;
 @Slf4j
 public class OrderItemController {
 
-    OrderItemRepository orderItemRepository;
+    OrderItemService orderItemService;
 
     @GetMapping("/")
     ApiResponse<Boolean> existsOrderByProductId(@RequestParam List<String> variantIds) {
         return new ApiResponse().<Boolean>builder()
-                .result(orderItemRepository.existsOrderForProduct(variantIds))
+                .result(orderItemService.existsOrderForProduct(variantIds))
                 .build();
     };
+
+    @GetMapping("/numberOfOrder/")
+    ApiResponse<Long> getNumberOfOrder(@RequestParam List<String> variantIds) {
+        return new ApiResponse().<Long>builder()
+                .result(orderItemService.getNumberOfOrder(variantIds))
+                .build();
+    };
+
 
 
 }
