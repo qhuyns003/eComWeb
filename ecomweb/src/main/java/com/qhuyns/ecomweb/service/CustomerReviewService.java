@@ -5,6 +5,8 @@ import com.qhuyns.ecomweb.entity.CustomerReview;
 import com.qhuyns.ecomweb.entity.Product;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import com.qhuyns.ecomweb.feignClient.IdentityFeignClient;
+import com.qhuyns.ecomweb.feignClient.OrderFeignClient;
 import com.qhuyns.ecomweb.mapper.*;
 import com.qhuyns.ecomweb.repository.CustomerReviewRepository;
 import com.qhuyns.ecomweb.repository.ProductRepository;
@@ -32,12 +34,14 @@ public class CustomerReviewService {
      CustomerReviewMapper customerReviewMapper;
      ProductVariantMapper productVariantMapper;
      DetailAttributeMapper detailAttributeMapper;
+     OrderFeignClient orderFeignClient;
     public List<ReviewProductResponse> getAllReview(String id) {
         List<CustomerReview> customerReview = customerReviewRepository.findAllWithUserAndProductVariantAndProductDetail(id);
         List<ReviewProductResponse> reviewProductResponses = new ArrayList<>();
         for (CustomerReview cr : customerReview) {
             ReviewProductResponse reviewProductResponse = customerReviewMapper.toReviewProductResponse(cr);
 //            reviewProductResponse.setUserId(cr.getOrderItem().getOrderShopGroup().getOrder().getUserId());
+            reviewProductResponse.setUser(orderFeignClient.getOwnerOfReview(cr.getId()).getResult());
             reviewProductResponse.setProductVariant(productVariantMapper.toProductVariantResponse(cr.getProductVariant()));
             reviewProductResponse.getProductVariant().setDetailAttributes(cr.getProductVariant().getDetailAttributes().stream().map(
                     da -> detailAttributeMapper.toDetailAttributeResponse(da)).collect(Collectors.toList()));

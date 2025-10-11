@@ -34,11 +34,19 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderItemService {
     OrderItemRepository orderItemRepository;
+    IdentityFeignClient identityFeignClient;
   public boolean existsOrderForProduct(List<String> variantIds) {
       return orderItemRepository.existsOrderForProduct(variantIds);
   }
 
     public Long getNumberOfOrder(List<String> variantIds) {
         return orderItemRepository.getNumberOfOrder(variantIds);
+    }
+
+    public UserResponse getOwnerOfOrder(String orderItemId) {
+      String customerId = orderItemRepository.findByCustomerReviewId(orderItemId)
+              .orElseThrow(()-> new AppException(ErrorCode.ORDER_NOT_EXISTS)).getOrderShopGroup().getOrder().getUserId();
+      UserResponse userResponse = identityFeignClient.getActivatedUser(customerId).getResult();
+      return userResponse;
     }
 }

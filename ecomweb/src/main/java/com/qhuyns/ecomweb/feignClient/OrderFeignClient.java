@@ -4,6 +4,7 @@ import com.qhuyns.ecomweb.configuration.FeignConfig;
 import com.qhuyns.ecomweb.dto.request.ApiResponse;
 import com.qhuyns.ecomweb.dto.response.ProductStatResponse;
 import com.qhuyns.ecomweb.dto.response.ShopResponse;
+import com.qhuyns.ecomweb.dto.response.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,5 +23,8 @@ public interface OrderFeignClient {
 
     @GetMapping("/orderItems/numberOfOrder/")
     ApiResponse<Long> getNumberOfOrder(@RequestParam List<String> variantIds);
+
+    @GetMapping("/orderItems/ownerOfReview/")
+    ApiResponse<UserResponse> getOwnerOfReview(@RequestParam String orderItemId) ;
 
 }

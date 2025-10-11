@@ -21,6 +21,6 @@ public class ReviewProductResponse {
     int rating;
     String comment;
     LocalDateTime createdAt;
-    String userId;
+    UserResponse user;
     ProductVariantResponse productVariant;
 }

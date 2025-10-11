@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, String> {
 
@@ -21,4 +22,5 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, String> {
 """)
     Long getNumberOfOrder(@Param("ids") List<String> ids);
 
+    Optional<OrderItem> findByCustomerReviewId(String id);
 }

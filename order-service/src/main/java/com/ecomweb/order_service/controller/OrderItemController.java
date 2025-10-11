@@ -3,6 +3,7 @@ package com.ecomweb.order_service.controller;
 import com.ecomweb.order_service.dto.request.OrderRequest;
 import com.ecomweb.order_service.dto.response.ApiResponse;
 import com.ecomweb.order_service.dto.response.OrderResponse;
+import com.ecomweb.order_service.dto.response.UserResponse;
 import com.ecomweb.order_service.repository.OrderItemRepository;
 import com.ecomweb.order_service.service.OrderItemService;
 import com.ecomweb.order_service.service.OrderService;
@@ -34,6 +35,13 @@ public class OrderItemController {
     ApiResponse<Long> getNumberOfOrder(@RequestParam List<String> variantIds) {
         return new ApiResponse().<Long>builder()
                 .result(orderItemService.getNumberOfOrder(variantIds))
+                .build();
+    };
+
+    @GetMapping("/ownerOfReview/")
+    ApiResponse<UserResponse> getOwnerOfReview(@RequestParam String orderItemId) {
+        return new ApiResponse().<UserResponse>builder()
+                .result(orderItemService.getOwnerOfOrder(orderItemId))
                 .build();
     };
 
