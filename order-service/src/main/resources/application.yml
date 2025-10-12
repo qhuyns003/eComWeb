@@ -12,6 +12,16 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+#    cau hinh batch, gom cac insert/delete/update vao 1 sql tranh bi n+1
+#     mo hinh sesion cache(tang java do hibernate quan li, tranh querry lai cac du lieu da co trong CUNG SESSION) -> batch buffer(cache tang db) -> transaction buffer -> db
+#    gia su co nhieu lenh save duco ghi vao session cache, sau khi find() -> batch -> ghi du lieu vao transsaction buffer
+#    sau khi ket thuc transsacton moi ghi du lieu that
+#     cac lenh flush co the khien batch giam hieu nang do chua tich luy du batch size
+#    generator uuid k lam flush, tuy nhien auto increment co the khien flush vi no phai tajo id duoi db roi ra ve server -> flush ngay
+    properties:
+      hibernate.jdbc.batch_size: 30
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
   mail:
     host: smtp.gmail.com
     port: 587
@@ -46,6 +56,8 @@ vnpay:
   #  phai config trong quan tri https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login, phai dung ngrok
   ipnUrl: "https://572362ca02eb.ngrok-free.app/vnpay/IPN"
 #            "http://localhost:8080/vnpay/IPN"
+
+
 
 
 
