@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.Map;
 import java.util.Objects;
 
+// globalExceptionHanlder chi bat duoc loi trong tang controller do xuong thoi (controllerAdvisor), khi request dang o filter chain thi k bat dc loi o do
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {

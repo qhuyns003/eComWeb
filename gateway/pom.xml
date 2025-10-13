@@ -97,11 +97,19 @@
 			<version>0.9.1</version>
 		</dependency>
 
+<!--		dung cho blocking (vd mvc)-->
+<!--		<dependency>-->
+<!--			<groupId>redis.clients</groupId>-->
+<!--			<artifactId>jedis</artifactId>-->
+<!--			<version>4.4.0</version>-->
+<!--		</dependency>-->
+
+<!--	 rate limit cho gateway (unblocking,reactive)-->
 		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>4.4.0</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
 		</dependency>
+
 
 
 
