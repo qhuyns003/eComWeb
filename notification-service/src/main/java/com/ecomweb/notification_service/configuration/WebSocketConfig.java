@@ -10,6 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 // websocket giup client thay du lieu realtime ngay khong can reload nhu http
+// handshake : client -> filterchain -> wshandshakeconfig
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 //    /topic/: gửi cho nhiều người

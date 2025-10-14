@@ -75,9 +75,11 @@ spring:
           filters:
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 5      # Tái nạp 5 request/giây
-                redis-rate-limiter.burstCapacity: 10     # Cho phép tối đa 10 request burst
+                redis-rate-limiter.replenishRate: 5      # Tái nạp 5 request/giây, so rq duco nap lai sau 1 giay
+                redis-rate-limiter.burstCapacity: 10     # Cho phép tối đa 10 request burst/ so rq toi da trong 1 giay
                 key-resolver: "#{@ipKeyResolver}"
+
+#                vong doi : rq dau tien -> tao key -> cac rq sau dua vao timestamp hien tai va timestamp trong redis de tinh toan so luong key hoi phuc va tru token neu rq duco phep -> sau 1 tgian k co rq se tu dong xoa key
   data:
     redis:
       host: localhost

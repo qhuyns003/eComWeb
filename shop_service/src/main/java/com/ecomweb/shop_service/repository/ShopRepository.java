@@ -6,6 +6,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
+// mongo db khong co tang session-cache -> no flush ngay khi save
+
+
 // mongodb:
 //    - truy van single document
 //    - de scale khi du lieu lon
