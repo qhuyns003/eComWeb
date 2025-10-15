@@ -92,6 +92,7 @@ public class MessageService {
         }
     }
 
+    
     public List<MessageResponse> getMessagesByRoomId(String roomId) {
         List<Message> message = messageRepository.findByKeyRoomIdOrderByKeySentAtAsc(roomId);
         List<MessageResponse> messageResponses = message.stream().map(m -> {
