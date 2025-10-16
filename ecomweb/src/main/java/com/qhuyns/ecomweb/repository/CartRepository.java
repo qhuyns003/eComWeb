@@ -15,3 +15,9 @@ public interface CartRepository extends JpaRepository<Cart, String> {
 // managed: trang thai dc quan ly , lay ra boi jpa
 // detached: tung duo quan ly, khi sesion dong la  k con dc quan ly nua
 // removed: entity dc danh dau la se bi xa khi flush
+
+// session cache -> batch -> transaction buffer(db) -> disk(db)
+// với Transactional giúp kéo dài session cache suốt method đó nên gom được truy vấn
+// khi k có Transactional thì session cache mở và đóng ngay khi hoàn thành
+// session nhừo cơ chế OSIV mà nó được mửo xuyên suốt từ đầu tới cuối rq
+// session cache chỉ đcquyền giữ lại câu câu lệnh hibernate nếu nó đc đánh dấu @Transactional
