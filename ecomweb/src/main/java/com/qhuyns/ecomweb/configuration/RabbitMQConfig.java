@@ -1,9 +1,11 @@
 package com.qhuyns.ecomweb.configuration;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -20,6 +22,21 @@ import java.util.Map;
 // ngoai ra con giup giam latency khi k can cho response
 // giup sap he thong thi message trong queue van con, chay lai dc
 // scale tu nhien bang cach chia nho nghiep vu cho cac service
+
+
+// exchange la coordinator cua he thong, exchange + routing key se dieu huong message den dung queue muon binding
+// queue nao muon nhan thi tu binding
+// ngta cau hinh qua exchange + routing key voi 2 ly do chinh:
+// 1. giam phu thuoc, producer k can biet queue nao se lang nghe
+// 2. de dang mo rong, vi chi can binding them queue muon xu li la xong chu k can sua logic code cu
+// viec su dung nhieu exchange 1 luc la de tach biet logic- de gay roi, tranh trung lap ten- ten qua dai
+// viec su dung exchange + key de phat thong diep se giup tuan thu O trong solid vi khi muon mo rong thi ch can them consummer moi chu k phai sua code trong producer de gui message toi dau
+// lam giam coupling truc tiep giua service, lien lac thong qua event, k can biet ai gui ai nhan -> de mo rong (nguyen tac O)
+
+// exchange : dat theo domain service
+// routing key : dat theo event
+// queue : nghe theo domain + event tuong ung
+// producer -> exchange (so sanh cac binding cua no voi routing key tuong ung) -> queue -> consumer
 @Configuration
 public class RabbitMQConfig {
     // exchange va key dat theo publisher
@@ -145,7 +162,19 @@ public class RabbitMQConfig {
         // tránh loop nếu consumer throw exception
         // neu queue config dlq thi se gui vao dlq
         // con k se drop luon message va k requeue
+        // neu rabbit requeue -> k coi co loi
+        // set false de biet khi fail se k requeue -> throw exception de dlq bat
         factory.setDefaultRequeueRejected(false);
+
+        // Cấu hình retry
+        factory.setAdviceChain(
+                RetryInterceptorBuilder
+                        .stateless()
+                        .maxAttempts(3) // retry 3 lần
+                        .backOffOptions(1000, 2.0, 5000) // delay 1s, nhân 2 lần, tối đa 5s
+                        .recoverer(new RejectAndDontRequeueRecoverer()) // Sau khi retry fail -> đẩy sang DLQ
+                        .build()
+        );
         return factory;
     }
 
