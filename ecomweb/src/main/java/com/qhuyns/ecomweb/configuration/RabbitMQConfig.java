@@ -52,10 +52,9 @@ public class RabbitMQConfig {
     public static final String USER_SERVICE_SHOP_CREATED_QUEUE = "user-service.shop-created.queue";
     public static final String MAIL_SERVICE_USER_CREATED_QUEUE = "mail-service.user-created.queue";
     // === Routing Keys ===
-    public static final String SHOP_CREATION_FAILED = "shop.creation.failed";
-    public static final String SHOP_CREATED = "shop.created";
+    public static final String CREATION_FAILED = "failed-create";
+    public static final String CREATED = "created";
     public static final String DLQ = "dlq";
-    public static final String USER_CREATED = "user.created";
 
 
 
@@ -90,7 +89,7 @@ public class RabbitMQConfig {
     public Binding bindingShopCreationFailed(Queue userServiceShopCreationFailedQueue, DirectExchange shopExchange) {
         return BindingBuilder.bind(userServiceShopCreationFailedQueue)
                 .to(shopExchange)
-                .with(SHOP_CREATION_FAILED);
+                .with(CREATION_FAILED);
     }
 
 
@@ -104,7 +103,7 @@ public class RabbitMQConfig {
     public Binding bindingShopCreated(Queue userServiceShopCreatedQueue, DirectExchange shopExchange) {
         return BindingBuilder.bind(userServiceShopCreatedQueue)
                 .to(shopExchange)
-                .with(SHOP_CREATED);
+                .with(CREATED);
     }
 
 
@@ -124,7 +123,7 @@ public class RabbitMQConfig {
     public Binding bindingUserCreated(Queue mailServiceUserCreatedQueue, DirectExchange userExchange) {
         return BindingBuilder.bind(mailServiceUserCreatedQueue)
                 .to(userExchange)
-                .with(USER_CREATED);
+                .with(CREATED);
     }
 
 

@@ -43,19 +43,6 @@ public class CustomJwtDecoder implements JwtDecoder {
     public Jwt decode(String token) throws JwtException {
 
     // dung webclient cua webflux ma .block thi toc do cung ngang feign
-        log.info("TOKEN INDENTTY LOG "+ token);
-        IntrospectResponse response = null;
-        try {
-            response = authenticationService.introspect(IntrospectRequest.builder()
-                    .token(token).build());
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        if (!response.isValid()) throw new JwtException("Token invalid");
 
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");

@@ -27,7 +27,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
         "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
-
+    // Qualifier chi dinh class nao duoc ịnject khi DI bang interface (trg hop nhieu class impl interface)
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
@@ -44,11 +44,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, API_URL.URL_ANONYMOUS_DELETE).permitAll()
                 .anyRequest()
                 .authenticated());
+        // hasRole("ADMIN") -> role :ROLE_ADMIN
+        // hasAuthority("ADMIN") -> role : ADMIN
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
+                        .decoder(customJwtDecoder) // decode token ra
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())) // set authentication
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())); // xu li khi bi co loi xac thuc
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
@@ -58,8 +60,11 @@ public class SecurityConfig {
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // tim claim ten la scope va chuyen chuoi thanh list vd "1 2" -> [1,2]
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        // set prefix cho moi phan tu trong list vua duoc chuyen tu scope -> gan vao authorities
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+        // sub tu dong duoc mapping vao pricipal name
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);

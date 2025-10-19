@@ -20,10 +20,12 @@ public class MailListener {
     @RabbitListener(queues = RabbitMQConfig.MAIL_SERVICE_USER_CREATED_QUEUE, containerFactory ="rabbitListenerContainerFactory" )
     public void userCreated(UserCreated userCreated) throws Exception {
         if(userCreated.getEmailVerificationRequest() != null) {
-            String token = userCreated.getEmailVerificationRequest().getToken();
-            String email = userCreated.getEmailVerificationRequest().getEmail();
-            String username =  userCreated.getEmailVerificationRequest().getUsername();
-            emailService.sendVerificationEmail(email,token,username);
+
+            throw new RuntimeException();
+//            String token = userCreated.getEmailVerificationRequest().getToken();
+//            String email = userCreated.getEmailVerificationRequest().getEmail();
+//            String username =  userCreated.getEmailVerificationRequest().getUsername();
+//            emailService.sendVerificationEmail(email,token,username);
         }
 
     }

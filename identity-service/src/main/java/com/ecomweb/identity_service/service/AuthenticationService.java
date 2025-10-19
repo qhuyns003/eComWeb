@@ -159,8 +159,9 @@ public class AuthenticationService {
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
+        // vi payload duocc ma hoa bang base64url nen k can chi dinh thuat toan dao nguoc
         SignedJWT signedJWT = SignedJWT.parse(token);
-
+        // 2 dong tren tuong duong vs viec su dung nimbus
         Date expiryTime = (isRefresh)
                 ? new Date(signedJWT
                         .getJWTClaimsSet()
@@ -170,6 +171,7 @@ public class AuthenticationService {
                         .toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
+        // tu dong lay thuat toan khai bao o header de hash va so sanh
         var verified = signedJWT.verify(verifier);
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);

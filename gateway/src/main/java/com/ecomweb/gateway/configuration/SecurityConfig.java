@@ -113,3 +113,12 @@ public class SecurityConfig {
 
 
 }
+// cookie : nơi lưu trữ các cặp key value(là nơi dùng chung) , được trả từ mỗi http session
+// các origin dùng chung bộ cookie , 1 dữ liẹu trong cookie thì gắn với domain BE -> 2 origin cùng thao tác với 1 BE thì session bị ghi đè mơi nhất -> 1 trình duyệt thì k login 2 tài khảon 1 lúc đc
+// serverBE <-> trình duyệt <-> serverFE
+// khi trình duyệt nhập url địa chỉ (origin) của serverFE thì nó gọi đến và lấy tất cả file của FE trên server đó
+// (giống nhu việc trên trình duyệt có thể truy cập url của server BE)
+// trình duyệt nhận đc các file tĩnh và sẽ thực hiện hiển thị, chyaj code FE trên trình duyệt
+// khi tương tác với giao diện hệ thống, sẽ có lúc chạm vào reqquest tới BE, trình duyệt sẽ gửi rq tới BE
+// cookie có 1 cơ chế nếu rq tới BE nào mà nó trả về session hay vào cookie, khi gọi lại BE đó sẽ tự đôngj gửi kèm dữ liệu session trong cookie k quan tâm origin nào đang chạy
+// -> cors ra đời, ngăn chặn việc thông tin session của 1 origin chín hthoonsg bị sử dugnj lại bởi 1 origin khác -> bảo vệ người dùng

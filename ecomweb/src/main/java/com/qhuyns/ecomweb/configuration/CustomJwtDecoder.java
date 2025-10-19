@@ -42,10 +42,6 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
 
-        ApiResponse<IntrospectResponse> response = identityFeignClient.introspect(IntrospectRequest.builder()
-                .token(token).build());
-
-        if (!response.getResult().isValid()) throw new JwtException("Token invalid");
 
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");

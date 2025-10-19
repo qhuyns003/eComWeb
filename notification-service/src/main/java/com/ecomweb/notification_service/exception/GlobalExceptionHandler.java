@@ -24,9 +24,29 @@ public class GlobalExceptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = FeignException.class)
-    ResponseEntity<ApiResponse> handlingFeignException(FeignException exception) throws JsonProcessingException {
-        ApiResponse apiResponse = new ObjectMapper().readValue(exception.contentUTF8(), ApiResponse.class);
-        return ResponseEntity.status(HttpStatus.valueOf(exception.status())).body(apiResponse);
+    public ResponseEntity<ApiResponse> handlingFeignException(FeignException exception) {
+        try {
+            String content = exception.contentUTF8();
+
+            if (content == null || content.isEmpty()) {
+                // Trường hợp Feign không nhận được body
+                ApiResponse fallback = ApiResponse.builder()
+                        .message("Service không phản hồi hoặc body rỗng")
+                        .build();
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(fallback);
+            }
+
+            // Nếu có body, parse sang ApiResponse
+            ApiResponse apiResponse = new ObjectMapper().readValue(content, ApiResponse.class);
+            return ResponseEntity.status(HttpStatus.valueOf(exception.status())).body(apiResponse);
+
+        } catch (Exception e) {
+            // fallback nếu parse JSON lỗi
+            ApiResponse fallback = ApiResponse.builder()
+                    .message("Feign error: " + e.getMessage())
+                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(fallback);
+        }
     }
 
 
