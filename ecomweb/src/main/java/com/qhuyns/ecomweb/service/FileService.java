@@ -6,10 +6,15 @@ import com.qhuyns.ecomweb.dto.request.RoleRequest;
 import com.qhuyns.ecomweb.dto.response.RoleResponse;
 import com.qhuyns.ecomweb.exception.AppException;
 import com.qhuyns.ecomweb.exception.ErrorCode;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +23,7 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +31,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileService {
+
+    MinioClient minioClient;
+
+    @Value("${minio.bucket}")
+    @NonFinal
+    String bucketName;
 
     public String uploadImage(MultipartFile file) {
         try {
@@ -67,6 +79,48 @@ public class FileService {
             }
         } catch (Exception e) {
 
+        }
+    }
+
+
+
+    public String uploadImage2(MultipartFile file) {
+        try {
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+            }
+            String uniqueName = UUID.randomUUID().toString() + extension;
+
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(uniqueName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+            // Trả về URL truy cập ảnh
+            return ImagePrefix.IMAGE_PREFIX2 + bucketName + "/" + uniqueName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new AppException(ErrorCode.CANT_NOT_UPLOAD);
+        }
+    }
+
+    public void deleteImage2(String url) {
+        try {
+            // Lấy tên file từ url
+//            String fileName = url.substring(url.lastIndexOf('/') + 1);
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(url)
+                            .build()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -38,6 +38,13 @@ public class UserController {
                 .build();
     }
 
+    @PutMapping("/toSeller2")
+    ApiResponse<?> upgradeToSeller2(@RequestBody UpgradeSellerRequest request) throws Exception {
+        return ApiResponse.builder()
+                .result(userService.upgradeSellerRequest2(request))
+                .build();
+    }
+
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) throws Exception {
         return ApiResponse.<UserResponse>builder()
@@ -45,9 +52,25 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/2")
+    ApiResponse<?> createUser1(@RequestBody @Valid UserCreationRequest request) throws Exception {
+        userService.createUser2(request);
+        return ApiResponse.builder()
+                .result("ok")
+                .build();
+    }
+
     @PostMapping("/verification")
     ApiResponse<?> activeUser(@RequestParam String username, @RequestParam String token) {
         userService.activeUser(username, token);
+        return ApiResponse.builder()
+                .result("success")
+                .build();
+    }
+
+    @PostMapping("/verification2")
+    ApiResponse<?> activeUser2(@RequestParam String username, @RequestParam String token) {
+        userService.activeUser2(username, token);
         return ApiResponse.builder()
                 .result("success")
                 .build();
@@ -108,6 +131,13 @@ public class UserController {
     ApiResponse<UserResponse> updateUser( @RequestBody @Valid UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser( request))
+                .build();
+    }
+
+    @PutMapping("/my-info2")
+    ApiResponse<UserResponse> updateUser2( @RequestBody @Valid UserUpdateRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.updateUser2( request))
                 .build();
     }
 }

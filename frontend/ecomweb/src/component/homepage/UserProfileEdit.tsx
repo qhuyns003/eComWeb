@@ -1,30 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAppSelector } from '../../store/hooks';
 import { selectUser } from '../../store/features/userSlice';
-import { selectIsSeller } from '../../store/features/userSlice';
 import ShopActionButton from './ShopActionButton';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Giả sử có API updateUser, bạn cần implement ở api.ts
-import { updateUser, getShopInfoByUserId } from '../../api/api';
+import { updateUser, getShopInfoByUserId, getMyInfo } from '../../api/api';
 import UserAddressEdit from './UserAddressEdit';
 import Header from '../layout/Header';
 import Footer from '../layout/Footer';
 
 const UserProfileEdit: React.FC = () => {
   const user = useAppSelector(selectUser);
-  const isSeller = useAppSelector(selectIsSeller);
+  const { isSeller, user: keycloakUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  
+  // Ưu tiên Keycloak user, fallback Redux user
+  const currentUser = keycloakUser || user;
+  
   const [form, setForm] = useState({
-    fullName: user?.fullName || '',
-    dob: user?.dob || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    username: user?.username || '',
+    fullName: '',
+    dob: '',
+    email: '',
+    phone: '',
+    username: '',
   });
+  
   const [loading, setLoading] = useState(false);
+  const [userLoading, setUserLoading] = useState(true);
+
+  // Lấy thông tin user chi tiết từ API
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        setUserLoading(true);
+        
+        // Thử lấy từ Keycloak token trước
+        if (keycloakUser) {
+          setForm({
+            fullName: keycloakUser.name || keycloakUser.fullName || '',
+            dob: keycloakUser.dob || '',
+            email: keycloakUser.email || '',
+            phone: keycloakUser.phone || '',
+            username: keycloakUser.preferred_username || keycloakUser.username || '',
+          });
+        }
+        
+        // Sau đó lấy thông tin chi tiết từ backend (nếu có)
+        try {
+          const response = await getMyInfo();
+          const userInfo = response.data?.result;
+          
+          if (userInfo) {
+            setForm(prev => ({
+              fullName: userInfo.fullName || prev.fullName,
+              dob: userInfo.dob || prev.dob,
+              email: userInfo.email || prev.email,
+              phone: userInfo.phone || prev.phone,
+              username: userInfo.username || prev.username,
+            }));
+          }
+        } catch (error) {
+          console.log('Không lấy được thông tin từ backend, dùng Keycloak info');
+        }
+        
+      } catch (error) {
+        console.error('Lỗi lấy thông tin user:', error);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [isAuthenticated, keycloakUser]);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
@@ -108,7 +161,16 @@ const UserProfileEdit: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="max-w-5xl mx-auto mt-8">
+      {userLoading ? (
+        <div className="max-w-5xl mx-auto mt-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Đang tải thông tin cá nhân...</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="max-w-5xl mx-auto mt-8">
         <div className="pl-2">
           <button
             type="button"
@@ -205,7 +267,9 @@ const UserProfileEdit: React.FC = () => {
           </div>
         )}
         <ToastContainer position="top-right" autoClose={2000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="colored" />
-      </div>
+        </div>
+        </>
+      )}
       <Footer />
     </>
   );

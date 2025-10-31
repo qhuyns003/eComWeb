@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeaderAdmin from './HeaderAdmin';
 import SendGlobalNotification from './SendGlobalNotification';
-import { sendNotification } from '../../api/api';
+import { sendNotification, getShopInfoByUserId, getMyInfo } from '../../api/api';
 import ShopProducts from './ShopProducts';
 import EditProduct from './EditProduct';
 import AddProduct from './AddProduct';
 import { useAppSelector } from '../../store/hooks';
 import { selectUser } from '../../store/features/userSlice';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface MenuItem {
   id: string;
@@ -25,7 +26,44 @@ const ShopAdmin: React.FC = () => {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [notificationOption, setNotificationOption] = useState<string | null>(null);
   const user = useAppSelector(selectUser);
-  const userId: string = String(user?.id) || "";
+  const { user: keycloakUser, isAuthenticated } = useAuth();
+  
+  // State để lưu userId từ API
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+  
+  // Lấy user ID từ API khi component mount
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        setLoadingUser(true);
+        
+        // Thử lấy từ shop info trước (có thể có userId)
+        const shopResponse = await getShopInfoByUserId();
+        const shop = shopResponse.data?.result;
+        
+        if (shop?.userId) {
+          // Shop có userId
+          setUserId(shop.userId);
+        } else {
+          // Fallback: lấy từ user info API
+          const userResponse = await getMyInfo();
+          const user = userResponse.data?.result;
+          if (user?.id) {
+            setUserId(user.id);
+          }
+        }
+      } catch (error) {
+        console.error('Lỗi lấy thông tin user:', error);
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [isAuthenticated]);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const navigate = useNavigate();
@@ -197,7 +235,18 @@ const ShopAdmin: React.FC = () => {
                 onCancel={handleCancelEdit}
               />
             ) : (
-              userId != null && <ShopProducts userId={userId} onEdit={handleEditProduct} onAdd={handleAddProduct} />
+              loadingUser ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Đang tải thông tin user...</p>
+                </div>
+              ) : userId ? (
+                <ShopProducts userId={userId} onEdit={handleEditProduct} onAdd={handleAddProduct} />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-red-600">Không tìm thấy thông tin user. Vui lòng liên hệ admin.</p>
+                </div>
+              )
             )
           ) : selectedMenuId === 'notification' && notificationOption === 'global' ? (
             <SendGlobalNotification />

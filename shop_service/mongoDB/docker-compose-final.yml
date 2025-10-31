@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  mongo1:
+    image: mongo:6.0
+    container_name: mongo1
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongo1:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    networks:
+      - mongo-cluster
+    restart: unless-stopped
+
+  mongo2:
+    image: mongo:6.0
+    container_name: mongo2
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./data/mongo2:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    networks:
+      - mongo-cluster
+    restart: unless-stopped
+
+  mongo3:
+    image: mongo:6.0
+    container_name: mongo3
+    ports:
+      - "27019:27017"
+    volumes:
+      - ./data/mongo3:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    networks:
+      - mongo-cluster
+    restart: unless-stopped
+
+  mongo-setup:
+    image: mongo:6.0
+    container_name: mongo-setup
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ./init-replica.js:/init-replica.js:ro
+    # Wait for all MongoDB instances to be ready, then initialize replica set
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MongoDB instances to start...';
+      sleep 10;
+      until mongosh --host mongo1:27017 --eval 'db.adminCommand({ping:1})' --quiet; do
+        echo 'Waiting for mongo1...';
+        sleep 2;
+      done;
+      until mongosh --host mongo2:27017 --eval 'db.adminCommand({ping:1})' --quiet; do
+        echo 'Waiting for mongo2...';
+        sleep 2;
+      done;
+      until mongosh --host mongo3:27017 --eval 'db.adminCommand({ping:1})' --quiet; do
+        echo 'Waiting for mongo3...';
+        sleep 2;
+      done;
+      echo 'All MongoDB instances are ready. Initializing replica set...';
+      mongosh --host mongo1:27017 /init-replica.js;
+      echo 'Replica set initialization completed.';
+      "
+    networks:
+      - mongo-cluster
+
+networks:
+  mongo-cluster:
+    driver: bridge

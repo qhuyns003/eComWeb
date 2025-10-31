@@ -12,4 +12,5 @@ public class AuthenticationResponse {
     String token;
     boolean authenticated;
     String role;
+    String refreshToken;
 }

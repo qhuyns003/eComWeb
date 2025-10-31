@@ -33,6 +33,12 @@ public class AuthenticationController {
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
 
+    @PostMapping("/token1")
+    ApiResponse<AuthenticationResponse> authenticate1(@RequestBody AuthenticationRequest request) {
+        var result = authenticationService.authenticate1(request);
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+    }
+
     @PostMapping("/introspect")
     ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)
             throws ParseException, JOSEException {

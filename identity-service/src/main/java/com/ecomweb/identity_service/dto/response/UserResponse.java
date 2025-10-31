@@ -19,4 +19,5 @@ public class UserResponse {
     String phone;
     LocalDate dob;
     List<RoleResponse> roles;
+    String keycloakId;
 }

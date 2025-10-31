@@ -34,20 +34,8 @@ services:
     networks:
       - mongo-cluster
 
-  mongo-setup:
-    image: mongo:6.0
-    container_name: mongo-setup
-    depends_on:
-      - mongo1
-      - mongo2
-      - mongo3
-    volumes:
-      - ./init-replica.js:/init-replica.js:ro
-    # embedded script: try mongo then mongosh for readiness, then run init script
-    entrypoint: ["/bin/sh", "-c", "cat > /tmp/wait-and-init.sh <<'\''EOS'\''\n#!/bin/sh\nset -e\ntry_ping() {\n  host=$$1\n  if command -v mongo >/dev/null 2>&1; then\n    mongo --host $${host}:27017 --eval \"db.adminCommand({ping:1})\" >/dev/null 2>&1 && return 0 || return 1\n  fi\n  if command -v mongosh >/dev/null 2>&1; then\n    mongosh --host $${host}:27017 --eval \"db.adminCommand({ping:1})\" >/dev/null 2>&1 && return 0 || return 1\n  fi\n  return 2\n}\nfor h in mongo1 mongo2 mongo3; do\n  echo \"waiting for $${h}\"\n  until try_ping $${h}; do sleep 1; done\ndone\n# run init script with available shell\nif command -v mongo >/dev/null 2>&1; then\n  mongo --host mongo1:27017 /init-replica.js\nelse\n  mongosh --host mongo1:27017 /init-replica.js\nfi\nEOS\nchmod +x /tmp/wait-and-init.sh && /tmp/wait-and-init.sh"]
-    networks:
-      - mongo-cluster
-
 networks:
   mongo-cluster:
     driver: bridge
+
+

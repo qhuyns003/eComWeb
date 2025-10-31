@@ -3,6 +3,11 @@ server:
   servlet:
     context-path: /orders
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8089/realms/ecomweb
   datasource:
     url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/order_service}
     driverClassName: "com.mysql.cj.jdbc.Driver"

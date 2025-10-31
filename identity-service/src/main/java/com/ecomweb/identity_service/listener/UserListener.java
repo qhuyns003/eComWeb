@@ -22,7 +22,8 @@ public class UserListener {
     public void handleRollback(ShopCreationFailed shopCreationFailed) {
 
         if(shopCreationFailed.getUserSnapshot() != null) {
-            userService.upgradeSellerRollback(shopCreationFailed.getUserSnapshot());
+//            userService.upgradeSellerRollback(shopCreationFailed.getUserSnapshot());
+            userService.upgradeSellerRollback2(shopCreationFailed.getUserSnapshot());
 
         }
 

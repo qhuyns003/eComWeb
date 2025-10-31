@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://192.168.2.6:27017,192.168.2.6:27018,192.168.2.6:27019/identity-service?replicaSet=rs0
+      uri: mongodb://localhost:27017/identity-service?replicaSet=rs0
       database: identity-service
   rabbitmq:
     host: localhost
@@ -20,6 +20,30 @@ spring:
           starttls:
             enable: true
     expiryTime: 3600 #second
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+#          cau hinh xac thuc, dc su dung khi ung dung muon xac thuc
+          issuer-uri: http://localhost:8089/realms/ecomweb
+      client:
+#        cau hinh de phai BE goi ra ngoai keycloak
+        registration:
+          keycloak:
+            client-id: ecomweb-backend
+            client-secret: xm1jgbj8u201mqvgAPLvD0mjuH7ADADT
+            authorization-grant-type: client_credentials
+            scope: openid,profile,email
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8089/realms/ecomweb
+            token-uri: http://localhost:8089/realms/ecomweb/protocol/openid-connect/token
+#keycloak:
+#  auth-server-url: http://localhost:8089
+#  realm: ecomweb
+#  resource: ecomweb-backend
+#  credentials:
+#    secret: xm1jgbj8u201mqvgAPLvD0mjuH7ADADT
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 3600 # in second

@@ -6,6 +6,12 @@ spring:
     name: api-gateway
   #  match voi path firstfit
   #  chi lam nhiem vu check token va dieu huong toi dung port
+#  danh dau su dung oauth2
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8089/realms/ecomweb
   cloud:
     gateway:
       routes:

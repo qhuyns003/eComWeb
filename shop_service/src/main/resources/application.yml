@@ -1,7 +1,12 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8089/realms/ecomweb
   data:
     mongodb:
-      uri: mongodb://192.168.2.6:27017,192.168.2.6:27018,192.168.2.6:27019/shop-service?replicaSet=rs0
+      uri: mongodb://localhost:27017/shop-service?replicaSet=rs0
       database: shop-service
 
   rabbitmq:

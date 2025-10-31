@@ -1,6 +1,5 @@
 import HomePage from "./component/homepage/HomePage";
 import { Routes, Route } from 'react-router-dom';
-import LoginForm from './component/login/LoginForm';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import AppInitializer from './component/AppInitializer';
@@ -9,8 +8,11 @@ import VerifyAccount from './component/register/VerifyAccount';
 import ProductDetail from './component/product/ProductDetail';
 import ShopAdmin from './component/admin/ShopAdmin';
 import LogoutModal from './component/common/LogoutModal';
+import ProtectedRoute from './components/ProtectedRoute';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
+import LoadingSpinner from './components/LoadingSpinner';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,35 +26,15 @@ import SearchResultPage from './component/homepage/SearchResultPage';
 import UserProfileEdit from './component/homepage/UserProfileEdit';
 import RegisterShopForm from './component/homepage/RegisterShopForm';
 
-
-
 import ShopDetail from './component/shop/ShopDetail';
 
 function AppContent() {
+  const { isAuthenticated, isLoading } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // Kiểm tra token khi component mount
-    const token = localStorage.getItem('token');
-    
-    // Chỉ kiểm tra nếu có token (user đã đăng nhập)
-    if (token) {
-      try {
-        const tokenData = JSON.parse(atob(token.split('.')[1]));
-        const currentTime = Date.now() / 1000;
-        if (tokenData.exp < currentTime) {
-          setShowLogoutModal(true);
-          return;
-        }
-      } catch (error) {
-        // Token không hợp lệ (có token nhưng format sai)
-        setShowLogoutModal(true);
-        return;
-      }
-    }
-
     const handleTokenExpired = () => {
       setShowLogoutModal(true);
     };
@@ -65,7 +47,7 @@ function AppContent() {
   }, []);
 
   const handleLogoutConfirm = () => {
-    // Xóa dữ liệu khi user xác nhận
+    // Xóa dữ liệu legacy nếu có
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     dispatch(clearUser());
@@ -74,22 +56,50 @@ function AppContent() {
   };
 
   const handleLogoutCancel = () => {
-    // Xóa dữ liệu khi user đóng modal
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    dispatch(clearUser());
     setShowLogoutModal(false);
-    navigate('/login');
   };
 
+  // Hiển thị loading khi đang khởi tạo Keycloak
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  // Nếu chưa authenticated, chỉ hiển thị các route public và redirect về home
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Routes>
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/verify" element={<VerifyAccount />} />
+          <Route path="*" element={<HomePage />} />
+        </Routes>
+        
+        <LogoutModal
+          isOpen={showLogoutModal}
+          onClose={handleLogoutCancel}
+          onConfirm={handleLogoutConfirm}
+          title="Phiên đăng nhập hết hạn"
+          message="Phiên đăng nhập của bạn đã hết hạn. Bạn cần đăng nhập lại để tiếp tục sử dụng."
+          cancelText="Đóng"
+          confirmText="Đăng nhập lại"
+        />
+      </>
+    );
+  }
+
+  // Authenticated routes
   return (
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginForm />} />
+        <Route path="/login" element={<HomePage />} /> {/* Redirect to home nếu đã login */}
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/product/:id" element={<ProductDetail />} /> 
-        <Route path="/admin" element={<ShopAdmin />} />
+        <Route path="/admin" element={
+          <ProtectedRoute requireSeller={true}>
+            <ShopAdmin />
+          </ProtectedRoute>
+        } />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/cart" element={<Cart />} />
@@ -110,30 +120,31 @@ function AppContent() {
         cancelText="Đóng"
         confirmText="Đăng nhập lại"
       />
+      
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </>
   );
 }
 
-
-
 function App() {
   return (
     <Provider store={store}>
-      <AppInitializer>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-        <AppContent />
-      </AppInitializer>
+      <AuthProvider>
+        <AppInitializer>
+          <AppContent />
+        </AppInitializer>
+      </AuthProvider>
     </Provider>
   );
 }

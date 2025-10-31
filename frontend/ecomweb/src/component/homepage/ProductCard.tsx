@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectIsAuthenticated } from "../../store/features/userSlice";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface ProductImageResponse {
   id: string;
@@ -20,22 +21,32 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ 
-  id, 
-  name, 
-  price, 
-  images, 
-  rating, 
-  numberOfOrder, 
-  buyNowLabel = "Mua ngay" 
+  id,
+  name,
+  price,
+  images,
+  rating,
+  numberOfOrder,
+  buyNowLabel = "Mua ngay"
 }) => {
   const navigate = useNavigate();
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const reduxAuthenticated = useAppSelector(selectIsAuthenticated);
+  const { isAuthenticated } = useAuth();
+  
+  // Ưu tiên Keycloak authentication, fallback Redux
+  const userAuthenticated = isAuthenticated || reduxAuthenticated;
 
   const handleBuyNow = () => {
+    console.log('ProductCard handleBuyNow clicked');
+    console.log('Keycloak isAuthenticated:', isAuthenticated);
+    console.log('Redux isAuthenticated:', reduxAuthenticated);
+    console.log('Final userAuthenticated:', userAuthenticated);
     
-    if (isAuthenticated) {
+    if (userAuthenticated) {
+      console.log('User authenticated, navigating to product detail:', `/product/${id}`);
       navigate(`/product/${id}`);
     } else {
+      console.log('User not authenticated, redirecting to login');
       navigate('/login');
     }
   };

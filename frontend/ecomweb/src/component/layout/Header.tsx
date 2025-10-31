@@ -10,11 +10,13 @@ import { fetchUserRooms, fetchRoomById } from "../../api/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
   const user = useAppSelector(selectUser);
+  const { login, isAuthenticated } = useAuth();
   const [showChatDropdown, setShowChatDropdown] = useState(false);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [notificationUnreadCount, setNotificationUnreadCount] = useState(0);
@@ -267,7 +269,7 @@ const Header: React.FC = () => {
             )}
           </div>
         )}
-        {user ? (
+        {isAuthenticated ? (
           <UserMenu />
         ) : (
           <>
@@ -279,7 +281,10 @@ const Header: React.FC = () => {
             </button>
             <button
               className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow"
-              onClick={() => navigate('/login')}
+              onClick={() => {
+                console.log('Header login button clicked');
+                login();
+              }}
             >
               Đăng nhập
             </button>

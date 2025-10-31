@@ -5,11 +5,14 @@ import SockJS from 'sockjs-client/dist/sockjs';
 import { Client } from '@stomp/stompjs';
 import { useAppSelector } from '../../store/hooks';
 import { selectUser } from '../../store/features/userSlice';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SendGlobalNotification: React.FC<{ onSent?: () => void }> = ({ onSent }) => {
   const user = useAppSelector(selectUser);
+  const { isAdmin } = useAuth();
+  
   // Chỉ cho phép ADMIN truy cập
-  if (!user?.roles?.some((role: any) => role.id === 'ADMIN')) {
+  if (!isAdmin) {
     return <div className="text-red-500 text-center font-bold p-8">Bạn không có quyền truy cập chức năng này.</div>;
   }
   const [stompClient, setStompClient] = useState<Client | null>(null);

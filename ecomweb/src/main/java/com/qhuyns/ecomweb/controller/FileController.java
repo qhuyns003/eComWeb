@@ -44,4 +44,19 @@ public class FileController {
                 .result("success")
                 .build();
     }
+
+    @PostMapping("/upload_image2")
+    public ApiResponse<String> uploadImage2(@RequestParam("file") MultipartFile file) {
+        return new ApiResponse<>().<String>builder()
+                .result(fileService.uploadImage2(file))
+                .build();
+    }
+
+    @DeleteMapping("/2")
+    public ApiResponse<String> deleteImage2(@RequestParam("url") String url) {
+        fileService.deleteImage2(url.substring((ImagePrefix.IMAGE_PREFIX2+"product-image/").length()));
+        return new ApiResponse<>().<String>builder()
+                .result("success")
+                .build();
+    }
 }

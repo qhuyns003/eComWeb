@@ -27,8 +27,8 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
 
-    @Autowired
-    private CustomJwtDecoder customJwtDecoder;
+//    @Autowired
+//    private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -41,9 +41,16 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated());
 
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+//        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+//                        .decoder(customJwtDecoder)
+//                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+//                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
+
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+                            // Nếu có converter, decoder riêng thì thêm ở đây, ví dụ:
+                            // jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
+                        }
+                )
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
@@ -51,16 +58,16 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-
-        return jwtAuthenticationConverter;
-    }
+//    @Bean
+//    JwtAuthenticationConverter jwtAuthenticationConverter() {
+//        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+//        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+//
+//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//
+//        return jwtAuthenticationConverter;
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

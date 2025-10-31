@@ -1,5 +1,13 @@
 package com.ecomweb.identity_service.configuration;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.filter.OncePerRequestFilter;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,11 +16,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -27,8 +40,11 @@ public class SecurityConfig {
         "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
 
-    @Autowired
-    private CustomJwtDecoder customJwtDecoder;
+    // khong duoc tao ben cho jwtdecode k thi oath2 se lay cai custom cua minh dua ch keycloak xu li -> bi sai
+    // oauth cung tu them converter mac dinh
+
+//    @Autowired
+//    private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -40,28 +56,31 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, API_URL.URL_ANONYMOUS_POST).permitAll()
                         .requestMatchers(HttpMethod.PUT, API_URL.URL_ANONYMOUS_PUT).permitAll()
                         .requestMatchers(HttpMethod.DELETE, API_URL.URL_ANONYMOUS_DELETE).permitAll()
-                .anyRequest()
-                .authenticated());
+                        .anyRequest()
+                        .authenticated());
 
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+                            // Nếu có converter, decoder riêng thì thêm ở đây, ví dụ:
+                            // jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
+                        }
+                        )
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
     }
 
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-
-        return jwtAuthenticationConverter;
-    }
+//    @Bean
+//    JwtAuthenticationConverter jwtAuthenticationConverter() {
+//        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+//        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+//
+//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//
+//        return jwtAuthenticationConverter;
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

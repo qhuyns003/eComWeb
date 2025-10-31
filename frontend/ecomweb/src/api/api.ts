@@ -98,8 +98,15 @@ export const login = (username: string, password: string) => {
   return axiosInstance.post('/identity/auth/token', { username, password });
 };
 
-export const getMyInfo = (token: string) => {
-  return axiosInstance.get('/identity/users/my-info',{headers: {Authorization: `Bearer ${token}`}});
+// Lấy thông tin user từ backend (cho legacy support)
+export const getMyInfo = (token?: string) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  return axiosInstance.get('/identity/users/my-info', { headers });
+};
+
+// Lấy thông tin user từ Keycloak userinfo endpoint
+export const getKeycloakUserInfo = () => {
+  return axiosInstance.get('/identity/auth/userinfo'); // Backend proxy to Keycloak userinfo
 };
 
 export const logout = (token: string) => {

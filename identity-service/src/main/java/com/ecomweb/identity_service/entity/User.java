@@ -28,6 +28,7 @@ public class User {
     String email;
     String phone;
     boolean active;
+    String keycloakId;
 
 //    @Builder.Default
 //    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

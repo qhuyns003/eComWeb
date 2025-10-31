@@ -28,9 +28,16 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -195,5 +202,84 @@ public class AuthenticationService {
             });
 
         return stringJoiner.toString();
+    }
+    private final RestTemplate restTemplate;
+
+    @Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
+    @NonFinal
+    private String clientId;
+    @Value("${spring.security.oauth2.client.registration.keycloak.client-secret}")
+    @NonFinal
+    private String clientSecret;
+    @Value("${spring.security.oauth2.client.provider.keycloak.token-uri}")
+    @NonFinal
+    private String tokenUri;
+
+    public AuthenticationResponse authenticate1(AuthenticationRequest request) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "password");
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("username", request.getUsername());
+        params.add("password", request.getPassword());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> httpRequest = new HttpEntity<>(params, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUri, httpRequest, Map.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Map body = response.getBody();
+            return AuthenticationResponse.builder()
+                    .token((String) body.get("access_token"))
+                    .refreshToken((String) body.get("refresh_token"))
+                    .authenticated(true)
+                    .build();
+        } else {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+    }
+
+    public AuthenticationResponse refreshToken1(RefreshRequest request) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "refresh_token");
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("refresh_token", request.getToken());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> httpRequest = new HttpEntity<>(params, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUri, httpRequest, Map.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Map body = response.getBody();
+            return AuthenticationResponse.builder()
+                    .token((String) body.get("access_token"))
+                    .refreshToken((String) body.get("refresh_token"))
+                    .authenticated(true)
+                    .build();
+        } else {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+    }
+
+    public void logout1(LogoutRequest request) {
+        String logoutUrl = "http://localhost:8089/realms/ecomweb/protocol/openid-connect/logout";
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("refresh_token", request.getToken());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> httpRequest = new HttpEntity<>(params, headers);
+
+        restTemplate.postForEntity(logoutUrl, httpRequest, String.class);
     }
 }

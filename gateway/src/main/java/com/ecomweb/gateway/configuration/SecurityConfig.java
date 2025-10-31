@@ -30,12 +30,14 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final CustomJwtDecoder customJwtDecoder;
+    // tai sao lai inject trong bean dc ?
+//    private final CustomJwtDecoder customJwtDecoder;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    public SecurityConfig(CustomJwtDecoder customJwtDecoder,
+    public SecurityConfig(
+//            CustomJwtDecoder customJwtDecoder,
                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
-        this.customJwtDecoder = customJwtDecoder;
+//        this.customJwtDecoder = customJwtDecoder;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
@@ -85,9 +87,9 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .jwtDecoder(customJwtDecoder)
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        .jwt(jwt -> {}
+//                                .jwtDecoder(customJwtDecoder)
+//                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
@@ -95,15 +97,15 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
-    ReactiveJwtAuthenticationConverter jwtAuthenticationConverter() {
-        var jwtGrantedAuthoritiesConverter = new org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        ReactiveJwtAuthenticationConverter converter = new ReactiveJwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(new ReactiveJwtGrantedAuthoritiesConverterAdapter(jwtGrantedAuthoritiesConverter));
-        return converter;
-    }
+//    @Bean
+//    ReactiveJwtAuthenticationConverter jwtAuthenticationConverter() {
+//        var jwtGrantedAuthoritiesConverter = new org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter();
+//        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+//
+//        ReactiveJwtAuthenticationConverter converter = new ReactiveJwtAuthenticationConverter();
+//        converter.setJwtGrantedAuthoritiesConverter(new ReactiveJwtGrantedAuthoritiesConverterAdapter(jwtGrantedAuthoritiesConverter));
+//        return converter;
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

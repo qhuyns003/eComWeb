@@ -3,6 +3,15 @@ server:
 #  servlet:
 #    context-path: /identity
 spring:
+  elasticsearch:
+    uris: http://localhost:9200
+    username: elastic
+    password: changeme
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8089/realms/ecomweb
   datasource:
     url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/ecomweb}
     driverClassName: "com.mysql.cj.jdbc.Driver"
@@ -77,6 +86,14 @@ logging:
   level:
     feign: DEBUG
     org.springframework.cloud.openfeign: DEBUG
+minio:
+  url: http://localhost:9000
+
+  access-key: minioadmin
+#    giong user name -> xac dinh quyen
+  secret-key: minioadmin
+#  giong password
+  bucket: product-image
 
 
 

@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+// khi application khoi chay thi ung dung chi chi tao ra object chu k chay logic trong code do
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -27,9 +28,13 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
         "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
-    // Qualifier chi dinh class nao duoc ịnject khi DI bang interface (trg hop nhieu class impl interface)
-    @Autowired
-    private CustomJwtDecoder customJwtDecoder;
+    // Qualifier chi dinh class nao duoc ịnject khi DI bang interface (trg hop nhieu class impl interface), hoac chi dinh bean duoc chon khi co qua nhieu bean giong nhau
+    // Injection dua vao data type, k quan tam ten neu k co qualifier
+    // A implement B -> thi co the inject theo A hay B deu dc
+    // impl cai nao thi chi dung dc method cua cai day
+    // injection ban chat la tim kiem trong bean xem co class nao match k thi duco inject vao
+//    @Autowired
+//    private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -47,10 +52,16 @@ public class SecurityConfig {
         // hasRole("ADMIN") -> role :ROLE_ADMIN
         // hasAuthority("ADMIN") -> role : ADMIN
 
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(customJwtDecoder) // decode token ra
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter())) // set authentication
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())); // xu li khi bi co loi xac thuc
+//        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+//                        .decoder(customJwtDecoder) // decode token ra
+//                        .jwtAuthenticationConverter(jwtAuthenticationConverter())) // set authentication
+//                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())); // xu li khi bi co loi xac thuc
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+                            // Nếu có converter, decoder riêng thì thêm ở đây, ví dụ:
+                            // jwt.jwtAuthenticationConverter(jwtAuthenticationConverter());
+                        }
+                )
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
@@ -58,19 +69,19 @@ public class SecurityConfig {
 
 
 
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        // tim claim ten la scope va chuyen chuoi thanh list vd "1 2" -> [1,2]
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        // set prefix cho moi phan tu trong list vua duoc chuyen tu scope -> gan vao authorities
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-        // sub tu dong duoc mapping vao pricipal name
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-
-        return jwtAuthenticationConverter;
-    }
+//    @Bean
+//    JwtAuthenticationConverter jwtAuthenticationConverter() {
+//        // tim claim ten la scope va chuyen chuoi thanh list vd "1 2" -> [1,2]
+//        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+//        // set prefix cho moi phan tu trong list vua duoc chuyen tu scope -> gan vao authorities
+//        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+//        // sub tu dong duoc mapping vao pricipal name
+//
+//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//
+//        return jwtAuthenticationConverter;
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder() {

@@ -3,11 +3,13 @@ import UserMenu from "../homepage/UserMenu";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectUser } from "../../store/features/userSlice";
+import { useAuth } from "../../contexts/AuthContext";
 
 const HeaderAdmin: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
+  const { login, isAuthenticated } = useAuth();
 
   return (
     <nav className="h-[70px] relative w-full px-6 md:px-16 lg:px-24 xl:px-32 flex items-center justify-between z-30 bg-gradient-to-r from-[#cc3333] to-pink-500 transition-all">
@@ -26,7 +28,7 @@ const HeaderAdmin: React.FC = () => {
       </div>
 
       <div className="flex gap-3">
-        {user ? (
+        {isAuthenticated ? (
           <UserMenu />
         ) : (
           <>
@@ -38,7 +40,7 @@ const HeaderAdmin: React.FC = () => {
             </button>
             <button
               className="bg-[#cc3333] w-32 h-9 rounded-full text-sm text-white hover:bg-[#b82d2d] transition shadow"
-              onClick={() => navigate('/login')}
+              onClick={() => login()}
             >
               Đăng nhập
             </button>

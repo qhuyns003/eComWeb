@@ -1,15 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { selectUser, selectIsSeller, logoutUser } from '../../store/features/userSlice';
+import { selectUser, logoutUser } from '../../store/features/userSlice';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const UserMenu: React.FC = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const user = useAppSelector(selectUser);
-  const isSeller = useAppSelector(selectIsSeller);
+  const { user: keycloakUser, logout, isSeller } = useAuth();
   const dispatch = useAppDispatch();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Sử dụng thông tin từ Keycloak user, fallback về Redux user nếu cần
+  const displayUser = keycloakUser || user;
+  const userName = keycloakUser?.name || keycloakUser?.preferred_username || user?.fullName || user?.username || 'User';
+  const userEmail = keycloakUser?.email || user?.email || '';
+
+  // Debug log (tạm thời) - có thể xóa sau khi test xong
+  // console.log('UserMenu - keycloakUser:', keycloakUser);
+  // console.log('UserMenu - redux user:', user);
+  // console.log('UserMenu - isSeller:', isSeller);
 
   // Đóng dropdown menu khi click ra ngoài
   useEffect(() => {
@@ -26,12 +37,16 @@ const UserMenu: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
+    // Logout từ Keycloak
+    logout();
+    // Cleanup Redux state
     dispatch(logoutUser());
     setUserMenuOpen(false);
     navigate('/');
   };
 
-  if (!user) return null;
+  // Check for either Keycloak user or Redux user
+  if (!keycloakUser && !user) return null;
 
   return (
     <div className="relative" ref={userMenuRef}>
@@ -41,11 +56,11 @@ const UserMenu: React.FC = () => {
       >
         <div className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center">
           <span className="text-sm font-semibold">
-            {user.fullName ? user.fullName.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase()}
+            {userName.charAt(0).toUpperCase()}
           </span>
         </div>
         <span className="text-sm font-medium hidden md:block">
-          Xin chào, {user.fullName || user.username}
+          Xin chào, {userName}
         </span>
         <svg 
           className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} 
@@ -60,8 +75,8 @@ const UserMenu: React.FC = () => {
       {userMenuOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 dropdown-menu">
           <div className="px-4 py-2 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900">{user.fullName || user.username}</p>
-            <p className="text-xs text-gray-500">{user.email}</p>
+            <p className="text-sm font-medium text-gray-900">{userName}</p>
+            <p className="text-xs text-gray-500">{userEmail}</p>
           </div>
           
           <button 
