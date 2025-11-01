@@ -1,5 +1,7 @@
 package com.qhuyns.ecomweb.service;
 
+import com.qhuyns.ecomweb.ES.document.ProductDocument;
+import com.qhuyns.ecomweb.ES.service.ProductESService;
 import com.qhuyns.ecomweb.constant.ImagePrefix;
 import com.qhuyns.ecomweb.dto.request.*;
 import com.qhuyns.ecomweb.dto.response.*;
@@ -62,7 +64,8 @@ public class ProductService {
     RedisCacheHelper cacheHelper;
     ShopFeignClient shopFeignClient;
     IdentityFeignClient identityFeignClient;
-    private final OrderFeignClient orderFeignClient;
+    OrderFeignClient orderFeignClient;
+    ProductESService productESService;
 
     // loi chi hien thi so luong mat hang da mua = da co review
     public List<ProductOverviewResponse> findTopSellingProducts(int limit) throws Exception {
@@ -226,6 +229,9 @@ public class ProductService {
         );
 
         return productResponsePage;
+
+//        return productESService.searchProducts(
+//                page, size, search, status, productFilterRequest, shopIdsg
     }
 
     public ProductResponse getProductForUpdate(String id) {
@@ -303,7 +309,9 @@ public class ProductService {
             is.close();
             weaviateService.addProduct(product.getId(),base64Image);
         }
-        log.info("success");
+
+        syncToElasticsearch(product);
+
     };
 
     @Transactional
@@ -363,6 +371,8 @@ public class ProductService {
          is.close();
          weaviateService.addProduct(product.getId(),base64Image);
      }
+
+     syncToElasticsearch(product);
     };
 
     public void delete(List<String> ids) {
@@ -379,6 +389,11 @@ public class ProductService {
             weaviateService.deleteByProductId(id);
         }
         productRepository.deleteByIdIn(ids);
+
+        // n+1 query
+        for(String id: ids){
+            productESService.deleteProduct(id);
+        }
     };
 
     public List<ProductOverviewResponse> findByShopId(int limit,String id) throws Exception {
@@ -408,6 +423,44 @@ public class ProductService {
                 , RedisKey.NEWEST_PROD_OF_SHOP.getTtl());
 
         return productOverviewResponses;
+    }
+
+
+    private void syncToElasticsearch(Product product) {
+        try {
+            // Tìm main image
+            String mainImageId = null;
+            String mainImageUrl = null;
+
+            for (ProductImage img : product.getImages()) {
+                if (img.getIsMain() != null && img.getIsMain()) {
+                    mainImageId = img.getId();
+                    mainImageUrl = img.getUrl();
+                    break;
+                }
+            }
+
+            // Convert to ProductDocument
+            ProductDocument document = ProductDocument.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .description(product.getDescription())
+                    .price(product.getPrice())
+                    .status(product.getStatus())
+                    .createdAt(product.getCreatedAt())
+                    .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
+                    .shopId(product.getShopId())
+                    .mainImageId(mainImageId)
+                    .mainImageUrl(mainImageUrl)
+                    .build();
+
+            // Index to Elasticsearch
+            productESService.indexProduct(document);
+
+        } catch (Exception e) {
+            log.error("Failed to sync product {} to Elasticsearch: ", product.getId(), e);
+            // Không throw exception để không làm gián đoạn flow chính
+        }
     }
 
 

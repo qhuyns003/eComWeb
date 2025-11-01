@@ -51,6 +51,7 @@ public class API_URL {
 
     // Các API POST cho người dùng không đăng nhập (public)
     public static final String[] URL_ANONYMOUS_POST = {
+            "/admin/**",
             "/identity/**",
             "/auth/token",
             "/auth/introspect",

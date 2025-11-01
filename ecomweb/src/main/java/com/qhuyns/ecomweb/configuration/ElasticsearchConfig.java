@@ -5,8 +5,9 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+// viec sync sang ES nen dung message broker de giam latenncy
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "com.qhuyns.ecomweb.repository.elasticsearch")
+@EnableElasticsearchRepositories(basePackages = "com.qhuyns.ecomweb.ES.repository")
 public class ElasticsearchConfig extends ElasticsearchConfiguration {
 
     @Override
