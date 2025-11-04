@@ -19,6 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 // user: prefix cho channel riêng từng user
 // ws: endpoint để client connect
 
+    // msg -> broker noi bo -> socket -> logic chanel -> listener
 
 
 //    Khi user đăng nhập, FE lấy token và mở kết nối WebSocket tới /ws?token=... bằng SockJS.
@@ -34,6 +35,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //    FE nhận message qua subscription và hiển thị ngay lập tức.
 //    Bước tạo kết nối đã định tuyến sẵn 1 đường hầm dành cho username đó, khi có reqquest đến user cụ thể thì chỉ cần tìm đúng đường hầm đã kết nối là đc
 //    BE có thể chứa nhiều ws sesion 1 lúc
+
+// giua client va server co 1 tang broker noi bo (simpleBroker) la noi de kiem tra cac desstination
+// neu gui broadcast tu BE se di qua broker nay, neu co destination trung khop moi foward message di tiep
+// moi ket noi socket co cac kenh logic rieng tuong ung voi moi destination subcribe
+// tai broker co 1 bang anh xa url + sessionId + subscriptionID tuong ung de biet mesage se gui toi cac destination ket noi nao
+    // co them 1 bang anh xa username/id + sessionID (mỗi session đại diện cho 1 kết nối socket)
+
+    // gủi broadcast : su dung bang anh xa lay sessionID + subsciptionID tu url
+    // gui rieng: su dung bang anh xa user de lay sessionID
+    //            sau do su dung url de lay subcriptionID tuong ung voi sessionID do
+    // => send
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // phat thong bao tu server

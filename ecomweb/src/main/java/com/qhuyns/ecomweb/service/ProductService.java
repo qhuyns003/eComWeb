@@ -362,6 +362,9 @@ public class ProductService {
                 pv.setProduct(product);
                 product.getProductVariants().add(pv);
         }
+     // sau khi save tu dong cap nhat tuong tu product = repo.save(product)
+     // bản chất product được update toàn bộ trước khi gửi đi chứ không phải là do db gửi lại kếtquar lên
+     // sau thao tac save la tat ca cac gểnation cua jpa da duoc apply
      productRepository.save(product);
      for(ProductImage image: product.getImages()){
          URL url = new URL(ImagePrefix.IMAGE_PREFIX+image.getUrl());

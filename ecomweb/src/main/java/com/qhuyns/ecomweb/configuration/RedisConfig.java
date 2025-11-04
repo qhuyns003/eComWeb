@@ -6,6 +6,10 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 @Configuration
 public class RedisConfig {
+// redis luudu lieu kieu key-value
+    // key mac dinh la string
+    // value co nhieu ctdl ho tro nhu String List Set Map
+    // thuong luu String (JSON)
 
     @Bean
     public JedisPool jedisPool() {
