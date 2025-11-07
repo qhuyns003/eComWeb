@@ -31,3 +31,10 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
 // VD : 1-iphone 13 | 2-iphone 14 -> "iphone"-[1,2] | "13"-[1] | "14"-[2]
 
 // ES sử dugnj nhiều ctdl để lưu các field chứ kông chỉ inverse index, lưu thêm 1 trường source để lưu data gốc để trả ra
+// BKD Tree - Block K-Dimentional Tree, sap xep gia tri cua 1 field thanh 1 list tang dan
+// chia doi list o mỗi bước dựa vào median value, chia đến khi nào node nó ía trị <= min cho trước
+// khi 1 truy vấn gte lte trên trường đo sẽ có 3 TH xảy ra
+// node out hoàn toàn range: bỏ k xét
+// node match hàon toàn range: lấy tất
+// node match 1 phần : duyệt và lọc thủ công
+// tại node lá có 1 bảng mapping sang docID tương ứng => các fied đều tar ra docID -> intersection để lấy bản ghi phù hợp
