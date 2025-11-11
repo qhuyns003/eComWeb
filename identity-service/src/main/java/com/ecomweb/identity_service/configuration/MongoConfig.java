@@ -18,7 +18,7 @@ public class MongoConfig {
 //disk lưu dữ liệu theo dạng các block có kích thước cố định
 // tuy nhiên dbms lại đọc dữ liệu theo nhiều cụm block 1 lúc gọi là page (địa chỉ (offset + size), số block tùy theo quy ước của db)
 // db dựa vào page để truy cập vào disk lấy data và đẩy lên RAM
-// thường dbms check xem page đó có trên RAM hay chưa rồi mới truy cập disk cho đỡ tốn IO
+// thường dbms check xem page đó có trên RAM hay chưa (bằng page ID trong header mỗi khi disk được ghi vào RAM) rồi mới truy cập disk cho đỡ tốn IO
 // các page thường có size hợp lý để tránh việc page lưu hết tất cả dữ liệu, khi đẩy vào RAM có thể sẽ không đủ dung lượng
 // => RAM phải nạp, phóng page nhiều lần, dễ gây tốn IO nhiều
 
@@ -36,3 +36,5 @@ public class MongoConfig {
 // B+Tree cải tiến hơn khi node không lưu thêm dữ liệu -> tăng được số key lưu thêm -> giảm độ cao cây
 // mõi lần đọc node chính là 1 lần truy cập vào các block để đọc key value haowcj pointer
 // các cây dùng index chỉ để lưu id PK thôi chứ khôgn lưu trữ dữ liệu thật, sau khi tổng hợp được các PK từ các bảng của index nó mới intersection và tra cứu trên table chính (id index, để lấy dữ liệu thật)
+// B+Tree có các con trỏ giữa các node ở leaf, tối ưu cho việc dùng range between vì không pahri backtrack lại nhưu BTree để tìm các gái trị tiếp
+// với B+Tree nếu tìm được match ngay tại internal thì vẫn phải đi tiếp xuống leaf vì key x ở internal chỉ lưu con trỏ còn dưới leaf sẽ có key x thật lưu data

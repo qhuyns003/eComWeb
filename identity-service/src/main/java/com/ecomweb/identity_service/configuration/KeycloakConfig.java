@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 
 //flow xac thuc token : BE goi den Keycloak de lay public key(chi dung de giai ma, k dung de ma hoa) -> parse duoc -> oauth2 giup xac thuc cac truong exp
 // flow xax thuc nguoi dung : keycloak tra ve code -> FE goi url doi code lay token (do keycloak ban dau tra code tren url -> k bao mat -> khi doi code token duco tra trong body)
-// ke gian k the doi code lay token duoc, vi domain cua no k dc config de doi token
+// ke gian k the doi code lay token duoc, vi domain cua no k dc config de doi token, BE vs keycloak giao tiep sv to sv dam bao an toan khi doi code lay token
 @Configuration
 public class KeycloakConfig {
     @Value("${keycloak.auth-server-url}")
