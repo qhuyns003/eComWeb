@@ -19,7 +19,7 @@ public class RedisConfig {
     }
 }
 
-// redis vẫn ghi dữ liệu ra disk, tuy nhiên nó được thực hiện trên 1 process cn tách biệt với process chính -> íolation, khôgn ảnh hưởng đến flow đọc ghi cơ bản
+// redis vẫn ghi dữ liệu ra disk, tuy nhiên nó được thực hiện trên 1 process cn tách biệt với process chính -> isolation, khôgn ảnh hưởng đến flow đọc ghi cơ bản
 // có 2 cách ghi dữ liệu của redis :
 // 1. RDB (Redis database file)
 // - là 1 file nhị phân lưu dữ liệu redis trong RAM tại 1 thời điểm cụ thể, snapshot này được chụp lại khi thỏa mãn điều kiện nhất định
@@ -40,3 +40,19 @@ public class RedisConfig {
 // - cơ chế COW phụcvuj cho việc rewwrite ở AOF k phục vụ việc ghi AOF từ RAM xuống disk vì:
 
 // => khi ị crash nó sẽ đọc lại file rdb hoặc aof để khôi phục data
+
+// redis sử dụng single thread để đảm bảo luồng an toàn tránh xung đột
+// single thread là 1 luồng duy nhất truy cập dữ liệu (dữ liệu trên RAM - k lien quan dữ liệu disk)
+// => trong 1 process có nhiều thread, còn single thread chỉ là cho phép 1 luồng duy nhất truy cậ dât
+// việc ghi aof chỉ là ghi lại lệnh, luồng riêng biệt vì k đôgnj chạm đến dữ liệu
+// việc ghi rdb bắt buộc pahri sử dungj fork do nó cần chụp lại dữ liệu mà redis k phục vụ multithread
+// process idolation trên RAM
+
+// Sơ qua về hdh
+// process thì tách biệt về mặt bộ nhứo so với process khác
+// trong process có nhiều thread và chúng sử dugnj chung 1 bộ nhớ
+// bộ nhớ dùng chung là RAM
+// process isolation do chúng sử dugnj virtual memmory- địa chỉ giũa 2 process có thể giống nhau nhưng chúng ánh xạ đén địa chỉ vật lsy trên RAM khác nhau -> isolation
+// hdh có quyền cho phép 2 tiến trình chỏ cùng vùng RAM nhưng vẫn đảm bảo isolation bằng 1 số cơ chế tiêu biểu là COW
+// COW cho phép process con đọc cùng 1 vùng nhớ process cha, nhưung khi ghi dữ liệu sẽ phải ghi ra vùng nhớ khác -> k gây conflict
+// -> COW giúp tối ưu bộ nhớ tánh bị trùng lặp dữ liệu
