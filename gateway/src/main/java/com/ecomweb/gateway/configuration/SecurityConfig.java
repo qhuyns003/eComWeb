@@ -124,3 +124,4 @@ public class SecurityConfig {
 // khi tương tác với giao diện hệ thống, sẽ có lúc chạm vào reqquest tới BE, trình duyệt sẽ gửi rq tới BE
 // cookie có 1 cơ chế nếu rq tới BE nào mà nó trả về session hay vào cookie, khi gọi lại BE đó sẽ tự đôngj gửi kèm dữ liệu session trong cookie k quan tâm origin nào đang chạy
 // -> cors ra đời, ngăn chặn việc thông tin session của 1 origin chín hthoonsg bị sử dugnj lại bởi 1 origin khác -> bảo vệ người dùng
+

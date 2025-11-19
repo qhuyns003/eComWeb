@@ -52,6 +52,8 @@ public class RedisConfig {
 // process thì tách biệt về mặt bộ nhứo so với process khác
 // trong process có nhiều thread và chúng sử dugnj chung 1 bộ nhớ
 // bộ nhớ dùng chung là RAM
+// thread đọc ghi trên RAM, các lệnh liên quan đọc ghi trên disk cũng là do thread yêu cầu trên RAM để OS thực hiện thay
+// tương tự dữ liệu ở disk phải được đưa lên RAM thread mới đọc được
 // process isolation do chúng sử dugnj virtual memmory- địa chỉ giũa 2 process có thể giống nhau nhưng chúng ánh xạ đén địa chỉ vật lsy trên RAM khác nhau -> isolation
 // hdh có quyền cho phép 2 tiến trình chỏ cùng vùng RAM nhưng vẫn đảm bảo isolation bằng 1 số cơ chế tiêu biểu là COW
 // COW cho phép process con đọc cùng 1 vùng nhớ process cha, nhưung khi ghi dữ liệu sẽ phải ghi ra vùng nhớ khác -> k gây conflict

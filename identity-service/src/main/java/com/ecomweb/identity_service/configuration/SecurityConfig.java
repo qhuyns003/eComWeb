@@ -89,14 +89,18 @@ public class SecurityConfig {
 
 
 }
+// thường thì csrf là cơ chế tấn công trên các web truyền thống server side -> có domain BE và FE là 1 -> cors sinh ra để bảo vệ với web client side
+// các web spa không bao giờ đọc được cookie của server do chỉ có cùng domain mới đọc đc -> phục vụ serverside
 
 // cors là cơ chế mà trình duyệt bảo vệ người dùng khỏi việc 1 domain khác sử dugnj lại cookie của 1 user hợp lệ đã login và lưu trên trình duyệt
 // server BE vẫn sẽ thực thi yêu cầu bình thường
 // BE chỉ set header để thông báo cho trình duyệt biết domain đó có được phép đọc respose hay không thôi
 
 // csrf mới là cơ chế lợi dụng cookie ng dùng để truy cập vào BE
-// -> Spring có cơ chế mặc định tạo 1 token trả về trình duyệt và lưu vào cookie
-// domain hợp lệ mới lấy đc token và set header mới gửi đc yêu cầu, hacker k thể lấy đc token này do cơ chế SOP ngăn đọc cookie
+// -> Spring có cơ chế mặc định tạo 1 token trả về trình duyệt và lưu vào cookie hoặc localStorage, formhtml(serverside)
+// khi spring được bật csrf, nó tự đông yêu cầu token csrf với các endpoint post,put,delete,patch, với các yêu cầu get khi trong form có yêu cầu lấy token nó sẽ trả token vào trực tiếp
+// do csrf trong spring phục vụ cho serverside web nên với các web kiẻu spa thì phải tự config endpoint để lấy token và tự set header vào các request sau này
+// endpoint lấy token phải inject lớp của spring để nó trả token của chính nó gen thì nó mới ktra đc => sau này đổi thành jwt cho đỡ phứuc tạp
 // httponly là cơ chế bảo mật của cookie khiến cho chính domain đó cũng k thể đọc đc cookie
 
 // localStorage và cookie đều để lưu trữ dữ liệu
@@ -105,3 +109,4 @@ public class SecurityConfig {
 // token jwt lưu trong localStorage nên k cần cơ chế chống csrf
 // localStorage chỉ được đọc bởi cùng 1 domain, domain khác khôgn thể đọc được do cơ chế SOP(same origin policy) bảo vệ
 // cors cũng quyết định việc domain FE đó có được đọc cookie hay không
+
